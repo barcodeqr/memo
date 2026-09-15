@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>表メモ帳</title>
+    <!-- SheetJS for Excel (.xlsx) export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --excel-bg: #f0f0f0;
+            --excel-border: #e6e6e6; /* 初期罫線をより薄く変更 */
+            --excel-header: #e1dfdd;
+            --excel-select: #cce8ff;
+            --excel-select-border: #2b579a;
+            --primary: #107c41;
+            --primary-hover: #0b5a30;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 8px;
+            background-color: #f7f7f7;
+            color: #333;
+            box-sizing: border-box;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* ページ切り替え用 */
+        .page {
+            display: none;
+            flex-direction: column;
+            flex-grow: 1;
+            height: 100%;
+        }
+        .page.active {
+            display: flex;
+        }
+
+        /* --- ホーム画面（最初のページ） --- */
+        .home-container {
+            max-width: 650px;
+            margin: 30px auto;
+            width: 100%;
+            background: #fff;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .home-header {
+            text-align: center;
+        }
+
+        .home-header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin: 0 0 16px 0;
+        }
+
+        .btn-create {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .btn-create:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .memo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .memo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            border: 1px solid var(--excel-border);
+            padding: 10px 14px;
+            border-radius: 6px;
+            gap: 10px;
+        }
+
+        .memo-title-text {
+            font-weight: 500;
+            cursor: pointer;
+            color: #0066cc;
+            flex-grow: 1;
+            word-break: break-all;
+        }
+        .memo-title-text:hover {
+            text-decoration: underline;
+        }
+
+        .memo-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .memo-actions button {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #fff;
+        }
+
+        .memo-actions button:hover {
+            background: #eee;
+        }
+
+        .btn-del {
+            color: #d9534f;
+            border-color: #d9534f !important;
+        }
+        .btn-del:hover {
+            background: #fdf2f2 !important;
+        }
+
+        /* --- エディタ画面（表ページ） --- */
+        .editor-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            background: #fff;
+            padding: 6px 10px;
+            border: 1px solid var(--excel-border);
+            border-radius: 4px;
+        }
+
+        .editor-top-left {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .btn-back {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .btn-back:hover { background: #5a6268; }
+
+        .editor-top-left input {
+            font-size: 0.95rem;
+            padding: 3px 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-weight: bold;
+            width: 100%;
+            max-width: 250px;
+        }
+
+        #btn-save {
+            font-size: 0.85rem;
+            padding: 5px 12px;
+            white-space: nowrap;
+        }
+
+        /* ツールバー */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 8px;
+            margin-bottom: 6px;
+            background: #fff;
+            padding: 4px 8px;
+            border: 1px solid var(--excel-border);
+            border-radius: 4px;
+            align-items: center;
+        }
+
+        .toolbar button, .toolbar select, .toolbar label {
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: #fff;
+            border-radius: 3px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toolbar button:hover {
+            background: #f3f2f1;
+        }
+
+        .toolbar button.active {
+            background: #cce8ff;
+            border-color: var(--excel-select-border);
+        }
+
+        .color-picker-wrapper {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.75rem;
+            border: 1px solid #ccc;
+            padding: 0 4px;
+            border-radius: 3px;
+            height: 26px;
+            background: #fff;
+        }
+
+        .color-picker-wrapper input[type="color"] {
+            width: 18px;
+            height: 18px;
+            border: none;
+            cursor: pointer;
+            background: none;
+            padding: 0;
+        }
+
+        /* スプレッドシート本体 */
+        .spreadsheet-container {
+            flex-grow: 1;
+            width: 100%;
+            overflow: auto;
+            border: 1px solid var(--excel-border);
+            background: #fff;
+            position: relative;
+            user-select: none; /* ドラッグ選択時の文字選択を防ぐ */
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed;
+            width: max-content;
+        }
+
+        th, td {
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            height: 26px;
+            font-size: 0.9rem;
+            position: relative;
+            background-color: #ffffff;
+        }
+
+        /* ヘッダー（行・列）のスタイル */
+        th {
+            background-color: var(--excel-header);
+            text-align: center;
+            font-weight: normal;
+            color: #555;
+            border: 1px solid var(--excel-border);
+        }
+
+        .row-header {
+            width: 45px;
+            min-width: 35px;
+        }
+
+        .col-header {
+            width: 90px;
+            min-width: 40px;
+        }
+
+        /* セルの入力部分 */
+        .cell-input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            padding: 0 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: inherit;
+        }
+
+        td.selected {
+            background-color: var(--excel-select) !important;
+            box-shadow: inset 0 0 0 1px var(--excel-select-border);
+            z-index: 5;
+        }
+
+        /* リサイズ用ハンドル */
+        .resize-col {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 5px;
+            height: 100%;
+            cursor: col-resize;
+            z-index: 10;
+        }
+
+        .resize-row {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 5px;
+            cursor: row-resize;
+            z-index: 10;
+        }
+
+        .btn-success {
+            background: var(--primary) !important;
+            color: white !important;
+            border-color: var(--primary) !important;
+        }
+        .btn-success:hover {
+            background: var(--primary-hover) !important;
+        }
+
+        .btn-clear-cell {
+            color: #d9534f;
+            border-color: #d9534f !important;
+        }
+        .btn-clear-cell:hover {
+            background: #fdf2f2 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= ページ1：ホーム画面 ================= -->
+    <div id="page-home" class="page active">
+        <div class="home-container">
+            <div class="home-header">
+                <h1>表メモ帳</h1>
+                <button id="btn-create-new" class="btn-create">＋ 表メモを作成</button>
+            </div>
+            
+            <div class="memo-list-section">
+                <div id="memo-list" class="memo-list">
+                    <!-- 保存されたデータがここにリスト表示されます -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= ページ2：表エディタ画面 ================= -->
+    <div id="page-editor" class="page">
+        <div class="editor-top-bar">
+            <div class="editor-top-left">
+                <button id="btn-go-home" class="btn-back">一覧に戻る</button>
+                <input type="text" id="memo-title" value="無題の表">
+            </div>
+            <div>
+                <button id="btn-save" class="btn-success">セーブ</button>
+            </div>
+        </div>
+
+        <!-- ツールバー -->
+        <div class="toolbar">
+            <button id="btn-bold" title="太字"><b>B</b></button>
+            
+            <div class="color-picker-wrapper">
+                <label>文字</label>
+                <input type="color" id="color-text" value="#000000">
+            </div>
+            
+            <div class="color-picker-wrapper">
+                <label>背景</label>
+                <input type="color" id="color-bg" value="#ffffff">
+            </div>
+
+            <button id="btn-align-left" title="左寄せ">左</button>
+            <button id="btn-align-center" title="中央寄せ">中</button>
+            <button id="btn-align-right" title="右寄せ">右</button>
+
+            <!-- 罫線コントロール -->
+            <select id="select-border-type">
+                <option value="all">格子 (全周)</option>
+                <option value="top">上だけ</option>
+                <option value="bottom">下だけ</option>
+                <option value="left">左だけ</option>
+                <option value="right">右だけ</option>
+                <option value="none">罫線なし</option>
+            </select>
+            <div class="color-picker-wrapper">
+                <label>罫線色</label>
+                <input type="color" id="color-border" value="#e6e6e6">
+            </div>
+
+            <button id="btn-excel" class="btn-success">Excel出力</button>
+            <button id="btn-csv">CSV出力</button>
+            <button id="btn-clear" class="btn-clear-cell" title="選択セルの内容・書式をすべて初期状態に戻す">セル削除</button>
+        </div>
+
+        <!-- 表エリア -->
+        <div class="spreadsheet-container" id="scroll-container">
+            <table id="spreadsheet">
+                <thead>
+                    <tr id="col-header-row">
+                        <th class="row-header"></th>
+                    </tr>
+                </thead>
+                <tbody id="sheet-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<script>
+    const COLS = 26; 
+    const ROWS = 100;
+    let selectedCells = []; 
+    let currentId = null;
+    let copiedCellData = null;
+    let isMouseDown = false;
+    let startCellCoord = null;
+    let activeFormulaInput = null; // 現在数式を入力中でセル選択を待っているinput
+    const defaultBorder = '1px solid #e6e6e6';
+
+    function getColumnName(index) {
+        let name = '';
+        let n = index;
+        while (n >= 0) {
+            name = String.fromCharCode(65 + (n % 26)) + name;
+            n = Math.floor(n / 26) - 1;
+        }
+        return name;
+    }
+
+    function colNameToIndex(colStr) {
+        let idx = 0;
+        for (let i = 0; i < colStr.length; i++) {
+            idx = idx * 26 + (colStr.charCodeAt(i) - 64);
+        }
+        return idx - 1;
+    }
+
+    // 初期化：スプレッドシートのグリッドを生成
+    function initSheet() {
+        const colHeaderRow = document.getElementById('col-header-row');
+        colHeaderRow.innerHTML = '<th class="row-header"></th>';
+        const sheetBody = document.getElementById('sheet-body');
+        sheetBody.innerHTML = '';
+
+        for (let c = 0; c < COLS; c++) {
+            const th = document.createElement('th');
+            th.className = 'col-header';
+            th.textContent = getColumnName(c);
+            
+            const handle = document.createElement('div');
+            handle.className = 'resize-col';
+            initColResizer(handle, th);
+            th.appendChild(handle);
+
+            colHeaderRow.appendChild(th);
+        }
+
+        for (let r = 0; r < ROWS; r++) {
+            const tr = document.createElement('tr');
+            
+            const rowTh = document.createElement('th');
+            rowTh.className = 'row-header';
+            rowTh.textContent = r + 1;
+            
+            const rowHandle = document.createElement('div');
+            rowHandle.className = 'resize-row';
+            initRowResizer(rowHandle, tr);
+            rowTh.appendChild(rowHandle);
+            
+            tr.appendChild(rowTh);
+
+            for (let c = 0; c < COLS; c++) {
+                const td = document.createElement('td');
+                td.style.borderTop = defaultBorder;
+                td.style.borderBottom = defaultBorder;
+                td.style.borderLeft = defaultBorder;
+                td.style.borderRight = defaultBorder;
+                td.dataset.row = r;
+                td.dataset.col = c;
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'cell-input';
+                input.dataset.row = r;
+                input.dataset.col = c;
+
+                // フォーカス時：数式があればそのまま表示（編集用）
+                input.addEventListener('focus', () => {
+                    if (input.dataset.formula) {
+                        input.value = input.dataset.formula;
+                    }
+                    if (selectedCells.length === 0 || !selectedCells.includes(td)) {
+                        selectRange(r, c, r, c);
+                    }
+                    updateToolbarState(input);
+                });
+
+                // フォーカス外れた時：数式を計算して結果を表示
+                input.addEventListener('blur', () => {
+                    // 少し遅延させて、他セルクリックによる参照モード切替と競合しないようにする
+                    setTimeout(() => {
+                        if (activeFormulaInput !== input) {
+                            processCellFormula(input);
+                            recalculateAllFormulas();
+                        }
+                    }, 200);
+                });
+
+                // マウスでの複数選択（ドラッグ）および数式編集中セルの番地挿入
+                td.addEventListener('mousedown', (e) => {
+                    // もし他のセルで数式編集中（=などで終わっている場合など）に別セルがクリックされたら、その番地を挿入する
+                    if (activeFormulaInput && activeFormulaInput !== input) {
+                        e.preventDefault();
+                        const cellRef = getColumnName(c) + (r + 1);
+                        activeFormulaInput.value += cellRef;
+                        activeFormulaInput.focus();
+                        return;
+                    }
+
+                    isMouseDown = true;
+                    startCellCoord = { r, c };
+                    selectRange(r, c, r, c);
+                    input.focus();
+                    e.preventDefault();
+                });
+
+                td.addEventListener('mouseenter', () => {
+                    if (isMouseDown && startCellCoord) {
+                        selectRange(startCellCoord.r, startCellCoord.c, r, c);
+                    }
+                });
+
+                // 入力中の監視（「=」が入ったら他セルクリックでの参照モードを有効化）
+                input.addEventListener('input', () => {
+                    const val = input.value;
+                    if (val.startsWith('=')) {
+                        activeFormulaInput = input;
+                    } else {
+                        if (activeFormulaInput === input) {
+                            activeFormulaInput = null;
+                        }
+                    }
+                });
+
+                // エンターキーでの下移動 ＆ スタイル付きコピー・ペースト対応
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        activeFormulaInput = null;
+                        input.blur(); // 計算を確定させる
+                        const nextRow = r + 1;
+                        if (nextRow < ROWS) {
+                            const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${c}"]`);
+                            if (nextInput) {
+                                nextInput.focus();
+                                nextInput.select();
+                            }
+                        }
+                    } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+                        copiedCellData = {
+                            val: input.value,
+                            formula: input.dataset.formula || '',
+                            bold: input.style.fontWeight,
+                            color: input.style.color,
+                            align: input.style.textAlign,
+                            bg: td.style.backgroundColor,
+                            borderTop: td.style.borderTop,
+                            borderBottom: td.style.borderBottom,
+                            borderLeft: td.style.borderLeft,
+                            borderRight: td.style.borderRight
+                        };
+                    } else if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+                        if (copiedCellData !== null) {
+                            e.preventDefault();
+                            selectedCells.forEach(targetTd => {
+                                const tInput = targetTd.querySelector('input');
+                                if (tInput) {
+                                    tInput.value = copiedCellData.val;
+                                    tInput.dataset.formula = copiedCellData.formula;
+                                    tInput.style.fontWeight = copiedCellData.bold || 'normal';
+                                    tInput.style.color = copiedCellData.color || '';
+                                    tInput.style.textAlign = copiedCellData.align || 'left';
+                                    processCellFormula(tInput);
+                                }
+                                targetTd.style.backgroundColor = copiedCellData.bg || '';
+                                targetTd.style.borderTop = copiedCellData.borderTop || defaultBorder;
+                                targetTd.style.borderBottom = copiedCellData.borderBottom || defaultBorder;
+                                targetTd.style.borderLeft = copiedCellData.borderLeft || defaultBorder;
+                                targetTd.style.borderRight = copiedCellData.borderRight || defaultBorder;
+                            });
+                            recalculateAllFormulas();
+                            updateToolbarState(input);
+                        }
+                    }
+                });
+
+                input.addEventListener('paste', (e) => handlePaste(e, r, c));
+
+                td.appendChild(input);
+                tr.appendChild(td);
+            }
+            sheetBody.appendChild(tr);
+        }
+    }
+
+    // --- 計算・数式処理エンジン ---
+    function getCellValue(r, c) {
+        const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+        if (!input) return 0;
+        const val = input.dataset.formula ? evaluateFormula(input.dataset.formula) : input.value;
+        const num = Number(val);
+        return isNaN(num) ? (val || 0) : num;
+    }
+
+    function processCellFormula(input) {
+        const raw = input.value.trim();
+        if (raw.startsWith('=')) {
+            input.dataset.formula = raw;
+            const res = evaluateFormula(raw);
+            input.value = res;
+        } else {
+            delete input.dataset.formula;
+        }
+    }
+
+    function evaluateFormula(formulaStr) {
+        try {
+            let expr = formulaStr.substring(1).trim(); // '=' を取り除く
+
+            // 関数処理 (SUM, AVERAGE, MAX, MIN)
+            const funcRegex = /(SUM|AVERAGE|MAX|MIN)\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/gi;
+            expr = expr.replace(funcRegex, (match, funcName, c1, r1, c2, r2) => {
+                const startC = colNameToIndex(c1);
+                const startR = parseInt(r1) - 1;
+                const endC = colNameToIndex(c2);
+                const endR = parseInt(r2) - 1;
+
+                let values = [];
+                for (let r = Math.min(startR, endR); r <= Math.max(startR, endR); r++) {
+                    for (let c = Math.min(startC, endC); c <= Math.max(startC, endC); c++) {
+                        let v = Number(getCellValue(r, c));
+                        if (!isNaN(v)) values.push(v);
+                    }
+                }
+
+                if (values.length === 0) return 0;
+
+                const f = funcName.toUpperCase();
+                if (f === 'SUM') {
+                    return values.reduce((a, b) => a + b, 0);
+                } else if (f === 'AVERAGE') {
+                    return values.reduce((a, b) => a + b, 0) / values.length;
+                } else if (f === 'MAX') {
+                    return Math.max(...values);
+                } else if (f === 'MIN') {
+                    return Math.min(...values);
+                }
+                return 0;
+            });
+
+            // セル参照の置き換え (例: A1, B10 など)
+            const cellRefRegex = /\b([A-Z]+)(\d+)\b/g;
+            expr = expr.replace(cellRefRegex, (match, colStr, rowStr) => {
+                const c = colNameToIndex(colStr);
+                const r = parseInt(rowStr) - 1;
+                let val = getCellValue(r, c);
+                return typeof val === 'string' ? `"${val}"` : (val || 0);
+            });
+
+            if (/^[0-9+\-*/().\s"<>!=]+$/.test(expr)) {
+                let result = Function('"use strict"; return (' + expr + ')')();
+                return Math.round(result * 1000000) / 1000000;
+            } else {
+                return "#ERROR!";
+            }
+        } catch (e) {
+            return "#ERROR!";
+        }
+    }
+
+    function recalculateAllFormulas() {
+        const inputs = document.querySelectorAll('.cell-input[data-formula]');
+        inputs.forEach(input => {
+            if (document.activeElement !== input) {
+                input.value = evaluateFormula(input.dataset.formula);
+            }
+        });
+    }
+
+    document.addEventListener('mouseup', () => {
+        isMouseDown = false;
+    });
+
+    function selectRange(r1, c1, r2, c2) {
+        selectedCells.forEach(td => td.classList.remove('selected'));
+        selectedCells = [];
+
+        const minR = Math.min(r1, r2);
+        const maxR = Math.max(r1, r2);
+        const minC = Math.min(c1, c2);
+        const maxC = Math.max(c1, c2);
+
+        for (let r = minR; r <= maxR; r++) {
+            for (let c = minC; c <= maxC; c++) {
+                const td = document.querySelector(`td[data-row="${r}"][data-col="${c}"]`);
+                if (td) {
+                    td.classList.add('selected');
+                    selectedCells.push(td);
+                }
+            }
+        }
+    }
+
+    function initColResizer(handle, th) {
+        let startX, startWidth;
+        handle.addEventListener('mousedown', (e) => {
+            startX = e.clientX;
+            startWidth = th.offsetWidth;
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+            e.stopPropagation();
+        });
+        function onMouseMove(e) { th.style.width = Math.max(40, startWidth + (e.clientX - startX)) + 'px'; }
+        function onMouseUp() { document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp); }
+    }
+
+    function initRowResizer(handle, tr) {
+        let startY, startHeight;
+        handle.addEventListener('mousedown', (e) => {
+            startY = e.clientY;
+            startHeight = tr.offsetHeight;
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+            e.stopPropagation();
+        });
+        function onMouseMove(e) {
+            const h = Math.max(22, startHeight + (e.clientY - startY));
+            tr.style.height = h + 'px';
+            tr.querySelectorAll('td, th').forEach(el => el.style.height = h + 'px');
+        }
+        function onMouseUp() { document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp); }
+    }
+
+    function handlePaste(e, startR, startC) {
+        const clipboardData = e.clipboardData || window.clipboardData;
+        const pastedText = clipboardData.getData('text/plain');
+        if (!pastedText) return;
+
+        if (pastedText.includes('\t') || pastedText.includes('\n')) {
+            e.preventDefault();
+            const lines = pastedText.split(/\r\n|\n/).map(line => line.split('\t'));
+            lines.forEach((rowCols, rIdx) => {
+                const targetR = startR + rIdx;
+                if (targetR >= ROWS) return;
+                rowCols.forEach((val, cIdx) => {
+                    const targetC = startC + cIdx;
+                    if (targetC >= COLS) return;
+                    const input = document.querySelector(`input[data-row="${targetR}"][data-col="${targetC}"]`);
+                    if (input) {
+                        input.value = val.trim();
+                        processCellFormula(input);
+                    }
+                });
+            });
+            recalculateAllFormulas();
+        }
+    }
+
+    // ツールバー操作
+    document.getElementById('btn-bold').addEventListener('click', () => {
+        if (selectedCells.length === 0) return;
+        const firstInput = selectedCells[0].querySelector('input');
+        const isBold = firstInput.style.fontWeight === 'bold';
+        const newBold = isBold ? 'normal' : 'bold';
+        selectedCells.forEach(td => {
+            const input = td.querySelector('input');
+            if (input) input.style.fontWeight = newBold;
+        });
+        document.getElementById('btn-bold').classList.toggle('active', !isBold);
+    });
+
+    document.getElementById('color-text').addEventListener('input', (e) => {
+        const val = e.target.value;
+        selectedCells.forEach(td => {
+            const input = td.querySelector('input');
+            if (input) input.style.color = val;
+        });
+    });
+
+    document.getElementById('color-bg').addEventListener('input', (e) => {
+        const val = e.target.value;
+        selectedCells.forEach(td => {
+            td.style.backgroundColor = val;
+        });
+    });
+
+    ['left', 'center', 'right'].forEach(align => {
+        document.getElementById(`btn-align-${align}`).addEventListener('click', () => {
+            selectedCells.forEach(td => {
+                const input = td.querySelector('input');
+                if (input) input.style.textAlign = align;
+            });
+        });
+    });
+
+    // --- セル削除機能 ---
+    document.getElementById('btn-clear').addEventListener('click', () => {
+        if (selectedCells.length === 0) {
+            alert('削除するセルを選択してください。');
+            return;
+        }
+        selectedCells.forEach(td => {
+            const input = td.querySelector('input');
+            if (input) {
+                input.value = '';
+                delete input.dataset.formula;
+                input.style.fontWeight = 'normal';
+                input.style.color = '';
+                input.style.textAlign = 'left';
+            }
+            td.style.backgroundColor = '';
+            td.style.borderTop = defaultBorder;
+            td.style.borderBottom = defaultBorder;
+            td.style.borderLeft = defaultBorder;
+            td.style.borderRight = defaultBorder;
+        });
+        recalculateAllFormulas();
+        if (selectedCells.length > 0) {
+            const firstInput = selectedCells[0].querySelector('input');
+            if (firstInput) updateToolbarState(firstInput);
+        }
+    });
+
+    // --- 罫線の適用処理 ---
+    function applyBorder() {
+        if (selectedCells.length === 0) return;
+        const typeSelect = document.getElementById('select-border-type');
+        const type = typeSelect.value;
+        const color = document.getElementById('color-border').value;
+        const customBorder = `1px solid ${color}`;
+        
+        selectedCells.forEach(td => {
+            if (type === 'all') {
+                td.style.borderTop = customBorder;
+                td.style.borderBottom = customBorder;
+                td.style.borderLeft = customBorder;
+                td.style.borderRight = customBorder;
+            } else if (type === 'top') {
+                td.style.borderTop = customBorder;
+                td.style.borderBottom = defaultBorder;
+                td.style.borderLeft = defaultBorder;
+                td.style.borderRight = defaultBorder;
+            } else if (type === 'bottom') {
+                td.style.borderTop = defaultBorder;
+                td.style.borderBottom = customBorder;
+                td.style.borderLeft = defaultBorder;
+                td.style.borderRight = defaultBorder;
+            } else if (type === 'left') {
+                td.style.borderTop = defaultBorder;
+                td.style.borderBottom = defaultBorder;
+                td.style.borderLeft = customBorder;
+                td.style.borderRight = defaultBorder;
+            } else if (type === 'right') {
+                td.style.borderTop = defaultBorder;
+                td.style.borderBottom = defaultBorder;
+                td.style.borderLeft = defaultBorder;
+                td.style.borderRight = customBorder;
+            } else if (type === 'none') {
+                td.style.borderTop = defaultBorder;
+                td.style.borderBottom = defaultBorder;
+                td.style.borderLeft = defaultBorder;
+                td.style.borderRight = defaultBorder;
+            }
+        });
+    }
+
+    const borderSelect = document.getElementById('select-border-type');
+    borderSelect.addEventListener('change', applyBorder);
+    borderSelect.addEventListener('click', applyBorder);
+    document.getElementById('color-border').addEventListener('input', applyBorder);
+
+    function updateToolbarState(input) {
+        document.getElementById('btn-bold').classList.toggle('active', input.style.fontWeight === 'bold');
+        if (input.style.color) document.getElementById('color-text').value = input.style.color;
+        if (selectedCells.length > 0 && selectedCells[0].style.backgroundColor) {
+            document.getElementById('color-bg').value = selectedCells[0].style.backgroundColor;
+        }
+    }
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        if (pageId === 'page-home') {
+            renderMemoList();
+        }
+    }
+
+    document.getElementById('btn-create-new').addEventListener('click', () => {
+        currentId = null;
+        activeFormulaInput = null;
+        document.getElementById('memo-title').value = "無題の表";
+        initSheet();
+        showPage('page-editor');
+    });
+
+    document.getElementById('btn-go-home').addEventListener('click', () => {
+        activeFormulaInput = null;
+        showPage('page-home');
+    });
+
+    // --- セーブ機能 ---
+    document.getElementById('btn-save').addEventListener('click', () => {
+        const titleInput = document.getElementById('memo-title');
+        const titleVal = titleInput.value.trim() || "無題の表";
+
+        let sheetData = [];
+        for (let r = 0; r < ROWS; r++) {
+            let rowObj = {};
+            for (let c = 0; c < COLS; c++) {
+                const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+                const td = input ? input.parentElement : null;
+                rowObj[c] = {
+                    val: input ? input.value : "",
+                    formula: input ? (input.dataset.formula || "") : "",
+                    bold: input ? input.style.fontWeight : "",
+                    color: input ? input.style.color : "",
+                    align: input ? input.style.textAlign : "",
+                    bg: td ? td.style.backgroundColor : "",
+                    borderTop: td ? td.style.borderTop : "",
+                    borderBottom: td ? td.style.borderBottom : "",
+                    borderLeft: td ? td.style.borderLeft : "",
+                    borderRight: td ? td.style.borderRight : ""
+                };
+            }
+            sheetData.push(rowObj);
+        }
+
+        let savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
+        if (!currentId) {
+            currentId = 'memo_' + Date.now();
+        }
+
+        savedMemos[currentId] = {
+            title: titleVal,
+            data: sheetData,
+            updatedAt: Date.now()
+        };
+
+        localStorage.setItem('hyo_memos', JSON.stringify(savedMemos));
+        renderMemoList();
+        alert(`「${titleVal}」をセーブしました！`);
+    });
+
+    // --- ホーム画面のリスト描画 ---
+    function renderMemoList() {
+        const listContainer = document.getElementById('memo-list');
+        const savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
+        const keys = Object.keys(savedMemos);
+
+        listContainer.innerHTML = '';
+
+        if (keys.length === 0) {
+            listContainer.innerHTML = '<p style="color: #888; text-align: center; margin: 10px 0;">保存された表メモはありません。</p>';
+            return;
+        }
+
+        keys.sort((a, b) => (savedMemos[b].updatedAt || 0) - (savedMemos[a].updatedAt || 0));
+
+        keys.forEach(id => {
+            const memo = savedMemos[id];
+            const item = document.createElement('div');
+            item.className = 'memo-item';
+
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'memo-title-text';
+            titleSpan.textContent = memo.title || "無題の表";
+            titleSpan.addEventListener('click', () => {
+                loadMemoToEditor(id);
+            });
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'memo-actions';
+
+            const btnEx = document.createElement('button');
+            btnEx.textContent = 'Excel';
+            btnEx.addEventListener('click', () => exportExcel(memo.title, memo.data));
+
+            const btnCsv = document.createElement('button');
+            btnCsv.textContent = 'CSV';
+            btnCsv.addEventListener('click', () => exportCSV(memo.title, memo.data));
+
+            const btnDel = document.createElement('button');
+            btnDel.textContent = '削除';
+            btnDel.className = 'btn-del';
+            btnDel.addEventListener('click', () => {
+                if (confirm(`「${memo.title}」を削除してもよろしいですか？`)) {
+                    delete savedMemos[id];
+                    localStorage.setItem('hyo_memos', JSON.stringify(savedMemos));
+                    renderMemoList();
+                }
+            });
+
+            actionsDiv.appendChild(btnEx);
+            actionsDiv.appendChild(btnCsv);
+            actionsDiv.appendChild(btnDel);
+
+            item.appendChild(titleSpan);
+            item.appendChild(actionsDiv);
+            listContainer.appendChild(item);
+        });
+    }
+
+    function loadMemoToEditor(id) {
+        const savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
+        const memo = savedMemos[id];
+        if (!memo) return;
+
+        currentId = id;
+        activeFormulaInput = null;
+        document.getElementById('memo-title').value = memo.title;
+        initSheet();
+
+        memo.data.forEach((rowObj, r) => {
+            if (r >= ROWS) return;
+            Object.keys(rowObj).forEach(cStr => {
+                const c = parseInt(cStr);
+                if (c >= COLS) return;
+                const cellInfo = rowObj[c];
+                const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+                const td = input ? input.parentElement : null;
+                if (input && td) {
+                    input.value = cellInfo.val;
+                    if (cellInfo.formula) {
+                        input.dataset.formula = cellInfo.formula;
+                    } else {
+                        delete input.dataset.formula;
+                    }
+                    input.style.fontWeight = cellInfo.bold || 'normal';
+                    input.style.color = cellInfo.color || '';
+                    input.style.textAlign = cellInfo.align || 'left';
+                    td.style.backgroundColor = cellInfo.bg || '';
+                    td.style.borderTop = cellInfo.borderTop || defaultBorder;
+                    td.style.borderBottom = cellInfo.borderBottom || defaultBorder;
+                    td.style.borderLeft = cellInfo.borderLeft || defaultBorder;
+                    td.style.borderRight = cellInfo.borderRight || defaultBorder;
+                }
+            });
+        });
+
+        recalculateAllFormulas();
+        showPage('page-editor');
+    }
+
+    document.getElementById('btn-excel').addEventListener('click', () => {
+        const title = document.getElementById('memo-title').value.trim() || "表メモ";
+        let data = [];
+        for (let r = 0; r < ROWS; r++) {
+            let row = [];
+            for (let c = 0; c < COLS; c++) {
+                const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+                let outVal = input ? (input.dataset.formula || input.value) : "";
+                row.push(outVal);
+            }
+            data.push(row);
+        }
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "シート1");
+        XLSX.writeFile(wb, `${title}.xlsx`);
+    });
+
+    function exportExcel(title, sheetData) {
+        let data = [];
+        sheetData.forEach(rowObj => {
+            let row = [];
+            for (let c = 0; c < COLS; c++) {
+                let cell = rowObj[c];
+                row.push(cell ? (cell.formula || cell.val) : "");
+            }
+            data.push(row);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "シート1");
+        XLSX.writeFile(wb, `${title}.xlsx`);
+    }
+
+    document.getElementById('btn-csv').addEventListener('click', () => {
+        const title = document.getElementById('memo-title').value.trim() || "表メモ";
+        let csvContent = "";
+        for (let r = 0; r < ROWS; r++) {
+            let rowData = [];
+            for (let c = 0; c < COLS; c++) {
+                const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+                let val = input ? (input.dataset.formula || input.value) : "";
+                val = '"' + String(val).replace(/"/g, '""') + '"';
+                rowData.push(val);
+            }
+            csvContent += rowData.join(',') + "\r\n";
+        }
+        downloadCSV(title, csvContent);
+    });
+
+    function exportCSV(title, sheetData) {
+        let csvContent = "";
+        sheetData.forEach(rowObj => {
+            let rowData = [];
+            for (let c = 0; c < COLS; c++) {
+                let val = rowObj[c] ? (rowObj[c].formula || rowObj[c].val) : "";
+                val = '"' + String(val).replace(/"/g, '""') + '"';
+                rowData.push(val);
+            }
+            csvContent += rowData.join(',') + "\r\n";
+        });
+        downloadCSV(title, csvContent);
+    }
+
+    function downloadCSV(title, csvContent) {
+        const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${title}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    renderMemoList();
+</script>
+
+</body>
+</html>
