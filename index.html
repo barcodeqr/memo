@@ -1281,7 +1281,11 @@
             });
         });
 
-        recalculateAllFormulas();
+        // データの読み込みと描画が完全に終わった後に一斉再計算を実行
+        setTimeout(() => {
+            recalculateAllFormulas();
+        }, 50);
+
         showPage('page-editor');
     }
 
