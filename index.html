@@ -625,7 +625,10 @@
 
                 input.addEventListener('blur', () => {
                     setTimeout(() => {
-                        if (!isComposing && activeFormulaInput !== input) {
+                        if (!isComposing) {
+                            if (activeFormulaInput === input) {
+                                activeFormulaInput = null;
+                            }
                             processCellFormula(input);
                             recalculateAllFormulas();
                         }
