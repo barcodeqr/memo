@@ -620,8 +620,6 @@
                 input.addEventListener('compositionstart', () => { isComposing = true; });
                 input.addEventListener('compositionend', () => {
                     isComposing = false;
-                    processCellFormula(input);
-                    recalculateAllFormulas();
                     checkFormulaInput();
                 });
 
@@ -631,7 +629,7 @@
                             processCellFormula(input);
                             recalculateAllFormulas();
                         }
-                    }, 100);
+                    }, 300);
                 });
 
                 const handleCellInteraction = (e) => {
@@ -672,14 +670,7 @@
                     }
                 };
 
-                input.addEventListener('input', () => {
-                    if (!isComposing) {
-                        processCellFormula(input);
-                        recalculateAllFormulas();
-                    }
-                    checkFormulaInput();
-                });
-                
+                input.addEventListener('input', checkFormulaInput);
                 input.addEventListener('keyup', checkFormulaInput);
 
                 input.addEventListener('keydown', (e) => {
@@ -1290,11 +1281,7 @@
             });
         });
 
-        // データの読み込みと描画が完全に終わった後に一斉再計算を実行
-        setTimeout(() => {
-            recalculateAllFormulas();
-        }, 50);
-
+        recalculateAllFormulas();
         showPage('page-editor');
     }
 
