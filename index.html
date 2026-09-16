@@ -107,15 +107,26 @@
             gap: 10px;
         }
 
+        .memo-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            cursor: pointer;
+            gap: 2px;
+            word-break: break-all;
+        }
+
         .memo-title-text {
             font-weight: 500;
-            cursor: pointer;
             color: #0066cc;
-            flex-grow: 1;
-            word-break: break-all;
         }
         .memo-title-text:hover {
             text-decoration: underline;
+        }
+
+        .memo-date-text {
+            font-size: 0.75rem;
+            color: #666;
         }
 
         .memo-actions {
@@ -192,7 +203,7 @@
             white-space: nowrap;
         }
 
-        /* ツールバー */
+        /* ツールバーと色分けされたグループ枠 */
         .toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -238,18 +249,29 @@
             display: inline-flex;
             align-items: center;
             gap: 2px;
-            background: #f8f9fa;
-            border: 1px solid #e0e0e0;
-            padding: 1px 3px;
+            padding: 2px 4px;
             border-radius: 4px;
+            border: 1px solid #ccc;
         }
 
         .tool-group-label {
             font-size: 0.65rem;
-            color: #555;
             font-weight: bold;
             margin-right: 1px;
         }
+
+        /* 各グループごとの濃い色・カラーリング */
+        .group-text { background: #e8f4fd; border-color: #b6d4fe; }
+        .group-text .tool-group-label { color: #084298; }
+
+        .group-color { background: #fef3c7; border-color: #fde047; }
+        .group-color .tool-group-label { color: #854d0e; }
+
+        .group-align { background: #d1fae5; border-color: #6ee7b7; }
+        .group-align .tool-group-label { color: #065f46; }
+
+        .group-border { background: #fce7f3; border-color: #fbcfe8; }
+        .group-border .tool-group-label { color: #9d174d; }
 
         .color-picker-wrapper {
             display: inline-flex;
@@ -281,6 +303,7 @@
             background: #fff;
             position: relative;
             user-select: none;
+            -webkit-user-select: none;
         }
 
         table {
@@ -307,13 +330,12 @@
             display: table-cell;
         }
 
-        /* セル内のフレックスコンテナ（上下位置の制御） */
         .cell-inner {
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: center; /* デフォルト中央 (flex-start:上, center:中, flex-end:下) */
+            justify-content: center;
         }
 
         th {
@@ -328,14 +350,15 @@
             width: 45px;
             min-width: 35px;
             text-align: center;
+            touch-action: none;
         }
 
         .col-header {
             width: 90px;
             min-width: 40px;
+            touch-action: none;
         }
 
-        /* セルの入力部分 */
         .cell-input {
             width: 100%;
             border: none;
@@ -353,12 +376,11 @@
             z-index: 5;
         }
 
-        /* リサイズ用ハンドル */
         .resize-col {
             position: absolute;
             right: 0;
             top: 0;
-            width: 5px;
+            width: 8px;
             height: 100%;
             cursor: col-resize;
             z-index: 10;
@@ -369,7 +391,7 @@
             left: 0;
             bottom: 0;
             width: 100%;
-            height: 5px;
+            height: 8px;
             cursor: row-resize;
             z-index: 10;
         }
@@ -423,7 +445,7 @@
         <!-- ツールバー -->
         <div class="toolbar">
             <!-- 文字設定グループ -->
-            <div class="tool-group">
+            <div class="tool-group group-text">
                 <span class="tool-group-label">文字</span>
                 <button id="btn-bold" title="太字"><b>B</b></button>
                 <select id="select-font-size" title="文字サイズ">
@@ -436,7 +458,7 @@
             </div>
 
             <!-- 色設定グループ -->
-            <div class="tool-group">
+            <div class="tool-group group-color">
                 <span class="tool-group-label">色</span>
                 <div class="color-picker-wrapper" title="文字色">
                     <label>字</label>
@@ -449,7 +471,7 @@
             </div>
 
             <!-- 配置設定グループ -->
-            <div class="tool-group">
+            <div class="tool-group group-align">
                 <span class="tool-group-label">配置</span>
                 <select id="select-align-horiz" title="左右位置">
                     <option value="left">左</option>
@@ -464,8 +486,8 @@
             </div>
 
             <!-- 罫線設定グループ -->
-            <div class="tool-group" style="background: #eef4fb; border-color: #bcd2f5;">
-                <span class="tool-group-label" style="color: #1a5276;">罫線</span>
+            <div class="tool-group group-border">
+                <span class="tool-group-label">罫線</span>
                 <select id="select-border-type" title="罫線パターン">
                     <option value="all">格子</option>
                     <option value="top">上</option>
@@ -485,8 +507,6 @@
                 </div>
             </div>
 
-            <button id="btn-excel" class="btn-success">Excel</button>
-            <button id="btn-csv">CSV</button>
             <button id="btn-clear" class="btn-clear-cell" title="セル削除">削除</button>
         </div>
 
@@ -605,7 +625,7 @@
                     }, 200);
                 });
 
-                td.addEventListener('mousedown', (e) => {
+                const handleCellInteraction = (e) => {
                     if (activeFormulaInput && activeFormulaInput !== input) {
                         e.preventDefault();
                         const cellRef = getColumnName(c) + (r + 1);
@@ -619,7 +639,12 @@
                     selectRange(r, c, r, c);
                     input.focus();
                     e.preventDefault();
-                });
+                };
+
+                td.addEventListener('mousedown', handleCellInteraction);
+                td.addEventListener('touchstart', (e) => {
+                    handleCellInteraction(e);
+                }, { passive: false });
 
                 td.addEventListener('mouseenter', () => {
                     if (isMouseDown && startCellCoord) {
@@ -627,7 +652,7 @@
                     }
                 });
 
-                input.addEventListener('input', () => {
+                const checkFormulaInput = () => {
                     const val = input.value;
                     if (val.startsWith('=')) {
                         activeFormulaInput = input;
@@ -636,7 +661,10 @@
                             activeFormulaInput = null;
                         }
                     }
-                });
+                };
+
+                input.addEventListener('input', checkFormulaInput);
+                input.addEventListener('keyup', checkFormulaInput);
 
                 input.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') {
@@ -781,9 +809,8 @@
         });
     }
 
-    document.addEventListener('mouseup', () => {
-        isMouseDown = false;
-    });
+    document.addEventListener('mouseup', () => { isMouseDown = false; });
+    document.addEventListener('touchend', () => { isMouseDown = false; });
 
     function selectRange(r1, c1, r2, c2) {
         selectedCells.forEach(td => td.classList.remove('selected'));
@@ -805,26 +832,54 @@
         }
     }
 
+    /* スマホ＆PC対応 列幅リサイザー */
     function initColResizer(handle, th) {
         let startX, startWidth;
-        handle.addEventListener('mousedown', (e) => {
-            startX = e.clientX;
+        function onStart(clientX) {
+            startX = clientX;
             startWidth = th.offsetWidth;
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
+            document.addEventListener('touchmove', onTouchMove);
+            document.addEventListener('touchend', onTouchEnd);
+        }
+        handle.addEventListener('mousedown', (e) => {
+            onStart(e.clientX);
+            e.stopPropagation();
+        });
+        handle.addEventListener('touchstart', (e) => {
+            onStart(e.touches[0].clientX);
             e.stopPropagation();
         });
         function onMouseMove(e) { th.style.width = Math.max(40, startWidth + (e.clientX - startX)) + 'px'; }
-        function onMouseUp() { document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp); }
+        function onTouchMove(e) { th.style.width = Math.max(40, startWidth + (e.touches[0].clientX - startX)) + 'px'; }
+        function onMouseUp() { cleanup(); }
+        function onTouchEnd() { cleanup(); }
+        function cleanup() {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            document.removeEventListener('touchmove', onTouchMove);
+            document.removeEventListener('touchend', onTouchEnd);
+        }
     }
 
+    /* スマホ＆PC対応 行高リサイザー */
     function initRowResizer(handle, tr) {
         let startY, startHeight;
-        handle.addEventListener('mousedown', (e) => {
-            startY = e.clientY;
+        function onStart(clientY) {
+            startY = clientY;
             startHeight = tr.offsetHeight;
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
+            document.addEventListener('touchmove', onTouchMove);
+            document.addEventListener('touchend', onTouchEnd);
+        }
+        handle.addEventListener('mousedown', (e) => {
+            onStart(e.clientY);
+            e.stopPropagation();
+        });
+        handle.addEventListener('touchstart', (e) => {
+            onStart(e.touches[0].clientY);
             e.stopPropagation();
         });
         function onMouseMove(e) {
@@ -832,7 +887,19 @@
             tr.style.height = h + 'px';
             tr.querySelectorAll('td, th').forEach(el => el.style.height = h + 'px');
         }
-        function onMouseUp() { document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp); }
+        function onTouchMove(e) {
+            const h = Math.max(22, startHeight + (e.clientY - startY));
+            tr.style.height = h + 'px';
+            tr.querySelectorAll('td, th').forEach(el => el.style.height = h + 'px');
+        }
+        function onMouseUp() { cleanup(); }
+        function onTouchEnd() { cleanup(); }
+        function cleanup() {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            document.removeEventListener('touchmove', onTouchMove);
+            document.removeEventListener('touchend', onTouchEnd);
+        }
     }
 
     function handlePaste(e, startR, startC) {
@@ -979,10 +1046,10 @@
                 td.style.borderLeft = defaultBorder;
                 td.style.borderRight = customBorder;
             } else if (type === 'none') {
-                td.style.borderTop = 'none';
-                td.style.borderBottom = 'none';
-                td.style.borderLeft = 'none';
-                td.style.borderRight = 'none';
+                td.style.borderTop = defaultBorder;
+                td.style.borderBottom = defaultBorder;
+                td.style.borderLeft = defaultBorder;
+                td.style.borderRight = defaultBorder;
             }
         });
     }
@@ -1024,15 +1091,42 @@
         showPage('page-editor');
     });
 
+    /* 戻るボタン：セーブ確認ダイアログを表示 */
     document.getElementById('btn-go-home').addEventListener('click', () => {
+        if (confirm("セーブをしますか？")) {
+            document.getElementById('btn-save').click();
+        }
         activeFormulaInput = null;
-        showPage('page-editor');
         showPage('page-home');
     });
 
     document.getElementById('btn-save').addEventListener('click', () => {
         const titleInput = document.getElementById('memo-title');
-        const titleVal = titleInput.value.trim() || "無題の表";
+        let titleVal = titleInput.value.trim() || "無題の表";
+
+        let savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
+        if (!currentId) {
+            currentId = 'memo_' + Date.now();
+        }
+
+        /* 同じ表題がある場合（2）、（3）のように増やす */
+        let finalTitle = titleVal;
+        let count = 1;
+        let isDuplicate = true;
+        while (isDuplicate) {
+            isDuplicate = false;
+            for (let id in savedMemos) {
+                if (id !== currentId && savedMemos[id].title === finalTitle) {
+                    count++;
+                    let baseName = titleVal.replace(/（\d+）$/, '');
+                    finalTitle = `${baseName}（${count}）`;
+                    isDuplicate = true;
+                    break;
+                }
+            }
+        }
+        titleVal = finalTitle;
+        titleInput.value = titleVal;
 
         let sheetData = [];
         for (let r = 0; r < ROWS; r++) {
@@ -1057,11 +1151,6 @@
                 };
             }
             sheetData.push(rowObj);
-        }
-
-        let savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
-        if (!currentId) {
-            currentId = 'memo_' + Date.now();
         }
 
         savedMemos[currentId] = {
@@ -1094,12 +1183,24 @@
             const item = document.createElement('div');
             item.className = 'memo-item';
 
+            /* セーブ日時を生成 */
+            const dateObj = new Date(memo.updatedAt || Date.now());
+            const dateStr = `${dateObj.getFullYear()}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${String(dateObj.getDate()).padStart(2, '0')} ${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
+
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'memo-info';
+            infoDiv.addEventListener('click', () => loadMemoToEditor(id));
+
             const titleSpan = document.createElement('span');
             titleSpan.className = 'memo-title-text';
             titleSpan.textContent = memo.title || "無題の表";
-            titleSpan.addEventListener('click', () => {
-                loadMemoToEditor(id);
-            });
+
+            const dateSpan = document.createElement('span');
+            dateSpan.className = 'memo-date-text';
+            dateSpan.textContent = `保存日時: ${dateStr}`;
+
+            infoDiv.appendChild(titleSpan);
+            infoDiv.appendChild(dateSpan);
 
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'memo-actions';
@@ -1127,7 +1228,7 @@
             actionsDiv.appendChild(btnCsv);
             actionsDiv.appendChild(btnDel);
 
-            item.appendChild(titleSpan);
+            item.appendChild(infoDiv);
             item.appendChild(actionsDiv);
             listContainer.appendChild(item);
         });
@@ -1177,24 +1278,6 @@
         showPage('page-editor');
     }
 
-    document.getElementById('btn-excel').addEventListener('click', () => {
-        const title = document.getElementById('memo-title').value.trim() || "表メモ";
-        let data = [];
-        for (let r = 0; r < ROWS; r++) {
-            let row = [];
-            for (let c = 0; c < COLS; c++) {
-                const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
-                let outVal = input ? (input.dataset.formula || input.value) : "";
-                row.push(outVal);
-            }
-            data.push(row);
-        }
-        const ws = XLSX.utils.aoa_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "シート1");
-        XLSX.writeFile(wb, `${title}.xlsx`);
-    });
-
     function exportExcel(title, sheetData) {
         let data = [];
         sheetData.forEach(rowObj => {
@@ -1210,22 +1293,6 @@
         XLSX.utils.book_append_sheet(wb, ws, "シート1");
         XLSX.writeFile(wb, `${title}.xlsx`);
     }
-
-    document.getElementById('btn-csv').addEventListener('click', () => {
-        const title = document.getElementById('memo-title').value.trim() || "表メモ";
-        let csvContent = "";
-        for (let r = 0; r < ROWS; r++) {
-            let rowData = [];
-            for (let c = 0; c < COLS; c++) {
-                const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
-                let val = input ? (input.dataset.formula || input.value) : "";
-                val = '"' + String(val).replace(/"/g, '""') + '"';
-                rowData.push(val);
-            }
-            csvContent += rowData.join(',') + "\r\n";
-        }
-        downloadCSV(title, csvContent);
-    });
 
     function exportCSV(title, sheetData) {
         let csvContent = "";
