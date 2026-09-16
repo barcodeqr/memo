@@ -620,6 +620,8 @@
                 input.addEventListener('compositionstart', () => { isComposing = true; });
                 input.addEventListener('compositionend', () => {
                     isComposing = false;
+                    processCellFormula(input);
+                    recalculateAllFormulas();
                     checkFormulaInput();
                 });
 
@@ -629,7 +631,7 @@
                             processCellFormula(input);
                             recalculateAllFormulas();
                         }
-                    }, 300);
+                    }, 100);
                 });
 
                 const handleCellInteraction = (e) => {
@@ -670,7 +672,14 @@
                     }
                 };
 
-                input.addEventListener('input', checkFormulaInput);
+                input.addEventListener('input', () => {
+                    if (!isComposing) {
+                        processCellFormula(input);
+                        recalculateAllFormulas();
+                    }
+                    checkFormulaInput();
+                });
+                
                 input.addEventListener('keyup', checkFormulaInput);
 
                 input.addEventListener('keydown', (e) => {
