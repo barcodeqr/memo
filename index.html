@@ -616,13 +616,20 @@
                     updateToolbarState(input);
                 });
 
+                let isComposing = false;
+                input.addEventListener('compositionstart', () => { isComposing = true; });
+                input.addEventListener('compositionend', () => {
+                    isComposing = false;
+                    checkFormulaInput();
+                });
+
                 input.addEventListener('blur', () => {
                     setTimeout(() => {
-                        if (activeFormulaInput !== input) {
+                        if (!isComposing && activeFormulaInput !== input) {
                             processCellFormula(input);
                             recalculateAllFormulas();
                         }
-                    }, 200);
+                    }, 300);
                 });
 
                 const handleCellInteraction = (e) => {
@@ -888,7 +895,7 @@
             tr.querySelectorAll('td, th').forEach(el => el.style.height = h + 'px');
         }
         function onTouchMove(e) {
-            const h = Math.max(22, startHeight + (e.clientY - startY));
+            const h = Math.max(22, startHeight + (e.touches[0].clientY - startY));
             tr.style.height = h + 'px';
             tr.querySelectorAll('td, th').forEach(el => el.style.height = h + 'px');
         }
