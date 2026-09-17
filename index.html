@@ -599,6 +599,7 @@
         const onHandleStart = (e) => {
             e.stopPropagation();
             isMouseDown = true;
+            
             if (selectedCells.length > 0) {
                 const firstTd = selectedCells[0];
                 startCellCoord = { r: parseInt(firstTd.dataset.row), c: parseInt(firstTd.dataset.col) };
@@ -606,12 +607,40 @@
                 startCellCoord = { r, c };
             }
             selectRange(startCellCoord.r, startCellCoord.c, r, c);
+
+            const onHandleMove = (moveEvent) => {
+                const clientX = moveEvent.clientX || (moveEvent.touches && moveEvent.touches[0].clientX);
+                const clientY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches[0].clientY);
+                if (!clientX || !clientY) return;
+
+                const elem = document.elementFromPoint(clientX, clientY);
+                const targetTd = elem ? elem.closest('td.data-cell') : null;
+                if (targetTd) {
+                    const targetR = parseInt(targetTd.dataset.row);
+                    const targetC = parseInt(targetTd.dataset.col);
+                    if (!isNaN(targetR) && !isNaN(targetC)) {
+                        selectRange(startCellCoord.r, startCellCoord.c, targetR, targetC);
+                    }
+                }
+            };
+
+            const onHandleEnd = () => {
+                isMouseDown = false;
+                document.removeEventListener('mousemove', onHandleMove);
+                document.removeEventListener('mouseup', onHandleEnd);
+                document.removeEventListener('touchmove', onHandleMove);
+                document.removeEventListener('touchend', onHandleEnd);
+                saveState();
+            };
+
+            document.addEventListener('mousemove', onHandleMove);
+            document.addEventListener('mouseup', onHandleEnd);
+            document.addEventListener('touchmove', onHandleMove, { passive: true });
+            document.addEventListener('touchend', onHandleEnd);
         };
+
         handle.addEventListener('mousedown', onHandleStart);
-        handle.addEventListener('touchstart', (e) => {
-            lastTouchTime = Date.now();
-            onHandleStart(e.touches[0]);
-        }, { passive: true });
+        handle.addEventListener('touchstart', onHandleStart, { passive: true });
     }
 
     function initSheet() {
