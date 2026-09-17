@@ -1,0 +1,15 @@
+{
+  "name": "表メモ帳",
+  "short_name": "表メモ帳",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f7f7",
+  "theme_color": "#107c41",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png"
+    }
+  ]
+}
