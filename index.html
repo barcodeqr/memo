@@ -69,12 +69,20 @@
         .memo-title-text { font-weight: 500; color: #0066cc; }
         .memo-title-text:hover { text-decoration: underline; }
         .memo-date-text { font-size: 0.75rem; color: #666; }
-        .memo-actions { display: flex; gap: 6px; flex-shrink: 0; }
-        .memo-actions button {
+        .memo-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+        .memo-actions button, .memo-actions select {
             font-size: 0.8rem; padding: 4px 8px; border: 1px solid #ccc;
-            border-radius: 4px; cursor: pointer; background: #fff;
+            border-radius: 4px; cursor: pointer; background: #fff; height: 30px;
         }
         .memo-actions button:hover { background: #eee; }
+        
+        /* 出力用プルダウンのスタイル */
+        .export-select {
+            color: #333;
+            font-weight: bold;
+            background-color: #fff;
+        }
+
         .btn-del { color: #d9534f; border-color: #d9534f !important; }
         .btn-del:hover { background: #fdf2f2 !important; }
 
@@ -840,7 +848,6 @@
         e.target.value = "";
     });
     
-    // 文字色・背景色のBOX（クリックするだけで即座にその色が適用されるように改善）
     const colorText = document.getElementById('color-text');
     const colorBg = document.getElementById('color-bg');
 
@@ -1008,19 +1015,88 @@
             
             const actionsDiv = document.createElement('div'); actionsDiv.className = 'memo-actions';
             
-            const btnEx = document.createElement('button'); btnEx.textContent = 'Excel';
-            btnEx.addEventListener('click', () => exportExcel(memo.title, memo.data, memo.cols || COLS));
-            const btnCsv = document.createElement('button'); btnCsv.textContent = 'CSV';
-            btnCsv.addEventListener('click', () => exportCSV(memo.title, memo.data, memo.cols || COLS));
-            const btnDel = document.createElement('button'); btnDel.textContent = '削除'; btnDel.className = 'btn-del';
+            // 出力切り替え用プルダウン
+            const exportSelect = document.createElement('select');
+            exportSelect.className = 'export-select';
+            
+            // プレースホルダー（初期表示）
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = "";
+            defaultOpt.textContent = "出力選択";
+            defaultOpt.disabled = true;
+            defaultOpt.selected = true;
+            exportSelect.appendChild(defaultOpt);
+
+            // 1. LINE（薄緑線）
+            const optLine = document.createElement('option');
+            optLine.value = "line";
+            optLine.textContent = "LINE";
+            optLine.style.color = "#06c755";
+            optLine.style.border = "1px solid #b7eb8f";
+            exportSelect.appendChild(optLine);
+
+            // 2. Excel（Excelっぽい濃い緑色）
+            const optExcel = document.createElement('option');
+            optExcel.value = "excel";
+            optExcel.textContent = "Excel";
+            optExcel.style.color = "#107c41";
+            optExcel.style.fontWeight = "bold";
+            exportSelect.appendChild(optExcel);
+
+            // 3. CSV（そのまま）
+            const optCsv = document.createElement('option');
+            optCsv.value = "csv";
+            optCsv.textContent = "CSV";
+            exportSelect.appendChild(optCsv);
+
+            // プルダウン変更時の処理
+            exportSelect.addEventListener('change', () => {
+                const val = exportSelect.value;
+                if (val === 'line') {
+                    sendToLine(memo.title, memo.data, memo.cols || COLS);
+                } else if (val === 'excel') {
+                    exportExcel(memo.title, memo.data, memo.cols || COLS);
+                } else if (val === 'csv') {
+                    exportCSV(memo.title, memo.data, memo.cols || COLS);
+                }
+                // 実行後に選択を初期状態に戻す
+                exportSelect.value = "";
+            });
+
+            // 削除ボタン
+            const btnDel = document.createElement('button'); 
+            btnDel.textContent = '削除'; 
+            btnDel.className = 'btn-del';
             btnDel.addEventListener('click', () => {
                 if (confirm(`「${memo.title}」を削除してもよろしいですか？`)) {
                     delete savedMemos[id]; localStorage.setItem('hyo_memos', JSON.stringify(savedMemos)); renderMemoList();
                 }
             });
-            actionsDiv.appendChild(btnEx); actionsDiv.appendChild(btnCsv); actionsDiv.appendChild(btnDel);
-            item.appendChild(infoDiv); item.appendChild(actionsDiv); listContainer.appendChild(item);
+
+            actionsDiv.appendChild(exportSelect); 
+            actionsDiv.appendChild(btnDel);
+            
+            item.appendChild(infoDiv); 
+            item.appendChild(actionsDiv); 
+            listContainer.appendChild(item);
         });
+    }
+
+    function sendToLine(title, sheetData, totalCols) {
+        let text = `【${title}】\n`;
+        sheetData.forEach(rowObj => {
+            let rowValues = [];
+            for (let c = 0; c < totalCols; c++) {
+                let cell = rowObj[c];
+                let val = cell ? (cell.formula ? evaluateFormula(cell.formula) : cell.val) : "";
+                if (val !== "") rowValues.push(val);
+            }
+            if (rowValues.length > 0) {
+                text += rowValues.join(" / ") + "\n";
+            }
+        });
+        const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`;
+        window.open(lineUrl, '_blank');
     }
 
     function loadMemoToEditor(id) {
