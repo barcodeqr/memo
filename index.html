@@ -128,25 +128,24 @@
 
         .tool-group {
             display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px;
-            border-radius: 4px; border: 1px solid #ccc; flex-shrink: 0; height: 38px;
+            border-radius: 4px; border: 1px solid #cbd5e1; flex-shrink: 0; height: 38px;
         }
         .tool-group-label { font-size: 0.75rem; font-weight: bold; margin-right: 2px; }
         
-        /* ④ 書式の履歴は青色系、行列は黄色系に指定 */
-        .group-history { background: #eff6ff; border-color: #93c5fd; }
-        .group-history .tool-group-label { color: #2563eb; }
-        .group-size { background: #fef3c7; border-color: #fde047; }
-        .group-size .tool-group-label { color: #854d0e; }
-        .group-text { background: #e8f4fd; border-color: #b6d4fe; }
-        .group-text .tool-group-label { color: #084298; }
-        .group-color { background: #fef3c7; border-color: #fde047; }
-        .group-color .tool-group-label { color: #854d0e; }
-        .group-format { background: #f3e8fd; border-color: #d8b4fe; }
-        .group-format .tool-group-label { color: #6b21a8; }
-        .group-align { background: #d1fae5; border-color: #6ee7b7; }
-        .group-align .tool-group-label { color: #065f46; }
-        .group-border { background: #fce7f3; border-color: #fbcfe8; }
-        .group-border .tool-group-label { color: #9d174d; }
+        .group-history { background: #f8fafc; border-color: #cbd5e1; }
+        .group-history .tool-group-label { color: #475569; }
+        .group-size { background: #f8fafc; border-color: #cbd5e1; }
+        .group-size .tool-group-label { color: #475569; }
+        .group-text { background: #f8fafc; border-color: #cbd5e1; }
+        .group-text .tool-group-label { color: #475569; }
+        .group-color { background: #f8fafc; border-color: #cbd5e1; }
+        .group-color .tool-group-label { color: #475569; }
+        .group-format { background: #f8fafc; border-color: #cbd5e1; }
+        .group-format .tool-group-label { color: #475569; }
+        .group-align { background: #f8fafc; border-color: #cbd5e1; }
+        .group-align .tool-group-label { color: #475569; }
+        .group-border { background: #f8fafc; border-color: #cbd5e1; }
+        .group-border .tool-group-label { color: #475569; }
 
         .color-picker-wrapper { gap: 3px; height: 34px; padding: 0 6px; }
         .color-picker-wrapper input[type="color"] {
@@ -177,7 +176,7 @@
         
         .mobile-color-btn input[type=color] { width: 25px; height: 25px; padding: 0; border: 0; background: transparent; }
         
-        /* スマホ用 書式一覧ドロワー（初期非表示） */
+        /* スマホ用 書式一覧ドロワー */
         .mobile-toolbar-drawer {
             display: none; flex-direction: column; gap: 6px; background: #fff;
             padding: 8px; border: 1px solid #d9d9d9; border-radius: 6px; margin-bottom: 4px;
@@ -201,45 +200,23 @@
             font-size: 13px;
             padding: 0 8px;
         }
-        .mobile-toolbar-drawer select {
-            padding: 0 4px;
-        }
-        .mobile-toolbar-drawer .color-picker-wrapper input[type="color"] {
-            width: 22px;
-            height: 22px;
-        }
+        .mobile-toolbar-drawer select { padding: 0 4px; }
+        .mobile-toolbar-drawer .color-picker-wrapper input[type="color"] { width: 22px; height: 22px; }
 
         #btn-drawer-close {
-            border-radius: 6px !important;
-            font-weight: bold;
-            writing-mode: horizontal-tb !important;
-            background: linear-gradient(to bottom, #f1f5f9, #cbd5e1) !important;
-            color: #334155 !important;
-            border: 1px solid #94a3b8 !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-            white-space: nowrap;
+            border-radius: 6px !important; font-weight: bold; writing-mode: horizontal-tb !important;
+            background: linear-gradient(to bottom, #f1f5f9, #cbd5e1) !important; color: #334155 !important;
+            border: 1px solid #94a3b8 !important; box-shadow: 0 1px 3px rgba(0,0,0,0.15); white-space: nowrap;
         }
 
-        #btn-clear-m {
-            border-radius: 6px !important;
-            font-weight: bold;
-            writing-mode: horizontal-tb !important;
-            white-space: nowrap;
-        }
+        #btn-clear-m { border-radius: 6px !important; font-weight: bold; writing-mode: horizontal-tb !important; white-space: nowrap; }
 
         #btn-open-drawer {
-            background: linear-gradient(to bottom, #d8b4fe, #9333ea) !important;
-            color: #ffffff !important;
-            border: 1px solid #7e22ce !important;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            font-weight: bold;
-            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+            background: linear-gradient(to bottom, #d8b4fe, #9333ea) !important; color: #ffffff !important;
+            border: 1px solid #7e22ce !important; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-weight: bold; text-shadow: 0 1px 1px rgba(0,0,0,0.2);
         }
-        #btn-open-drawer:active {
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-            transform: translateY(1px);
-        }
+        #btn-open-drawer:active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); transform: translateY(1px); }
 
         @media (min-width: 700px) {
             .mobile-selection-bar { display: none; }
@@ -256,26 +233,12 @@
             background: #fff; position: relative; user-select: none; -webkit-user-select: none;
             -webkit-overflow-scrolling: touch;
         }
-        .spreadsheet-container::-webkit-scrollbar {
-            width: 18px;
-            height: 18px;
-        }
-        .spreadsheet-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 9px;
-        }
-        .spreadsheet-container::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 9px;
-            border: 3px solid #f1f1f1;
-        }
-        .spreadsheet-container::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-        .spreadsheet-container {
-            scrollbar-width: auto;
-            scrollbar-color: #888 #f1f1f1;
-        }
+        .spreadsheet-container::-webkit-scrollbar { width: 18px; height: 18px; }
+        .spreadsheet-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 9px; }
+        .spreadsheet-container::-webkit-scrollbar-thumb { background: #888; border-radius: 9px; border: 3px solid #f1f1f1; }
+        .spreadsheet-container::-webkit-scrollbar-thumb:hover { background: #555; }
+        .spreadsheet-container { scrollbar-width: auto; scrollbar-color: #888 #f1f1f1; }
+        
         table { border-collapse: separate; border-spacing: 0; table-layout: fixed; width: max-content; }
         th, td {
             padding: 0; margin: 0; overflow: visible; white-space: nowrap; text-overflow: ellipsis;
@@ -291,40 +254,17 @@
             padding: 0 4px; box-sizing: border-box; font-family: inherit; font-size: inherit;
             position: relative; z-index: 2;
         }
-        td.selected {
-            outline: 2px solid var(--excel-select-border);
-            outline-offset: -2px;
-            z-index: 5;
-            position: relative;
-        }
-        td.selected::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-color: rgba(43, 87, 154, 0.18);
-            pointer-events: none;
-            z-index: 1;
-        }
+        td.selected { outline: 2px solid var(--excel-select-border); outline-offset: -2px; z-index: 5; position: relative; }
+        td.selected::after { content: ''; position: absolute; inset: 0; background-color: rgba(43, 87, 154, 0.18); pointer-events: none; z-index: 1; }
         td.formula-source { outline: 2px solid #107c41; outline-offset: -2px; z-index: 6; }
         td.formula-source::after { display: none; }
 
         .cell-handle {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background-color: #ffffff;
-            border: 2px solid var(--excel-select-border);
-            z-index: 25;
-            display: none;
-            pointer-events: auto;
-            touch-action: none;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            color: var(--excel-select-border);
-            font-size: 11px;
-            font-weight: bold;
-            text-align: center;
-            line-height: 8px;
-            cursor: crosshair;
+            position: absolute; width: 12px; height: 12px; background-color: #ffffff;
+            border: 2px solid var(--excel-select-border); z-index: 25; display: none;
+            pointer-events: auto; touch-action: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            color: var(--excel-select-border); font-size: 11px; font-weight: bold; text-align: center;
+            line-height: 8px; cursor: crosshair;
         }
         .cell-handle-tl { top: -6px; left: -6px; }
         .cell-handle-br { bottom: -6px; right: -6px; }
@@ -337,7 +277,7 @@
         .btn-clear-cell { color: #d9534f; border-color: #d9534f !important; font-weight: bold; border-radius: 4px; }
         .btn-del-rowcol { color: #d9534f; border-color: #d9534f !important; }
 
-        /* カスタム確認モーダル（戻るボタン用） */
+        /* カスタム確認モーダル */
         .custom-modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;
@@ -390,29 +330,25 @@
             <span id="selection-info">A1</span>
             <button id="btn-open-drawer" title="全書式を開く" style="border-radius: 6px;">全書式</button>
             <button id="btn-select-all" title="表全体を選択" style="border-radius: 6px;">全選択</button>
-            <button id="btn-border-all" title="選択範囲に全罫線" style="border-radius: 6px;">▦ 枠</button>
+            <button id="btn-border-all" title="選択範囲に格子" style="border-radius: 6px;">▦ 枠</button>
             <button id="btn-border-outer" title="選択範囲の外枠" style="border-radius: 6px;">□ 外枠</button>
             <button id="btn-border-none" title="罫線を消す" style="border-radius: 6px;">□̸ 消す</button>
+            <label class="mobile-color-btn" title="枠の色" style="border-radius: 6px;">線 <input type="color" id="mobile-border-color" value="#e6e6e6"></label>
             <label class="mobile-color-btn" title="背景色" style="border-radius: 6px;">背景 <input type="color" id="mobile-bg-color" value="#fff2cc"></label>
             <label class="mobile-color-btn" title="文字色" style="border-radius: 6px;">文字 <input type="color" id="mobile-text-color" value="#000000"></label>
         </div>
 
-        <!-- スマホ用 書式一覧ドロワー（①罫線グループを追加） -->
+        <!-- スマホ用 書式一覧ドロワー (順番: 閉じる・履歴・文字・配置・行列・数字・罫線・削除) -->
         <div class="mobile-toolbar-drawer" id="mobile-toolbar-drawer">
             <div class="mobile-drawer-row">
                 <button id="btn-drawer-close">閉じる</button>
+                
                 <div class="tool-group group-history" style="margin:0;">
                     <span class="tool-group-label">履歴</span>
                     <button id="btn-undo-m" title="戻る" disabled>↶</button>
                     <button id="btn-redo-m" title="進む" disabled>↷</button>
                 </div>
-                <div class="tool-group group-size" style="margin:0;">
-                    <span class="tool-group-label">行・列</span>
-                    <button id="btn-add-row-m">行＋</button>
-                    <button id="btn-delete-row-m" class="btn-del-rowcol">行－</button>
-                    <button id="btn-add-col-m">列＋</button>
-                    <button id="btn-delete-col-m" class="btn-del-rowcol">列－</button>
-                </div>
+                
                 <div class="tool-group group-text" style="margin:0;">
                     <span class="tool-group-label">文字</span>
                     <button id="btn-bold-m"><b>B</b></button>
@@ -423,18 +359,10 @@
                         <option value="1.1rem">中</option>
                         <option value="1.3rem">大</option>
                     </select>
-                </div>
-                <div class="tool-group group-color" style="margin:0;">
-                    <span class="tool-group-label">色</span>
                     <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m" value="#000000"></div>
                     <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m" value="#ffffff"></div>
                 </div>
-                <div class="tool-group group-format" style="margin:0;">
-                    <span class="tool-group-label">数字</span>
-                    <button id="btn-format-none-m">標準</button>
-                    <button id="btn-format-comma-m"><b>,</b></button>
-                    <button id="btn-format-currency-m"><b>¥</b></button>
-                </div>
+                
                 <div class="tool-group group-align" style="margin:0;">
                     <span class="tool-group-label">配置</span>
                     <select id="select-align-horiz-m">
@@ -443,8 +371,29 @@
                         <option value="center">中</option>
                         <option value="right">右</option>
                     </select>
+                    <select id="select-align-vert-m">
+                        <option value="" disabled selected>上下</option>
+                        <option value="center">中</option>
+                        <option value="flex-start">上</option>
+                        <option value="flex-end">下</option>
+                    </select>
                 </div>
-                <!-- ① スマホ版ドロワー内へ罫線グループを復活 -->
+                
+                <div class="tool-group group-size" style="margin:0;">
+                    <span class="tool-group-label">行・列</span>
+                    <button id="btn-add-row-m">行＋</button>
+                    <button id="btn-delete-row-m" class="btn-del-rowcol">行－</button>
+                    <button id="btn-add-col-m">列＋</button>
+                    <button id="btn-delete-col-m" class="btn-del-rowcol">列－</button>
+                </div>
+                
+                <div class="tool-group group-format" style="margin:0;">
+                    <span class="tool-group-label">数字</span>
+                    <button id="btn-format-none-m">標準</button>
+                    <button id="btn-format-comma-m"><b>,</b></button>
+                    <button id="btn-format-currency-m"><b>¥</b></button>
+                </div>
+                
                 <div class="tool-group group-border" style="margin:0;">
                     <span class="tool-group-label">罫線</span>
                     <select id="select-border-type-m">
@@ -461,8 +410,9 @@
                         <option value="2px">中</option>
                         <option value="3px">太</option>
                     </select>
-                    <div class="color-picker-wrapper"><label>線色</label><input type="color" id="color-border-m" value="#e6e6e6"></div>
+                    <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m" value="#e6e6e6"></div>
                 </div>
+                
                 <button id="btn-clear-m" class="btn-clear-cell">削除</button>
             </div>
         </div>
@@ -470,18 +420,13 @@
         <!-- PC用ツールバー -->
         <div class="toolbar">
             <span id="selection-info-pc" style="font-size: 14px; font-weight: bold; color: #1e293b; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; padding: 0 8px; height: 34px; display: inline-flex; align-items: center; justify-content: center; min-width: 55px; flex-shrink: 0;">A1</span>
+            
             <div class="tool-group group-history">
                 <span class="tool-group-label">履歴</span>
                 <button id="btn-undo" title="戻る (Ctrl+Z)" disabled>↶ 戻る</button>
                 <button id="btn-redo" title="進む (Ctrl+Y)" disabled>↷ 進む</button>
             </div>
-            <div class="tool-group group-size">
-                <span class="tool-group-label">行・列</span>
-                <button id="btn-add-row" title="選択位置に行を挿入">行＋</button>
-                <button id="btn-delete-row" class="btn-del-rowcol" title="選択行を削除">行－</button>
-                <button id="btn-add-col" title="選択位置に列を挿入">列＋</button>
-                <button id="btn-delete-col" class="btn-del-rowcol" title="選択列を削除">列－</button>
-            </div>
+
             <div class="tool-group group-text">
                 <span class="tool-group-label">文字</span>
                 <button id="btn-bold" title="太字"><b>B</b></button>
@@ -492,18 +437,10 @@
                     <option value="1.1rem">中(16)</option>
                     <option value="1.3rem">大(20)</option>
                 </select>
-            </div>
-            <div class="tool-group group-color">
-                <span class="tool-group-label">色</span>
                 <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text" value="#000000"></div>
                 <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg" value="#ffffff"></div>
             </div>
-            <div class="tool-group group-format">
-                <span class="tool-group-label">数字</span>
-                <button id="btn-format-none" title="標準">標準</button>
-                <button id="btn-format-comma" title="カンマ"><b>,</b></button>
-                <button id="btn-format-currency" title="通貨"><b>¥</b></button>
-            </div>
+
             <div class="tool-group group-align">
                 <span class="tool-group-label">配置</span>
                 <select id="select-align-horiz" title="左右位置">
@@ -519,6 +456,22 @@
                     <option value="flex-end">下</option>
                 </select>
             </div>
+
+            <div class="tool-group group-size">
+                <span class="tool-group-label">行・列</span>
+                <button id="btn-add-row" title="選択位置に行を挿入">行＋</button>
+                <button id="btn-delete-row" class="btn-del-rowcol" title="選択行を削除">行－</button>
+                <button id="btn-add-col" title="選択位置に列を挿入">列＋</button>
+                <button id="btn-delete-col" class="btn-del-rowcol" title="選択列を削除">列－</button>
+            </div>
+
+            <div class="tool-group group-format">
+                <span class="tool-group-label">数字</span>
+                <button id="btn-format-none" title="標準">標準</button>
+                <button id="btn-format-comma" title="カンマ"><b>,</b></button>
+                <button id="btn-format-currency" title="通貨"><b>¥</b></button>
+            </div>
+
             <div class="tool-group group-border">
                 <span class="tool-group-label">罫線</span>
                 <select id="select-border-type" title="罫線パターン">
@@ -535,8 +488,9 @@
                     <option value="2px">中</option>
                     <option value="3px">太</option>
                 </select>
-                <div class="color-picker-wrapper"><label>線色</label><input type="color" id="color-border" value="#e6e6e6"></div>
+                <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border" value="#e6e6e6"></div>
             </div>
+
             <button id="btn-clear" class="btn-clear-cell" title="セル削除">削除</button>
         </div>
 
@@ -1297,7 +1251,6 @@
         }
     }
 
-    // ② セレクトボックス変更後に初期項目名に戻る設定
     document.getElementById('btn-format-comma').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'comma')); });
     document.getElementById('btn-format-currency').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'currency')); });
     document.getElementById('btn-format-none').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'none')); });
@@ -1320,7 +1273,6 @@
         document.getElementById('btn-bold-m').classList.toggle('active', !isBold);
     });
 
-    // フォントサイズ (② 選択後初期項目名に戻す)
     ['select-font-size', 'select-font-size-m'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -1333,11 +1285,12 @@
         }
     });
     
-    // ③ 字・背景・線色の即時＆連続適用
     const colorText = document.getElementById('color-text');
     const colorBg = document.getElementById('color-bg');
+    const colorBorder = document.getElementById('color-border');
     const colorTextM = document.getElementById('color-text-m');
     const colorBgM = document.getElementById('color-bg-m');
+    const colorBorderM = document.getElementById('color-border-m');
 
     function applyTextColor(colorVal) {
         if (selectedCells.length === 0) return;
@@ -1368,8 +1321,11 @@
         colorBgM.addEventListener('click', () => applyBgColor(colorBgM.value));
         colorBgM.addEventListener('input', (e) => applyBgColor(e.target.value));
     }
+
     const mobileBgColor = document.getElementById('mobile-bg-color');
     const mobileTextColor = document.getElementById('mobile-text-color');
+    const mobileBorderColor = document.getElementById('mobile-border-color');
+
     if (mobileBgColor) {
         mobileBgColor.addEventListener('click', () => applyBgColor(mobileBgColor.value));
         mobileBgColor.addEventListener('input', (e) => applyBgColor(e.target.value));
@@ -1378,8 +1334,11 @@
         mobileTextColor.addEventListener('click', () => applyTextColor(mobileTextColor.value));
         mobileTextColor.addEventListener('input', (e) => applyTextColor(e.target.value));
     }
+    if (mobileBorderColor && colorBorderM) {
+        mobileBorderColor.addEventListener('input', (e) => { colorBorderM.value = e.target.value; });
+        colorBorderM.addEventListener('input', (e) => { mobileBorderColor.value = e.target.value; });
+    }
     
-    // 配置 (② 選択後初期項目名に戻す)
     ['select-align-horiz', 'select-align-horiz-m'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -1392,15 +1351,17 @@
         }
     });
 
-    const selectAlignVert = document.getElementById('select-align-vert');
-    if (selectAlignVert) {
-        selectAlignVert.addEventListener('change', (e) => {
-            saveState();
-            const val = e.target.value;
-            selectedCells.forEach(td => { const inner = td.querySelector('.cell-inner'); if(inner) inner.style.justifyContent = val; });
-            e.target.value = "";
-        });
-    }
+    ['select-align-vert', 'select-align-vert-m'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', (e) => {
+                saveState();
+                const val = e.target.value;
+                selectedCells.forEach(td => { const inner = td.querySelector('.cell-inner'); if(inner) inner.style.justifyContent = val; });
+                e.target.value = "";
+            });
+        }
+    });
 
     document.getElementById('btn-clear').addEventListener('click', () => {
         if (selectedCells.length === 0) return;
@@ -1429,22 +1390,58 @@
         });
     }
 
-    // 罫線適用処理 (①・②・③ 線色も連続使用・選択後初期化対応)
     function applyBorderCustom(type, widthId, colorId) {
         if (selectedCells.length === 0 || !type) return;
         saveState();
-        const customBorder = `${document.getElementById(widthId).value} solid ${document.getElementById(colorId).value}`;
-        selectedCells.forEach(td => {
-            if (type === 'all') { td.style.borderTop = customBorder; td.style.borderBottom = customBorder; td.style.borderLeft = customBorder; td.style.borderRight = customBorder; }
-            else if (type === 'top') td.style.borderTop = customBorder;
-            else if (type === 'bottom') td.style.borderBottom = customBorder;
-            else if (type === 'left') td.style.borderLeft = customBorder;
-            else if (type === 'right') td.style.borderRight = customBorder;
-            else if (type === 'none') { td.style.borderTop = defaultBorder; td.style.borderBottom = defaultBorder; td.style.borderLeft = defaultBorder; td.style.borderRight = defaultBorder; }
-        });
+        
+        const widthVal = document.getElementById(widthId).value;
+        const colorVal = document.getElementById(colorId).value;
+        const customBorder = `${widthVal} solid ${colorVal}`;
+
+        if (type === 'all') {
+            selectedCells.forEach(td => {
+                td.style.borderTop = customBorder;
+                td.style.borderBottom = customBorder;
+                td.style.borderLeft = customBorder;
+                td.style.borderRight = customBorder;
+            });
+        } else if (type === 'outer') {
+            let minR = ROWS, maxR = -1, minC = COLS, maxC = -1;
+            selectedCells.forEach(td => {
+                const r = parseInt(td.dataset.row);
+                const c = parseInt(td.dataset.col);
+                if (r < minR) minR = r;
+                if (r > maxR) maxR = r;
+                if (c < minC) minC = c;
+                if (c > maxC) maxC = c;
+            });
+
+            selectedCells.forEach(td => {
+                const r = parseInt(td.dataset.row);
+                const c = parseInt(td.dataset.col);
+                if (r === minR) td.style.borderTop = customBorder;
+                if (r === maxR) td.style.borderBottom = customBorder;
+                if (c === minC) td.style.borderLeft = customBorder;
+                if (c === maxC) td.style.borderRight = customBorder;
+            });
+        } else if (type === 'top') {
+            selectedCells.forEach(td => { td.style.borderTop = customBorder; });
+        } else if (type === 'bottom') {
+            selectedCells.forEach(td => { td.style.borderBottom = customBorder; });
+        } else if (type === 'left') {
+            selectedCells.forEach(td => { td.style.borderLeft = customBorder; });
+        } else if (type === 'right') {
+            selectedCells.forEach(td => { td.style.borderRight = customBorder; });
+        } else if (type === 'none') {
+            selectedCells.forEach(td => {
+                td.style.borderTop = defaultBorder;
+                td.style.borderBottom = defaultBorder;
+                td.style.borderLeft = defaultBorder;
+                td.style.borderRight = defaultBorder;
+            });
+        }
     }
 
-    // PC用罫線セレクト
     const typeSelect = document.getElementById('select-border-type');
     if (typeSelect) {
         typeSelect.addEventListener('change', (e) => {
@@ -1452,17 +1449,7 @@
             e.target.value = "";
         });
     }
-    document.getElementById('select-border-width').addEventListener('change', () => {
-        // 設定のみ
-    });
-    const colorBorder = document.getElementById('color-border');
-    if (colorBorder) {
-        colorBorder.addEventListener('click', () => {
-            // ③ 線色クリックで即時適用（もし既存の選択タイプがあれば直前タイプで再適用も可能）
-        });
-    }
 
-    // スマホ用罫線セレクト (①)
     const typeSelectM = document.getElementById('select-border-type-m');
     if (typeSelectM) {
         typeSelectM.addEventListener('change', (e) => {
@@ -1471,24 +1458,16 @@
         });
     }
 
-    // スマホクイックバーの罫線ボタン
     document.getElementById('btn-border-all').addEventListener('click', () => {
-        if (selectedCells.length === 0) return;
-        saveState();
-        const b = '1px solid #000000';
-        selectedCells.forEach(td => { td.style.borderTop = b; td.style.borderBottom = b; td.style.borderLeft = b; td.style.borderRight = b; });
+        applyBorderCustom('all', 'select-border-width-m', mobileBorderColor ? 'mobile-border-color' : 'color-border-m');
     });
     document.getElementById('btn-border-outer').addEventListener('click', () => {
-        if (selectedCells.length === 0) return;
-        saveState();
-        const b = '1px solid #000000';
-        selectedCells.forEach(td => { td.style.borderTop = b; td.style.borderBottom = b; td.style.borderLeft = b; td.style.borderRight = b; });
+        applyBorderCustom('outer', 'select-border-width-m', mobileBorderColor ? 'mobile-border-color' : 'color-border-m');
     });
     document.getElementById('btn-border-none').addEventListener('click', () => {
-        if (selectedCells.length === 0) return;
-        saveState();
-        selectedCells.forEach(td => { td.style.borderTop = defaultBorder; td.style.borderBottom = defaultBorder; td.style.borderLeft = defaultBorder; td.style.borderRight = defaultBorder; });
+        applyBorderCustom('none', 'select-border-width-m', mobileBorderColor ? 'mobile-border-color' : 'color-border-m');
     });
+
     document.getElementById('btn-select-all').addEventListener('click', () => {
         selectRange(0, 0, ROWS - 1, COLS - 1);
         updateSelectionInfo(0, 0);
