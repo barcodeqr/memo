@@ -86,17 +86,30 @@
             background: #fff; padding: 4px 8px; border: 1px solid var(--excel-border); border-radius: 4px;
         }
         .editor-top-left { display: flex; gap: 6px; align-items: center; flex-grow: 1; }
+        
+        /* ⑤ 戻るボタンの立体感・サイズ調整 (灰色・立体的に修正) */
         .btn-back {
-            background: #6c757d; color: white; border: none; padding: 3px 8px;
-            border-radius: 4px; cursor: pointer; font-size: 0.75rem; flex-shrink: 0;
+            background: linear-gradient(to bottom, #f8fafc, #cbd5e1); color: #334155; border: 1px solid #94a3b8;
+            padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.9rem;
+            font-weight: bold; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            transition: background 0.2s, box-shadow 0.2s;
         }
+        .btn-back:hover { background: linear-gradient(to bottom, #e2e8f0, #94a3b8); }
+        .btn-back:active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); transform: translateY(1px); }
+
         .editor-top-left input {
             font-size: 0.9rem; padding: 2px 4px; border: 1px solid #ccc;
             border-radius: 4px; font-weight: bold; width: 100%; max-width: 200px;
         }
-        #btn-save { font-size: 0.8rem; padding: 4px 10px; white-space: nowrap; }
+        
+        /* ⑤⑥ セーブ・全書式ボタン等の立体化 (⑥全書式をボタンのように立体的にして色を紫に) */
+        #btn-save {
+            font-size: 0.9rem; padding: 6px 16px; white-space: nowrap; border-radius: 6px;
+            font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: background 0.2s, box-shadow 0.2s;
+        }
+        #btn-save:active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); transform: translateY(1px); }
 
-        /* ツールバー */
+        /* ツールバー (PC用) と書式一覧の高さ・デザイン統一 */
         .toolbar {
             display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
             gap: 8px; margin-bottom: 4px; background: #fff; padding: 6px 8px;
@@ -104,24 +117,26 @@
             flex-shrink: 0;
         }
         .toolbar button, .toolbar select, .toolbar label, .color-picker-wrapper {
-            font-size: 0.85rem; padding: 1px 6px; cursor: pointer; border: 1px solid #ccc;
-            background: #fff; border-radius: 3px; height: 32px; display: inline-flex;
+            font-size: 0.85rem; padding: 0 8px; cursor: pointer; border: 1px solid #ccc;
+            background: #fff; border-radius: 4px; height: 34px; display: inline-flex;
             align-items: center; justify-content: center; flex-shrink: 0;
+            box-sizing: border-box; vertical-align: middle;
         }
         .toolbar select { appearance: auto; -webkit-appearance: auto; -moz-appearance: auto; background-color: #fff; }
         .toolbar button.active { background: #cce8ff; border-color: var(--excel-select-border); }
         .toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
 
         .tool-group {
-            display: inline-flex; align-items: center; gap: 2px; padding: 2px 4px;
-            border-radius: 4px; border: 1px solid #ccc; flex-shrink: 0;
+            display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px;
+            border-radius: 4px; border: 1px solid #ccc; flex-shrink: 0; height: 38px;
         }
-        .tool-group-label { font-size: 0.7rem; font-weight: bold; margin-right: 2px; }
+        .tool-group-label { font-size: 0.75rem; font-weight: bold; margin-right: 2px; }
         
-        .group-history { background: #f1f5f9; border-color: #cbd5e1; }
-        .group-history .tool-group-label { color: #334155; }
-        .group-size { background: #e2e8f0; border-color: #94a3b8; }
-        .group-size .tool-group-label { color: #0f172a; }
+        /* ④ 書式一覧の「履歴」と「行列」の枠と文字をカラフルに */
+        .group-history { background: #fef2f2; border-color: #fca5a5; }
+        .group-history .tool-group-label { color: #dc2626; }
+        .group-size { background: #eff6ff; border-color: #93c5fd; }
+        .group-size .tool-group-label { color: #2563eb; }
         .group-text { background: #e8f4fd; border-color: #b6d4fe; }
         .group-text .tool-group-label { color: #084298; }
         .group-color { background: #fef3c7; border-color: #fde047; }
@@ -133,9 +148,9 @@
         .group-border { background: #fce7f3; border-color: #fbcfe8; }
         .group-border .tool-group-label { color: #9d174d; }
 
-        .color-picker-wrapper { gap: 2px; }
+        .color-picker-wrapper { gap: 3px; height: 34px; padding: 0 6px; }
         .color-picker-wrapper input[type="color"] {
-            width: 18px; height: 18px; border: none; cursor: pointer; background: none; padding: 0;
+            width: 20px; height: 20px; border: none; cursor: pointer; background: none; padding: 0;
         }
 
         /* スマホ用クイック書式バー */
@@ -152,10 +167,18 @@
             white-space: nowrap; flex-shrink: 0; touch-action: manipulation;
         }
         .mobile-selection-bar button:active, .mobile-color-btn:active { background: #eaf4ff; }
-        #selection-info { font-size: 12px; color: #555; min-width: 70px; white-space: nowrap; }
+        
+        /* ① スマホ表示時のセル番地を一番左に表示＆デザイン調整 */
+        #selection-info {
+            font-size: 15px; font-weight: bold; color: #1e293b; background: #f8fafc;
+            border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 10px;
+            min-width: 65px; text-align: center; white-space: nowrap; display: inline-flex;
+            align-items: center; justify-content: center; height: 38px; flex-shrink: 0;
+        }
+        
         .mobile-color-btn input[type=color] { width: 25px; height: 25px; padding: 0; border: 0; background: transparent; }
         
-        /* スマホ用 書式一覧（初期非表示） */
+        /* スマホ用 書式一覧ドロワー（初期非表示） */
         .mobile-toolbar-drawer {
             display: none; flex-direction: column; gap: 6px; background: #fff;
             padding: 8px; border: 1px solid #d9d9d9; border-radius: 6px; margin-bottom: 4px;
@@ -166,12 +189,68 @@
             display: flex; align-items: center; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch;
         }
 
+        .mobile-toolbar-drawer button,
+        .mobile-toolbar-drawer select,
+        .mobile-toolbar-drawer .tool-group,
+        .mobile-toolbar-drawer .color-picker-wrapper {
+            height: 38px !important;
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+            font-size: 13px;
+            padding: 0 8px;
+        }
+        .mobile-toolbar-drawer select {
+            padding: 0 4px;
+        }
+        .mobile-toolbar-drawer .color-picker-wrapper input[type="color"] {
+            width: 22px;
+            height: 22px;
+        }
+
+        /* ②「閉じる」ボタンを横表示（縦書き解除）、色を灰色、角丸に */
+        #btn-drawer-close {
+            border-radius: 6px !important;
+            font-weight: bold;
+            writing-mode: horizontal-tb !important;
+            background: linear-gradient(to bottom, #f1f5f9, #cbd5e1) !important;
+            color: #334155 !important;
+            border: 1px solid #94a3b8 !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            white-space: nowrap;
+        }
+
+        /* ③「削除」ボタンを横表示（縦書き解除） */
+        #btn-clear-m {
+            border-radius: 6px !important;
+            font-weight: bold;
+            writing-mode: horizontal-tb !important;
+            white-space: nowrap;
+        }
+
+        /* ⑥ 全書式ボタンをボタンのように立体的にして色を紫に */
+        #btn-open-drawer {
+            background: linear-gradient(to bottom, #d8b4fe, #9333ea) !important;
+            color: #ffffff !important;
+            border: 1px solid #7e22ce !important;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        }
+        #btn-open-drawer:active {
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            transform: translateY(1px);
+        }
+
         @media (min-width: 700px) {
             .mobile-selection-bar { display: none; }
             .mobile-toolbar-drawer { display: none !important; }
         }
         @media (max-width: 699px) {
-            .toolbar { display: none; } /* スマホ時はPC用ツールバーを隠す */
+            .toolbar { display: none; }
             td.data-cell { min-width: 40px; }
         }
 
@@ -259,7 +338,7 @@
         .resize-row { position: absolute; left: 0; bottom: 0; width: 100%; height: 8px; cursor: row-resize; z-index: 10; touch-action: none; }
 
         .btn-success { background: var(--primary) !important; color: white !important; border-color: var(--primary) !important; }
-        .btn-clear-cell { color: #d9534f; border-color: #d9534f !important; font-weight: bold; }
+        .btn-clear-cell { color: #d9534f; border-color: #d9534f !important; font-weight: bold; border-radius: 4px; }
         .btn-del-rowcol { color: #d9534f; border-color: #d9534f !important; }
 
         /* カスタム確認モーダル（戻るボタン用） */
@@ -294,7 +373,7 @@
                 <div class="home-actions-top">
                     <button id="btn-create-new" class="btn-create">＋ 表メモを作成</button>
                     <button id="btn-import-file" class="btn-import">📂 ファイルを開く</button>
-                    <input type="file" id="file-input" accept=".xlsx, .xls, .csv" style="display: none;">
+                    <input type="file" id="file-input" accept=".xlsx, .xlsx, .csv" style="display: none;">
                 </div>
             </div>
             <div id="memo-list" class="memo-list"><p style="color: #888; text-align: center; margin: 10px 0;">保存された表メモはありません。</p></div>
@@ -311,22 +390,22 @@
             <button id="btn-save" class="btn-success">セーブ</button>
         </div>
 
-        <!-- スマホ用クイック書式バー -->
+        <!-- スマホ用クイック書式バー (①セル番地を一番左に配置) -->
         <div class="mobile-selection-bar" id="mobile-selection-bar">
             <span id="selection-info">A1</span>
-            <button id="btn-select-all" title="表全体を選択">全選択</button>
-            <button id="btn-open-drawer" title="全書式を開く" style="background-color: #eef2ff; color: #3730a3; border-color: #c7d2fe;">全書式</button>
-            <button id="btn-border-all" title="選択範囲に全罫線">▦ 枠</button>
-            <button id="btn-border-outer" title="選択範囲の外枠">□ 外枠</button>
-            <button id="btn-border-none" title="罫線を消す">□̸ 消す</button>
-            <label class="mobile-color-btn" title="背景色">背景 <input type="color" id="mobile-bg-color" value="#fff2cc"></label>
-            <label class="mobile-color-btn" title="文字色">文字 <input type="color" id="mobile-text-color" value="#000000"></label>
+            <button id="btn-open-drawer" title="全書式を開く" style="border-radius: 6px;">全書式</button>
+            <button id="btn-select-all" title="表全体を選択" style="border-radius: 6px;">全選択</button>
+            <button id="btn-border-all" title="選択範囲に全罫線" style="border-radius: 6px;">▦ 枠</button>
+            <button id="btn-border-outer" title="選択範囲の外枠" style="border-radius: 6px;">□ 外枠</button>
+            <button id="btn-border-none" title="罫線を消す" style="border-radius: 6px;">□̸ 消す</button>
+            <label class="mobile-color-btn" title="背景色" style="border-radius: 6px;">背景 <input type="color" id="mobile-bg-color" value="#fff2cc"></label>
+            <label class="mobile-color-btn" title="文字色" style="border-radius: 6px;">文字 <input type="color" id="mobile-text-color" value="#000000"></label>
         </div>
 
         <!-- スマホ用 書式一覧ドロワー（初期は非表示） -->
         <div class="mobile-toolbar-drawer" id="mobile-toolbar-drawer">
             <div class="mobile-drawer-row">
-                <button id="btn-drawer-close" style="background-color: #fee2e2; color: #991b1b; border-color: #fca5a5;">閉じる</button>
+                <button id="btn-drawer-close">閉じる</button>
                 <div class="tool-group group-history" style="margin:0;">
                     <span class="tool-group-label">履歴</span>
                     <button id="btn-undo-m" title="戻る" disabled>↶</button>
@@ -374,6 +453,7 @@
 
         <!-- PC用ツールバー -->
         <div class="toolbar">
+            <span id="selection-info-pc" style="font-size: 14px; font-weight: bold; color: #1e293b; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; padding: 0 8px; height: 34px; display: inline-flex; align-items: center; justify-content: center; min-width: 55px; flex-shrink: 0;">A1</span>
             <div class="tool-group group-history">
                 <span class="tool-group-label">履歴</span>
                 <button id="btn-undo" title="戻る (Ctrl+Z)" disabled="">↶ 戻る</button>
@@ -601,7 +681,8 @@
 
         input.addEventListener('focus', () => {
             document.querySelectorAll('td.formula-source').forEach(el => el.classList.remove('formula-source'));
-            if (input.value.startsWith('=') || input.dataset.formula) {
+            const valStr = input.value;
+            if (valStr.startsWith('=') || valStr.startsWith('＝') || input.dataset.formula) {
                 td.classList.add('formula-source');
             }
             if (input.dataset.formula) {
@@ -615,7 +696,8 @@
         });
 
         input.addEventListener('input', () => {
-            if (input.value.startsWith('=')) {
+            const valStr = input.value;
+            if (valStr.startsWith('=') || valStr.startsWith('＝')) {
                 activeFormulaInput = input;
                 td.classList.add('formula-source');
             } else {
@@ -1050,9 +1132,10 @@
 
     function processCellFormula(input) {
         const raw = input.value.trim();
-        if (raw.startsWith('=')) {
-            input.dataset.formula = raw;
-            input.value = evaluateFormula(raw);
+        let normalizedRaw = raw.startsWith('＝') ? '=' + raw.substring(1) : raw;
+        if (normalizedRaw.startsWith('=')) {
+            input.dataset.formula = normalizedRaw;
+            input.value = evaluateFormula(normalizedRaw);
         } else {
             delete input.dataset.formula;
         }
@@ -1128,13 +1211,15 @@
                 if (td) { td.classList.add('selected'); selectedCells.push(td); }
             }
         }
-        const info = document.getElementById('selection-info');
-        if (info) {
-            const range = (minR === maxR && minC === maxC)
-                ? `${getColumnName(minC)}${minR+1}`
-                : `${getColumnName(minC)}${minR+1}:${getColumnName(maxC)}${maxR+1}`;
-            info.textContent = range; // セル番地を常時シンプルに表示
-        }
+        const range = (minR === maxR && minC === maxC)
+            ? `${getColumnName(minC)}${minR+1}`
+            : `${getColumnName(minC)}${minR+1}:${getColumnName(maxC)}${maxR+1}`;
+        
+        const infoMobile = document.getElementById('selection-info');
+        if (infoMobile) infoMobile.textContent = range;
+        const infoPc = document.getElementById('selection-info-pc');
+        if (infoPc) infoPc.textContent = range;
+
         updateToolbarState(selectedCells[0]?.querySelector('input'));
     }
 
@@ -1307,7 +1392,6 @@
         applyTextColor(e.target.value)
     );
 
-    // スマホ用 全書式ドロワーの開閉制御
     document.getElementById('btn-open-drawer').addEventListener('click', () => {
         document.getElementById('mobile-toolbar-drawer').classList.add('open');
     });
