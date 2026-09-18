@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
+<html lang="ja"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
@@ -69,20 +67,12 @@
         .memo-title-text { font-weight: 500; color: #0066cc; }
         .memo-title-text:hover { text-decoration: underline; }
         .memo-date-text { font-size: 0.75rem; color: #666; }
-        .memo-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
-        .memo-actions button, .memo-actions select {
+        .memo-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .memo-actions button {
             font-size: 0.8rem; padding: 4px 8px; border: 1px solid #ccc;
-            border-radius: 4px; cursor: pointer; background: #fff; height: 30px;
+            border-radius: 4px; cursor: pointer; background: #fff;
         }
         .memo-actions button:hover { background: #eee; }
-        
-        /* 出力用プルダウンのスタイル */
-        .export-select {
-            color: #333;
-            font-weight: bold;
-            background-color: #fff;
-        }
-
         .btn-del { color: #d9534f; border-color: #d9534f !important; }
         .btn-del:hover { background: #fdf2f2 !important; }
 
@@ -144,35 +134,114 @@
             width: 18px; height: 18px; border: none; cursor: pointer; background: none; padding: 0;
         }
 
+        /* スマホ用クイック書式バー */
+        .mobile-selection-bar {
+            display:flex; align-items:center; gap:6px; overflow-x:auto;
+            padding:6px 8px; margin-bottom:4px; background:#fff;
+            border:1px solid #d9d9d9; border-radius:6px; flex-shrink:0;
+            -webkit-overflow-scrolling:touch;
+        }
+        .mobile-selection-bar button, .mobile-color-btn {
+            height:38px; min-width:58px; padding:0 9px; border:1px solid #c9c9c9;
+            border-radius:7px; background:#fff; font-size:14px; font-weight:600;
+            display:inline-flex; align-items:center; justify-content:center; gap:3px;
+            white-space:nowrap; flex-shrink:0; touch-action:manipulation;
+        }
+        .mobile-selection-bar button:active, .mobile-color-btn:active { background:#eaf4ff; }
+        #selection-info { font-size:12px; color:#555; min-width:100px; white-space:nowrap; }
+        .mobile-color-btn input[type=color] { width:25px; height:25px; padding:0; border:0; background:transparent; }
+        @media (min-width: 700px) {
+            .mobile-selection-bar { display:none; }
+        }
+        @media (max-width: 699px) {
+            .toolbar { padding-bottom:5px; }
+            td.data-cell { min-width:40px; }
+        }
+
         /* スプレッドシート本体 */
         .spreadsheet-container {
             flex-grow: 1; width: 100%; overflow: auto; border: 1px solid var(--excel-border);
             background: #fff; position: relative; user-select: none; -webkit-user-select: none;
             -webkit-overflow-scrolling: touch;
         }
+        /* 縦・横スクロールバーを太くしてタッチしやすく */
+        .spreadsheet-container::-webkit-scrollbar {
+            width: 18px;
+            height: 18px;
+        }
+        .spreadsheet-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 9px;
+        }
+        .spreadsheet-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 9px;
+            border: 3px solid #f1f1f1;
+        }
+        .spreadsheet-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        /* Firefox用 */
+        .spreadsheet-container {
+            scrollbar-width: auto;
+            scrollbar-color: #888 #f1f1f1;
+        }
         table { border-collapse: separate; border-spacing: 0; table-layout: fixed; width: max-content; }
         th, td {
-            padding: 0; margin: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+            padding: 0; margin: 0; overflow: visible; white-space: nowrap; text-overflow: ellipsis;
             height: 30px; font-size: 0.9rem; position: relative; background-color: #ffffff;
         }
         td.data-cell { border: 1px solid var(--excel-border); display: table-cell; }
-        .cell-inner { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; position: relative; }
+        .cell-inner { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 2; }
         th { background-color: var(--excel-header); text-align: center; font-weight: normal; color: #555; border: 1px solid var(--excel-border); }
         .row-header { width: 45px; min-width: 35px; touch-action: auto; }
         .col-header { width: 90px; min-width: 40px; touch-action: auto; }
         .cell-input {
             width: 100%; border: none; outline: none; background: transparent;
             padding: 0 4px; box-sizing: border-box; font-family: inherit; font-size: inherit;
+            position: relative; z-index: 2;
         }
-        td.selected { background-color: var(--excel-select) !important; box-shadow: inset 0 0 0 1px var(--excel-select-border); z-index: 5; }
+        /* 複数選択時のハイライト（背景色を上書きしないように半透明オーバーレイ＋枠線） */
+        td.selected {
+            outline: 2px solid var(--excel-select-border);
+            outline-offset: -2px;
+            z-index: 5;
+            position: relative;
+        }
+        td.selected::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: rgba(43, 87, 154, 0.18); /* 薄い青オーバーレイ */
+            pointer-events: none;
+            z-index: 1;
+        }
+        /* 数式入力中のセルを強調 */
+        td.formula-source { outline: 2px solid #107c41; outline-offset: -2px; z-index: 6; }
+        td.formula-source::after { display: none; } /* 数式強調時は選択オーバーレイを隠す */
 
-        /* セル選択用の小さな■ハンドル */
+        /* 選択範囲を広げるための「＋」ハンドル（セルからはみ出る形に調整） */
         .cell-handle {
-            position: absolute; width: 6px; height: 6px; background-color: var(--excel-select-border);
-            z-index: 10; display: none; pointer-events: auto;
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #ffffff;
+            border: 2px solid var(--excel-select-border);
+            z-index: 25;
+            display: none;
+            pointer-events: auto;
+            touch-action: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            color: var(--excel-select-border);
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 8px;
+            cursor: crosshair;
         }
-        .cell-handle-tl { top: 0; left: 0; cursor: nwse-resize; }
-        .cell-handle-br { bottom: 0; right: 0; cursor: nwse-resize; }
+        /* セルの角に重なり、外側にはみ出るように配置 */
+        .cell-handle-tl { top: -6px; left: -6px; }
+        .cell-handle-br { bottom: -6px; right: -6px; }
         td.selected .cell-handle { display: block; }
 
         .resize-col { position: absolute; right: 0; top: 0; width: 8px; height: 100%; cursor: col-resize; z-index: 10; touch-action: none; }
@@ -180,24 +249,9 @@
 
         .btn-success { background: var(--primary) !important; color: white !important; border-color: var(--primary) !important; }
         .btn-clear-cell { color: #d9534f; border-color: #d9534f !important; font-weight: bold; }
-
-        /* カスタム3択確認モーダル */
-        #custom-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;
-        }
-        .modal-content {
-            background: #fff; padding: 20px 24px; border-radius: 8px; width: 90%; max-width: 360px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center; display: flex; flex-direction: column; gap: 16px;
-        }
-        .modal-buttons { display: flex; flex-direction: column; gap: 8px; }
-        .modal-buttons button {
-            padding: 10px; font-size: 0.95rem; font-weight: bold; border-radius: 6px; border: none; cursor: pointer;
-        }
-        .btn-modal-ok { background-color: var(--primary); color: white; }
-        .btn-modal-discard { background-color: #d9534f; color: white; }
-        .btn-modal-cancel { background-color: #6c757d; color: white; }
+        .btn-del-rowcol { color: #d9534f; border-color: #d9534f !important; }
     </style>
+
 </head>
 <body>
 
@@ -212,7 +266,7 @@
                     <input type="file" id="file-input" accept=".xlsx, .xls, .csv" style="display: none;">
                 </div>
             </div>
-            <div id="memo-list" class="memo-list"></div>
+            <div id="memo-list" class="memo-list"><p style="color: #888; text-align: center; margin: 10px 0;">保存された表メモはありません。</p></div>
         </div>
     </div>
 
@@ -227,26 +281,37 @@
         </div>
 
         <!-- ツールバー -->
+        <div class="mobile-selection-bar" id="mobile-selection-bar">
+            <span id="selection-info">セルを選択してください</span>
+            <button id="btn-select-all" title="表全体を選択">全選択</button>
+            <button id="btn-border-all" title="選択範囲に全罫線">▦ 枠</button>
+            <button id="btn-border-outer" title="選択範囲の外枠">□ 外枠</button>
+            <button id="btn-border-none" title="罫線を消す">□̸ 消す</button>
+            <label class="mobile-color-btn" title="背景色">背景 <input type="color" id="mobile-bg-color" value="#fff2cc"></label>
+            <label class="mobile-color-btn" title="文字色">文字 <input type="color" id="mobile-text-color" value="#000000"></label>
+        </div>
+
         <div class="toolbar">
             <div class="tool-group group-history">
                 <span class="tool-group-label">履歴</span>
-                <button id="btn-undo" title="戻る (Ctrl+Z)" disabled>↶ 戻る</button>
-                <button id="btn-redo" title="進む (Ctrl+Y)" disabled>↷ 進む</button>
+                <button id="btn-undo" title="戻る (Ctrl+Z)" disabled="">↶ 戻る</button>
+                <button id="btn-redo" title="進む (Ctrl+Y)" disabled="">↷ 進む</button>
             </div>
             <div class="tool-group group-size">
                 <span class="tool-group-label">行・列</span>
-                <button id="btn-insert-row" title="選択行の上に挿入">行挿入</button>
-                <button id="btn-insert-col" title="選択列の左に挿入">列挿入</button>
-                <button id="btn-add-row" title="末尾に行追加">行＋</button>
-                <button id="btn-add-col" title="末尾に列追加">列＋</button>
+                <button id="btn-add-row" title="選択位置に行を挿入">行＋</button>
+                <button id="btn-delete-row" class="btn-del-rowcol" title="選択行を削除">行－</button>
+                <button id="btn-add-col" title="選択位置に列を挿入">列＋</button>
+                <button id="btn-delete-col" class="btn-del-rowcol" title="選択列を削除">列－</button>
             </div>
+
+
             <div class="tool-group group-text">
                 <span class="tool-group-label">文字</span>
                 <button id="btn-bold" title="太字"><b>B</b></button>
                 <select id="select-font-size" title="文字サイズ">
-                    <option value="" disabled selected>サイズ</option>
                     <option value="0.75rem">小(12)</option>
-                    <option value="0.9rem">標準(14)</option>
+                    <option value="0.9rem" selected="">標準(14)</option>
                     <option value="1.1rem">中(16)</option>
                     <option value="1.3rem">大(20)</option>
                 </select>
@@ -265,13 +330,11 @@
             <div class="tool-group group-align">
                 <span class="tool-group-label">配置</span>
                 <select id="select-align-horiz" title="左右位置">
-                    <option value="" disabled selected>左右</option>
                     <option value="left">左</option>
                     <option value="center">中</option>
                     <option value="right">右</option>
                 </select>
                 <select id="select-align-vert" title="上下位置">
-                    <option value="" disabled selected>上下</option>
                     <option value="center">中</option>
                     <option value="flex-start">上</option>
                     <option value="flex-end">下</option>
@@ -280,7 +343,6 @@
             <div class="tool-group group-border">
                 <span class="tool-group-label">罫線</span>
                 <select id="select-border-type" title="罫線パターン">
-                    <option value="" disabled selected>罫線</option>
                     <option value="all">格子</option>
                     <option value="top">上</option>
                     <option value="bottom">下</option>
@@ -288,8 +350,10 @@
                     <option value="right">右</option>
                     <option value="none">無</option>
                 </select>
+
+
                 <select id="select-border-width" title="太さ">
-                    <option value="1px" selected>細</option>
+                    <option value="1px">細</option>
                     <option value="2px">中</option>
                     <option value="3px">太</option>
                 </select>
@@ -307,19 +371,6 @@
         </div>
     </div>
 
-    <!-- 戻る時の3択カスタムモーダル -->
-    <div id="custom-modal">
-        <div class="modal-content">
-            <h3 style="margin:0; color:var(--primary);">確認</h3>
-            <p id="modal-message" style="margin:0; font-size:0.95rem;">変更をセーブしますか？</p>
-            <div class="modal-buttons">
-                <button id="modal-btn-ok" class="btn-modal-ok">OK（セーブして戻る）</button>
-                <button id="modal-btn-discard" class="btn-modal-discard">セーブせず戻る</button>
-                <button id="modal-btn-cancel" class="btn-modal-cancel">キャンセル（とどまる）</button>
-            </div>
-        </div>
-    </div>
-
 <script>
     let COLS = 15; 
     let ROWS = 40;  
@@ -330,7 +381,14 @@
     let startCellCoord = null;
     let activeFormulaInput = null;
     let lastTouchTime = 0;
+    let touchStartPos = null;
+    let touchMoved = false;
+    let formulaRangeStart = null; // for drag range in formula mode
+    let lastInsertedRefLen = 0; // 数式ドラッグ時の参照置き換え用
     const defaultBorder = '1px solid #e6e6e6';
+    const TOUCH_MOVE_THRESHOLD = 12; // px: above this = scroll, not select
+
+
 
     let undoStack = [];
     let redoStack = [];
@@ -452,6 +510,11 @@
         input.addEventListener('compositionend', () => { isComposing = false; });
 
         input.addEventListener('focus', () => {
+            // 数式入力中のセルを強調表示
+            document.querySelectorAll('td.formula-source').forEach(el => el.classList.remove('formula-source'));
+            if (input.value.startsWith('=') || input.dataset.formula) {
+                td.classList.add('formula-source');
+            }
             if (input.dataset.formula) {
                 input.value = input.dataset.formula;
             } else if (input.dataset.format) {
@@ -465,47 +528,211 @@
         input.addEventListener('input', () => {
             if (input.value.startsWith('=')) {
                 activeFormulaInput = input;
+                td.classList.add('formula-source');
             } else {
                 if (activeFormulaInput === input) activeFormulaInput = null;
+                td.classList.remove('formula-source');
             }
         });
 
         input.addEventListener('blur', () => {
             setTimeout(() => {
                 if (!isComposing) {
-                    if (activeFormulaInput === input) activeFormulaInput = null;
+                    // 数式入力中に他セルをクリックした場合はフォーカスを戻すので、ここでは処理しない
+                    if (document.activeElement === activeFormulaInput) return;
+                    if (activeFormulaInput === input) {
+                        activeFormulaInput = null;
+                        formulaRangeStart = null;
+                    }
+                    td.classList.remove('formula-source');
                     saveState();
                     processCellFormula(input);
                     recalculateAllFormulas();
                 }
-            }, 200);
+            }, 150);
         });
 
+        // 数式用のセル参照挿入（単一 or 範囲）。ドラッグ中は最後の参照を置き換える
+        const insertCellRefToFormula = (endR, endC, isDragUpdate = false) => {
+
+            if (!activeFormulaInput) return;
+            let ref;
+            if (formulaRangeStart && (formulaRangeStart.r !== endR || formulaRangeStart.c !== endC)) {
+                const minR = Math.min(formulaRangeStart.r, endR);
+                const maxR = Math.max(formulaRangeStart.r, endR);
+                const minC = Math.min(formulaRangeStart.c, endC);
+                const maxC = Math.max(formulaRangeStart.c, endC);
+                ref = getColumnName(minC) + (minR + 1) + ':' + getColumnName(maxC) + (maxR + 1);
+            } else {
+                ref = getColumnName(endC) + (endR + 1);
+            }
+            const val = activeFormulaInput.value;
+            let start, endPos;
+            if (isDragUpdate && lastInsertedRefLen > 0) {
+                // 前回挿入した参照を置き換え
+                endPos = activeFormulaInput.selectionStart || val.length;
+                start = endPos - lastInsertedRefLen;
+                if (start < 0) start = 0;
+            } else {
+                start = activeFormulaInput.selectionStart || val.length;
+                endPos = activeFormulaInput.selectionEnd || val.length;
+            }
+            activeFormulaInput.value = val.substring(0, start) + ref + val.substring(endPos);
+            activeFormulaInput.focus();
+            const newPos = start + ref.length;
+            activeFormulaInput.setSelectionRange(newPos, newPos);
+            lastInsertedRefLen = ref.length;
+            // 選択範囲を一時的にハイライト
+            selectRange(formulaRangeStart ? formulaRangeStart.r : endR, formulaRangeStart ? formulaRangeStart.c : endC, endR, endC);
+        };
+
+
+        // タッチとマウスの重複イベント防止 + スクロール時の誤選択防止
         const handleCellInteraction = (e) => {
             if (e.type === 'touchstart') {
                 lastTouchTime = Date.now();
+                touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                touchMoved = false;
+                // タッチ開始時点では選択しない（スクロール判定のため）
+                if (activeFormulaInput && activeFormulaInput !== input) {
+                    // 数式モードではタッチ開始で範囲開始を記録
+                    formulaRangeStart = { r, c };
+                    e.preventDefault(); // スクロールを少し抑制しつつフォーカス維持
+                }
+                return;
             } else if (e.type === 'mousedown' && Date.now() - lastTouchTime < 500) {
+                return; // タッチ直後のマウスイベントを無視
+            }
+
+            // 数式入力中：セル参照を挿入してフォーカスを数式セルに戻す
+            if (activeFormulaInput && activeFormulaInput !== input) {
+                e.preventDefault();
+                e.stopPropagation();
+                formulaRangeStart = { r, c };
+                lastInsertedRefLen = 0;
+                insertCellRefToFormula(r, c, false);
+                isMouseDown = true; // ドラッグで範囲選択可能に
+                startCellCoord = { r, c };
                 return;
             }
 
-            if (activeFormulaInput && activeFormulaInput !== input) {
-                e.preventDefault();
-                const cellRef = getColumnName(c) + (r + 1);
-                activeFormulaInput.value += cellRef;
-                activeFormulaInput.focus();
-                return;
+
+            // 通常モード
+            isMouseDown = true;
+            startCellCoord = { r, c };
+            formulaRangeStart = null;
+            selectRange(r, c, r, c);
+        };
+
+        const handleTouchMove = (e) => {
+            if (!touchStartPos) return;
+            const dx = Math.abs(e.touches[0].clientX - touchStartPos.x);
+            const dy = Math.abs(e.touches[0].clientY - touchStartPos.y);
+            if (dx > TOUCH_MOVE_THRESHOLD || dy > TOUCH_MOVE_THRESHOLD) {
+                touchMoved = true;
             }
-            isMouseDown = true; startCellCoord = { r, c };
-            selectRange(r, c, r, c); 
+            // 数式モードでドラッグ中なら範囲更新
+            if (activeFormulaInput && formulaRangeStart && isMouseDown && !touchMoved) {
+                // 軽く動いただけなら範囲に
+            }
+        };
+
+        const handleTouchEnd = (e) => {
+            if (e.type === 'touchend' && touchStartPos) {
+                if (!touchMoved) {
+                    // タップと判定 → 選択 or 数式参照挿入
+                    if (activeFormulaInput && activeFormulaInput !== input) {
+                        lastInsertedRefLen = 0;
+                        insertCellRefToFormula(r, c, false);
+                        formulaRangeStart = null;
+                    } else if (!activeFormulaInput) {
+                        const alreadySelected = selectedCells.length === 1 && selectedCells[0] === td;
+                        isMouseDown = false;
+                        startCellCoord = { r, c };
+                        selectRange(r, c, r, c);
+                        // 既に選択済みのセルを再度タップした場合のみフォーカス（スクロール時の誤フォーカス防止）
+                        // 初回タップは選択のみ、2回目で編集開始
+                        if (alreadySelected) {
+                            input.focus();
+                        }
+                    }
+                }
+
+
+                touchStartPos = null;
+                touchMoved = false;
+                isMouseDown = false;
+            }
         };
 
         td.addEventListener('mousedown', handleCellInteraction);
-        td.addEventListener('touchstart', handleCellInteraction, { passive: true });
-        td.addEventListener('mouseenter', () => { if (isMouseDown && startCellCoord) selectRange(startCellCoord.r, startCellCoord.c, r, c); });
+        td.addEventListener('touchstart', handleCellInteraction, { passive: false });
+        td.addEventListener('touchmove', handleTouchMove, { passive: true });
+        td.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+        // スマホ：セルを長押しして、そのままドラッグすると範囲選択
+        let longPressTimer = null;
+        let pointerSelecting = false;
+        const beginLongPress = (e) => {
+            if (e.pointerType !== 'touch') return;
+            clearTimeout(longPressTimer);
+            longPressTimer = setTimeout(() => {
+                pointerSelecting = true;
+                isMouseDown = true;
+                startCellCoord = { r, c };
+                selectRange(r, c, r, c);
+                if (navigator.vibrate) navigator.vibrate(18);
+            }, 380);
+        };
+        const moveLongPress = (e) => {
+            if (e.pointerType !== 'touch') return;
+            if (!pointerSelecting) {
+                if (Math.abs(e.movementX) > 8 || Math.abs(e.movementY) > 8) clearTimeout(longPressTimer);
+                return;
+            }
+            e.preventDefault();
+            const elem = document.elementFromPoint(e.clientX, e.clientY);
+            const target = elem && elem.closest('td.data-cell');
+            if (target) {
+                const tr = parseInt(target.dataset.row), tc = parseInt(target.dataset.col);
+                if (!Number.isNaN(tr) && !Number.isNaN(tc)) {
+                    selectRange(startCellCoord.r, startCellCoord.c, tr, tc);
+                }
+            }
+        };
+        const endLongPress = (e) => {
+            if (e.pointerType !== 'touch') return;
+            clearTimeout(longPressTimer);
+            if (pointerSelecting) {
+                e.preventDefault();
+                pointerSelecting = false;
+                isMouseDown = false;
+            }
+        };
+        td.addEventListener('pointerdown', beginLongPress, { passive:false });
+        td.addEventListener('pointermove', moveLongPress, { passive:false });
+        td.addEventListener('pointerup', endLongPress, { passive:false });
+        td.addEventListener('pointercancel', endLongPress, { passive:false });
+
+        td.addEventListener('mouseenter', () => {
+            if (isMouseDown && startCellCoord) {
+                if (activeFormulaInput && activeFormulaInput !== input) {
+                    // 数式モードのドラッグで範囲参照を更新（前回分を置き換え）
+                    insertCellRefToFormula(r, c, true);
+                } else {
+                    selectRange(startCellCoord.r, startCellCoord.c, r, c);
+                }
+            }
+        });
+
 
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                e.preventDefault(); activeFormulaInput = null; input.blur(); 
+                e.preventDefault();
+                activeFormulaInput = null;
+                formulaRangeStart = null;
+                td.classList.remove('formula-source');
+                input.blur();
                 const nextRow = r + 1;
                 if (nextRow < ROWS) {
                     const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${c}"]`);
@@ -525,7 +752,9 @@
                     selectedCells.forEach(targetTd => {
                         const tInput = targetTd.querySelector('input'); const tInner = targetTd.querySelector('.cell-inner');
                         if (tInput) {
-                            tInput.value = copiedCellData.val; tInput.dataset.formula = copiedCellData.formula; tInput.dataset.format = copiedCellData.format;
+                            tInput.value = copiedCellData.val;
+                            if (copiedCellData.formula) tInput.dataset.formula = copiedCellData.formula; else delete tInput.dataset.formula;
+                            if (copiedCellData.format) tInput.dataset.format = copiedCellData.format; else delete tInput.dataset.format;
                             tInput.style.fontWeight = copiedCellData.bold || 'normal'; tInput.style.fontSize = copiedCellData.fontSize || '0.9rem';
                             tInput.style.color = copiedCellData.color || ''; tInput.style.textAlign = copiedCellData.align || 'left';
                             processCellFormula(tInput);
@@ -544,6 +773,58 @@
             saveState();
             handlePaste(e, r, c);
         });
+    }
+
+
+    // 選択ハンドルをドラッグして範囲を広げる
+    function initCellHandle(handle, r, c) {
+        const onHandleStart = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            isMouseDown = true;
+
+            if (selectedCells.length > 0) {
+                // 現在の選択範囲の左上を起点にする
+                const rows = selectedCells.map(td => parseInt(td.dataset.row));
+                const cols = selectedCells.map(td => parseInt(td.dataset.col));
+                startCellCoord = { r: Math.min(...rows), c: Math.min(...cols) };
+            } else {
+                startCellCoord = { r, c };
+            }
+            selectRange(startCellCoord.r, startCellCoord.c, r, c);
+
+            const onHandleMove = (moveEvent) => {
+                const clientX = moveEvent.clientX ?? (moveEvent.touches && moveEvent.touches[0] && moveEvent.touches[0].clientX);
+                const clientY = moveEvent.clientY ?? (moveEvent.touches && moveEvent.touches[0] && moveEvent.touches[0].clientY);
+                if (clientX == null || clientY == null) return;
+
+                const elem = document.elementFromPoint(clientX, clientY);
+                const targetTd = elem ? elem.closest('td.data-cell') : null;
+                if (targetTd) {
+                    const targetR = parseInt(targetTd.dataset.row);
+                    const targetC = parseInt(targetTd.dataset.col);
+                    if (!isNaN(targetR) && !isNaN(targetC)) {
+                        selectRange(startCellCoord.r, startCellCoord.c, targetR, targetC);
+                    }
+                }
+            };
+
+            const onHandleEnd = () => {
+                isMouseDown = false;
+                document.removeEventListener('mousemove', onHandleMove);
+                document.removeEventListener('mouseup', onHandleEnd);
+                document.removeEventListener('touchmove', onHandleMove);
+                document.removeEventListener('touchend', onHandleEnd);
+            };
+
+            document.addEventListener('mousemove', onHandleMove);
+            document.addEventListener('mouseup', onHandleEnd);
+            document.addEventListener('touchmove', onHandleMove, { passive: false });
+            document.addEventListener('touchend', onHandleEnd);
+        };
+
+        handle.addEventListener('mousedown', onHandleStart);
+        handle.addEventListener('touchstart', onHandleStart, { passive: false });
     }
 
     function buildSheetStructure() {
@@ -571,13 +852,16 @@
                 td.dataset.row = r; td.dataset.col = c;
 
                 const inner = document.createElement('div'); inner.className = 'cell-inner'; inner.style.justifyContent = 'center';
-                
+
+                // セルの角からはみ出る形の選択ハンドル（＋に文字変更）
                 const handleTl = document.createElement('div');
                 handleTl.className = 'cell-handle cell-handle-tl';
+                handleTl.textContent = '+';
                 initCellHandle(handleTl, r, c);
-                
+
                 const handleBr = document.createElement('div');
                 handleBr.className = 'cell-handle cell-handle-br';
+                handleBr.textContent = '+';
                 initCellHandle(handleBr, r, c);
 
                 const input = document.createElement('input'); input.type = 'text'; input.className = 'cell-input';
@@ -587,60 +871,12 @@
 
                 inner.appendChild(handleTl);
                 inner.appendChild(handleBr);
-                inner.appendChild(input); 
-                td.appendChild(inner); 
+                inner.appendChild(input);
+                td.appendChild(inner);
                 tr.appendChild(td);
             }
             sheetBody.appendChild(tr);
         }
-    }
-
-    function initCellHandle(handle, r, c) {
-        const onHandleStart = (e) => {
-            e.stopPropagation();
-            isMouseDown = true;
-            
-            if (selectedCells.length > 0) {
-                const firstTd = selectedCells[0];
-                startCellCoord = { r: parseInt(firstTd.dataset.row), c: parseInt(firstTd.dataset.col) };
-            } else {
-                startCellCoord = { r, c };
-            }
-            selectRange(startCellCoord.r, startCellCoord.c, r, c);
-
-            const onHandleMove = (moveEvent) => {
-                const clientX = moveEvent.clientX || (moveEvent.touches && moveEvent.touches[0].clientX);
-                const clientY = moveEvent.clientY || (moveEvent.touches && moveEvent.touches[0].clientY);
-                if (!clientX || !clientY) return;
-
-                const elem = document.elementFromPoint(clientX, clientY);
-                const targetTd = elem ? elem.closest('td.data-cell') : null;
-                if (targetTd) {
-                    const targetR = parseInt(targetTd.dataset.row);
-                    const targetC = parseInt(targetTd.dataset.col);
-                    if (!isNaN(targetR) && !isNaN(targetC)) {
-                        selectRange(startCellCoord.r, startCellCoord.c, targetR, targetC);
-                    }
-                }
-            };
-
-            const onHandleEnd = () => {
-                isMouseDown = false;
-                document.removeEventListener('mousemove', onHandleMove);
-                document.removeEventListener('mouseup', onHandleEnd);
-                document.removeEventListener('touchmove', onHandleMove);
-                document.removeEventListener('touchend', onHandleEnd);
-                saveState();
-            };
-
-            document.addEventListener('mousemove', onHandleMove);
-            document.addEventListener('mouseup', onHandleEnd);
-            document.addEventListener('touchmove', onHandleMove, { passive: true });
-            document.addEventListener('touchend', onHandleEnd);
-        };
-
-        handle.addEventListener('mousedown', onHandleStart);
-        handle.addEventListener('touchstart', onHandleStart, { passive: true });
     }
 
     function initSheet() {
@@ -652,33 +888,10 @@
         updateUndoRedoButtons();
     }
 
+    // --- 行・列の挿入／削除（選択位置に対して操作） ---
+    // 行＋ : 選択セルの位置に行を挿入（選択なしなら末尾）
     document.getElementById('btn-add-row').addEventListener('click', () => {
-        saveState();
-        ROWS++;
-        const state = getSheetState();
-        state.rows = ROWS;
-        let emptyRow = {};
-        for (let c = 0; c < COLS; c++) {
-            emptyRow[c] = { val: "", formula: "", format: "", bold: "", fontSize: "", color: "", align: "", vertAlign: "", bg: "", borderTop: defaultBorder, borderBottom: defaultBorder, borderLeft: defaultBorder, borderRight: defaultBorder };
-        }
-        state.data.push(emptyRow);
-        restoreSheetState(state);
-    });
-
-    document.getElementById('btn-add-col').addEventListener('click', () => {
-        saveState();
-        if (COLS >= 26 * 26) return;
-        COLS++;
-        const state = getSheetState();
-        state.cols = COLS;
-        state.data.forEach(rowObj => {
-            rowObj[COLS - 1] = { val: "", formula: "", format: "", bold: "", fontSize: "", color: "", align: "", vertAlign: "", bg: "", borderTop: defaultBorder, borderBottom: defaultBorder, borderLeft: defaultBorder, borderRight: defaultBorder };
-        });
-        restoreSheetState(state);
-    });
-
-    document.getElementById('btn-insert-row').addEventListener('click', () => {
-        let targetR = 0;
+        let targetR = ROWS; // デフォルトは末尾
         if (selectedCells.length > 0) {
             targetR = parseInt(selectedCells[0].dataset.row);
         }
@@ -693,12 +906,13 @@
         restoreSheetState(state);
     });
 
-    document.getElementById('btn-insert-col').addEventListener('click', () => {
-        let targetC = 0;
+    // 列＋ : 選択セルの位置に列を挿入（選択なしなら末尾）
+    document.getElementById('btn-add-col').addEventListener('click', () => {
+        if (COLS >= 26 * 26) return;
+        let targetC = COLS; // デフォルトは末尾
         if (selectedCells.length > 0) {
             targetC = parseInt(selectedCells[0].dataset.col);
         }
-        if (COLS >= 26 * 26) return;
         saveState();
         const state = getSheetState();
         state.cols++;
@@ -711,6 +925,65 @@
         restoreSheetState(state);
     });
 
+    // 行－ : 選択行を削除
+    document.getElementById('btn-delete-row').addEventListener('click', () => {
+        if (selectedCells.length === 0) {
+            alert('削除する行を選択してください。');
+            return;
+        }
+        if (ROWS <= 1) {
+            alert('これ以上行を削除できません。');
+            return;
+        }
+        const rowsToDelete = [...new Set(selectedCells.map(td => parseInt(td.dataset.row)))].sort((a, b) => b - a);
+        if (!confirm(`${rowsToDelete.length}行を削除しますか？`)) return;
+        saveState();
+        const state = getSheetState();
+        rowsToDelete.forEach(r => {
+            if (r < state.data.length) state.data.splice(r, 1);
+        });
+        state.rows = state.data.length;
+        if (state.rows < 1) {
+            let emptyRow = {};
+            for (let c = 0; c < COLS; c++) {
+                emptyRow[c] = { val: "", formula: "", format: "", bold: "", fontSize: "", color: "", align: "", vertAlign: "", bg: "", borderTop: defaultBorder, borderBottom: defaultBorder, borderLeft: defaultBorder, borderRight: defaultBorder };
+            }
+            state.data.push(emptyRow);
+            state.rows = 1;
+        }
+        restoreSheetState(state);
+        selectedCells = [];
+    });
+
+    // 列－ : 選択列を削除
+    document.getElementById('btn-delete-col').addEventListener('click', () => {
+        if (selectedCells.length === 0) {
+            alert('削除する列を選択してください。');
+            return;
+        }
+        if (COLS <= 1) {
+            alert('これ以上列を削除できません。');
+            return;
+        }
+        const colsToDelete = [...new Set(selectedCells.map(td => parseInt(td.dataset.col)))].sort((a, b) => b - a);
+        if (!confirm(`${colsToDelete.length}列を削除しますか？`)) return;
+        saveState();
+        const state = getSheetState();
+        colsToDelete.forEach(c => {
+            state.data.forEach(rowObj => {
+                for (let i = c; i < state.cols - 1; i++) {
+                    rowObj[i] = rowObj[i + 1] || { val: "", formula: "", format: "", bold: "", fontSize: "", color: "", align: "", vertAlign: "", bg: "", borderTop: defaultBorder, borderBottom: defaultBorder, borderLeft: defaultBorder, borderRight: defaultBorder };
+                }
+                delete rowObj[state.cols - 1];
+            });
+            state.cols--;
+        });
+        if (state.cols < 1) state.cols = 1;
+        restoreSheetState(state);
+        selectedCells = [];
+    });
+
+    // グローバルキーボードショートカット (Ctrl+Z / Ctrl+Y)
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
             e.preventDefault();
@@ -789,8 +1062,17 @@
         });
     }
 
-    document.addEventListener('mouseup', () => { isMouseDown = false; });
+    document.addEventListener('mouseup', () => {
+        isMouseDown = false;
+        if (activeFormulaInput) {
+            formulaRangeStart = null;
+            lastInsertedRefLen = 0;
+            // 数式セルにフォーカスを戻す
+            setTimeout(() => { if (activeFormulaInput) activeFormulaInput.focus(); }, 10);
+        }
+    });
     document.addEventListener('touchend', () => { isMouseDown = false; });
+
 
     function selectRange(r1, c1, r2 = r1, c2 = c1) {
         selectedCells.forEach(td => td.classList.remove('selected'));
@@ -803,6 +1085,15 @@
                 if (td) { td.classList.add('selected'); selectedCells.push(td); }
             }
         }
+        const info = document.getElementById('selection-info');
+        if (info) {
+            const count = selectedCells.length;
+            const range = (minR === maxR && minC === maxC)
+                ? `${getColumnName(minC)}${minR+1}`
+                : `${getColumnName(minC)}${minR+1}:${getColumnName(maxC)}${maxR+1}`;
+            info.textContent = `${range} ${count}セル`;
+        }
+        updateToolbarState(selectedCells[0]?.querySelector('input'));
     }
 
     function initColResizer(handle, th) {
@@ -869,60 +1160,104 @@
         selectedCells.forEach(td => { const input = td.querySelector('input'); if (input) input.style.fontWeight = isBold ? 'normal' : 'bold'; });
         document.getElementById('btn-bold').classList.toggle('active', !isBold);
     });
+    document.getElementById('select-font-size').addEventListener('change', (e) => { saveState(); selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.fontSize = e.target.value; }); });
+    document.getElementById('select-align-horiz').addEventListener('change', (e) => { saveState(); selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.textAlign = e.target.value; }); });
+    document.getElementById('select-align-vert').addEventListener('change', (e) => { saveState(); selectedCells.forEach(td => { const inner = td.querySelector('.cell-inner'); if(inner) inner.style.justifyContent = e.target.value; }); });
 
-    document.getElementById('select-font-size').addEventListener('change', (e) => {
-        saveState();
-        const val = e.target.value;
-        selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.fontSize = val; });
-        e.target.value = "";
-    });
-    
-    const colorText = document.getElementById('color-text');
-    const colorBg = document.getElementById('color-bg');
+    // 色コードを #rrggbb に正規化（rgb(...) や空文字対応）
+    function toHexColor(color, fallback) {
+        if (!color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)') return fallback;
+        if (color.startsWith('#') && (color.length === 7 || color.length === 4)) {
+            if (color.length === 4) {
+                return '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
+            }
+            return color.toLowerCase();
+        }
+        const m = color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+        if (m) {
+            const r = parseInt(m[1], 10).toString(16).padStart(2, '0');
+            const g = parseInt(m[2], 10).toString(16).padStart(2, '0');
+            const b = parseInt(m[3], 10).toString(16).padStart(2, '0');
+            return '#' + r + g + b;
+        }
+        return fallback;
+    }
 
-    colorText.addEventListener('click', () => {
+    function applyTextColor(color) {
         if (selectedCells.length === 0) return;
         saveState();
         selectedCells.forEach(td => {
             const input = td.querySelector('input');
-            if (input) input.style.color = colorText.value;
+            if (input) input.style.color = color;
         });
-    });
-    colorText.addEventListener('input', (e) => {
-        saveState();
-        selectedCells.forEach(td => {
-            const input = td.querySelector('input');
-            if (input) input.style.color = e.target.value;
-        });
-    });
-
-    colorBg.addEventListener('click', () => {
+    }
+    function applyBgColor(color) {
         if (selectedCells.length === 0) return;
         saveState();
-        selectedCells.forEach(td => {
-            td.style.backgroundColor = colorBg.value;
-        });
+        selectedCells.forEach(td => { td.style.backgroundColor = color; });
+    }
+
+    // input + change の両方で適用。click でも現在の色を再適用（同じ色でも効くように）
+    const colorTextEl = document.getElementById('color-text');
+    const colorBgEl = document.getElementById('color-bg');
+    colorTextEl.addEventListener('input', (e) => applyTextColor(e.target.value));
+    colorTextEl.addEventListener('change', (e) => applyTextColor(e.target.value));
+    colorTextEl.addEventListener('click', () => {
+        if (selectedCells.length > 0) applyTextColor(colorTextEl.value);
     });
-    colorBg.addEventListener('input', (e) => {
-        saveState();
-        selectedCells.forEach(td => {
-            td.style.backgroundColor = e.target.value;
-        });
-    });
-    
-    document.getElementById('select-align-horiz').addEventListener('change', (e) => {
-        saveState();
-        const val = e.target.value;
-        selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.textAlign = val; });
-        e.target.value = "";
+    colorBgEl.addEventListener('input', (e) => applyBgColor(e.target.value));
+    colorBgEl.addEventListener('change', (e) => applyBgColor(e.target.value));
+    colorBgEl.addEventListener('click', () => {
+        if (selectedCells.length > 0) applyBgColor(colorBgEl.value);
     });
 
-    document.getElementById('select-align-vert').addEventListener('change', (e) => {
+    // スマホ向け：選択範囲のクイック罫線
+    function applySelectedBorders(mode) {
+        if (!selectedCells.length) return;
         saveState();
-        const val = e.target.value;
-        selectedCells.forEach(td => { const inner = td.querySelector('.cell-inner'); if(inner) inner.style.justifyContent = val; });
-        e.target.value = "";
-    });
+        const width = document.getElementById('select-border-width')?.value || '1px';
+        const color = document.getElementById('color-border')?.value || '#e6e6e6';
+        const line = `${width} solid ${color}`;
+        const rows = selectedCells.map(td => +td.dataset.row);
+        const cols = selectedCells.map(td => +td.dataset.col);
+        const minR = Math.min(...rows), maxR = Math.max(...rows);
+        const minC = Math.min(...cols), maxC = Math.max(...cols);
+
+        selectedCells.forEach(td => {
+            const r = +td.dataset.row, c = +td.dataset.col;
+            if (mode === 'none') {
+                td.style.borderTop = td.style.borderBottom =
+                td.style.borderLeft = td.style.borderRight = defaultBorder;
+            } else if (mode === 'all') {
+                td.style.borderTop = td.style.borderBottom =
+                td.style.borderLeft = td.style.borderRight = line;
+            } else if (mode === 'outer') {
+                if (r === minR) td.style.borderTop = line;
+                if (r === maxR) td.style.borderBottom = line;
+                if (c === minC) td.style.borderLeft = line;
+                if (c === maxC) td.style.borderRight = line;
+            }
+        });
+    }
+
+    document.getElementById('btn-select-all').addEventListener('click', () =>
+        selectRange(0, 0, ROWS - 1, COLS - 1)
+    );
+    document.getElementById('btn-border-all').addEventListener('click', () =>
+        applySelectedBorders('all')
+    );
+    document.getElementById('btn-border-outer').addEventListener('click', () =>
+        applySelectedBorders('outer')
+    );
+    document.getElementById('btn-border-none').addEventListener('click', () =>
+        applySelectedBorders('none')
+    );
+    document.getElementById('mobile-bg-color').addEventListener('input', e =>
+        applyBgColor(e.target.value)
+    );
+    document.getElementById('mobile-text-color').addEventListener('input', e =>
+        applyTextColor(e.target.value)
+    );
 
     document.getElementById('btn-clear').addEventListener('click', () => {
         if (selectedCells.length === 0) return;
@@ -936,12 +1271,11 @@
         recalculateAllFormulas();
     });
 
+    // 任意の場所への格子・枠線の適用
     function applyBorder() {
         if (selectedCells.length === 0) return;
         saveState();
-        const typeSelect = document.getElementById('select-border-type');
-        const type = typeSelect.value;
-        if (!type) return;
+        const type = document.getElementById('select-border-type').value;
         const customBorder = `${document.getElementById('select-border-width').value} solid ${document.getElementById('color-border').value}`;
         selectedCells.forEach(td => {
             if (type === 'all') { td.style.borderTop = customBorder; td.style.borderBottom = customBorder; td.style.borderLeft = customBorder; td.style.borderRight = customBorder; }
@@ -951,24 +1285,33 @@
             else if (type === 'right') td.style.borderRight = customBorder;
             else if (type === 'none') { td.style.borderTop = defaultBorder; td.style.borderBottom = defaultBorder; td.style.borderLeft = defaultBorder; td.style.borderRight = defaultBorder; }
         });
-        typeSelect.value = "";
     }
+
+
     document.getElementById('select-border-type').addEventListener('change', applyBorder);
-    document.getElementById('select-border-width').addEventListener('change', () => {
-        const type = document.getElementById('select-border-type').value;
-        if (type) applyBorder();
+    document.getElementById('select-border-width').addEventListener('change', applyBorder);
+    const colorBorderEl = document.getElementById('color-border');
+    colorBorderEl.addEventListener('input', applyBorder);
+    colorBorderEl.addEventListener('change', applyBorder);
+    colorBorderEl.addEventListener('click', () => {
+        if (selectedCells.length > 0) applyBorder();
     });
-    document.getElementById('color-border').addEventListener('input', () => {
-        const type = document.getElementById('select-border-type').value;
-        if (type) applyBorder();
-    });
+
 
     function updateToolbarState(input) {
         document.getElementById('btn-bold').classList.toggle('active', input.style.fontWeight === 'bold');
-        if (input.style.color) document.getElementById('color-text').value = input.style.color;
+        if (input.style.fontSize) document.getElementById('select-font-size').value = input.style.fontSize;
+        // rgb(...) を #rrggbb に変換してカラーピッカーに反映（同じ色を再選択できるようにする）
+        document.getElementById('color-text').value = toHexColor(input.style.color, '#000000');
+        if (input.style.textAlign) document.getElementById('select-align-horiz').value = input.style.textAlign;
         const td = input.closest('td');
-        if (td && td.style.backgroundColor) document.getElementById('color-bg').value = td.style.backgroundColor;
+        if (td) {
+            const inner = td.querySelector('.cell-inner');
+            if (inner && inner.style.justifyContent) document.getElementById('select-align-vert').value = inner.style.justifyContent;
+            document.getElementById('color-bg').value = toHexColor(td.style.backgroundColor, '#ffffff');
+        }
     }
+
 
     function showPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -982,24 +1325,8 @@
     });
 
     document.getElementById('btn-go-home').addEventListener('click', () => {
-        document.getElementById('custom-modal').style.display = 'flex';
-    });
-
-    document.getElementById('modal-btn-ok').addEventListener('click', () => {
-        document.getElementById('custom-modal').style.display = 'none';
-        document.getElementById('btn-save').click();
-        activeFormulaInput = null;
-        showPage('page-home');
-    });
-
-    document.getElementById('modal-btn-discard').addEventListener('click', () => {
-        document.getElementById('custom-modal').style.display = 'none';
-        activeFormulaInput = null;
-        showPage('page-home');
-    });
-
-    document.getElementById('modal-btn-cancel').addEventListener('click', () => {
-        document.getElementById('custom-modal').style.display = 'none';
+        if (confirm("セーブをしますか？")) document.getElementById('btn-save').click();
+        activeFormulaInput = null; showPage('page-home');
     });
 
     document.getElementById('btn-save').addEventListener('click', () => {
@@ -1044,88 +1371,19 @@
             
             const actionsDiv = document.createElement('div'); actionsDiv.className = 'memo-actions';
             
-            // 出力切り替え用プルダウン
-            const exportSelect = document.createElement('select');
-            exportSelect.className = 'export-select';
-            
-            // プレースホルダー（初期表示）
-            const defaultOpt = document.createElement('option');
-            defaultOpt.value = "";
-            defaultOpt.textContent = "出力選択";
-            defaultOpt.disabled = true;
-            defaultOpt.selected = true;
-            exportSelect.appendChild(defaultOpt);
-
-            // 1. LINE（薄緑線）
-            const optLine = document.createElement('option');
-            optLine.value = "line";
-            optLine.textContent = "LINE";
-            optLine.style.color = "#06c755";
-            optLine.style.border = "1px solid #b7eb8f";
-            exportSelect.appendChild(optLine);
-
-            // 2. Excel（Excelっぽい濃い緑色）
-            const optExcel = document.createElement('option');
-            optExcel.value = "excel";
-            optExcel.textContent = "Excel";
-            optExcel.style.color = "#107c41";
-            optExcel.style.fontWeight = "bold";
-            exportSelect.appendChild(optExcel);
-
-            // 3. CSV（そのまま）
-            const optCsv = document.createElement('option');
-            optCsv.value = "csv";
-            optCsv.textContent = "CSV";
-            exportSelect.appendChild(optCsv);
-
-            // プルダウン変更時の処理
-            exportSelect.addEventListener('change', () => {
-                const val = exportSelect.value;
-                if (val === 'line') {
-                    sendToLine(memo.title, memo.data, memo.cols || COLS);
-                } else if (val === 'excel') {
-                    exportExcel(memo.title, memo.data, memo.cols || COLS);
-                } else if (val === 'csv') {
-                    exportCSV(memo.title, memo.data, memo.cols || COLS);
-                }
-                // 実行後に選択を初期状態に戻す
-                exportSelect.value = "";
-            });
-
-            // 削除ボタン
-            const btnDel = document.createElement('button'); 
-            btnDel.textContent = '削除'; 
-            btnDel.className = 'btn-del';
+            const btnEx = document.createElement('button'); btnEx.textContent = 'Excel';
+            btnEx.addEventListener('click', () => exportExcel(memo.title, memo.data, memo.cols || COLS));
+            const btnCsv = document.createElement('button'); btnCsv.textContent = 'CSV';
+            btnCsv.addEventListener('click', () => exportCSV(memo.title, memo.data, memo.cols || COLS));
+            const btnDel = document.createElement('button'); btnDel.textContent = '削除'; btnDel.className = 'btn-del';
             btnDel.addEventListener('click', () => {
                 if (confirm(`「${memo.title}」を削除してもよろしいですか？`)) {
                     delete savedMemos[id]; localStorage.setItem('hyo_memos', JSON.stringify(savedMemos)); renderMemoList();
                 }
             });
-
-            actionsDiv.appendChild(exportSelect); 
-            actionsDiv.appendChild(btnDel);
-            
-            item.appendChild(infoDiv); 
-            item.appendChild(actionsDiv); 
-            listContainer.appendChild(item);
+            actionsDiv.appendChild(btnEx); actionsDiv.appendChild(btnCsv); actionsDiv.appendChild(btnDel);
+            item.appendChild(infoDiv); item.appendChild(actionsDiv); listContainer.appendChild(item);
         });
-    }
-
-    function sendToLine(title, sheetData, totalCols) {
-        let text = `【${title}】\n`;
-        sheetData.forEach(rowObj => {
-            let rowValues = [];
-            for (let c = 0; c < totalCols; c++) {
-                let cell = rowObj[c];
-                let val = cell ? (cell.formula ? evaluateFormula(cell.formula) : cell.val) : "";
-                if (val !== "") rowValues.push(val);
-            }
-            if (rowValues.length > 0) {
-                text += rowValues.join(" / ") + "\n";
-            }
-        });
-        const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`;
-        window.open(lineUrl, '_blank');
     }
 
     function loadMemoToEditor(id) {
@@ -1159,6 +1417,7 @@
         recalculateAllFormulas(); showPage('page-editor');
     }
 
+    // --- ファイルインポート（読み込み）機能 ---
     document.getElementById('btn-import-file').addEventListener('click', () => {
         document.getElementById('file-input').click();
     });
@@ -1238,9 +1497,7 @@
             for (let c = 0; c < totalCols; c++) {
                 let val = rowObj[c] ? (rowObj[c].formula ? evaluateFormula(rowObj[c].formula) : rowObj[c].val) : "";
                 if(typeof val === 'string') val = val.replace(/[¥,]/g, '');
-                // 修正箇所：文字列置換の構文エラーを修正
-                val = '"' + String(val).replace(/"/g, '""') + '"'; 
-                rowData.push(val);
+                val = '"' + String(val).replace(/"/g, '""') + '"'; rowData.push(val);
             }
             csvContent += rowData.join(',') + "\r\n";
         });
