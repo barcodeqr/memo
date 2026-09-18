@@ -140,26 +140,39 @@
 
         /* スマホ用クイック書式バー */
         .mobile-selection-bar {
-            display:flex; align-items:center; gap:6px; overflow-x:auto;
-            padding:6px 8px; margin-bottom:4px; background:#fff;
-            border:1px solid #d9d9d9; border-radius:6px; flex-shrink:0;
-            -webkit-overflow-scrolling:touch;
+            display: flex; align-items: center; gap: 6px; overflow-x: auto;
+            padding: 6px 8px; margin-bottom: 4px; background: #fff;
+            border: 1px solid #d9d9d9; border-radius: 6px; flex-shrink: 0;
+            -webkit-overflow-scrolling: touch;
         }
         .mobile-selection-bar button, .mobile-color-btn {
-            height:38px; min-width:58px; padding:0 9px; border:1px solid #c9c9c9;
-            border-radius:7px; background:#fff; font-size:14px; font-weight:600;
-            display:inline-flex; align-items:center; justify-content:center; gap:3px;
-            white-space:nowrap; flex-shrink:0; touch-action:manipulation;
+            height: 38px; min-width: 58px; padding: 0 9px; border: 1px solid #c9c9c9;
+            border-radius: 7px; background: #fff; font-size: 14px; font-weight: 600;
+            display: inline-flex; align-items: center; justify-content: center; gap: 3px;
+            white-space: nowrap; flex-shrink: 0; touch-action: manipulation;
         }
-        .mobile-selection-bar button:active, .mobile-color-btn:active { background:#eaf4ff; }
-        #selection-info { font-size:12px; color:#555; min-width:100px; white-space:nowrap; }
-        .mobile-color-btn input[type=color] { width:25px; height:25px; padding:0; border:0; background:transparent; }
+        .mobile-selection-bar button:active, .mobile-color-btn:active { background: #eaf4ff; }
+        #selection-info { font-size: 12px; color: #555; min-width: 70px; white-space: nowrap; }
+        .mobile-color-btn input[type=color] { width: 25px; height: 25px; padding: 0; border: 0; background: transparent; }
+        
+        /* スマホ用 書式一覧（初期非表示） */
+        .mobile-toolbar-drawer {
+            display: none; flex-direction: column; gap: 6px; background: #fff;
+            padding: 8px; border: 1px solid #d9d9d9; border-radius: 6px; margin-bottom: 4px;
+            flex-shrink: 0;
+        }
+        .mobile-toolbar-drawer.open { display: flex; }
+        .mobile-drawer-row {
+            display: flex; align-items: center; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+        }
+
         @media (min-width: 700px) {
-            .mobile-selection-bar { display:none; }
+            .mobile-selection-bar { display: none; }
+            .mobile-toolbar-drawer { display: none !important; }
         }
         @media (max-width: 699px) {
-            .toolbar { padding-bottom:5px; }
-            td.data-cell { min-width:40px; }
+            .toolbar { display: none; } /* スマホ時はPC用ツールバーを隠す */
+            td.data-cell { min-width: 40px; }
         }
 
         /* スプレッドシート本体 */
@@ -298,10 +311,11 @@
             <button id="btn-save" class="btn-success">セーブ</button>
         </div>
 
-        <!-- ツールバー -->
+        <!-- スマホ用クイック書式バー -->
         <div class="mobile-selection-bar" id="mobile-selection-bar">
-            <span id="selection-info">セルを選択してください</span>
+            <span id="selection-info">A1</span>
             <button id="btn-select-all" title="表全体を選択">全選択</button>
+            <button id="btn-open-drawer" title="全書式を開く" style="background-color: #eef2ff; color: #3730a3; border-color: #c7d2fe;">全書式</button>
             <button id="btn-border-all" title="選択範囲に全罫線">▦ 枠</button>
             <button id="btn-border-outer" title="選択範囲の外枠">□ 外枠</button>
             <button id="btn-border-none" title="罫線を消す">□̸ 消す</button>
@@ -309,6 +323,56 @@
             <label class="mobile-color-btn" title="文字色">文字 <input type="color" id="mobile-text-color" value="#000000"></label>
         </div>
 
+        <!-- スマホ用 書式一覧ドロワー（初期は非表示） -->
+        <div class="mobile-toolbar-drawer" id="mobile-toolbar-drawer">
+            <div class="mobile-drawer-row">
+                <button id="btn-drawer-close" style="background-color: #fee2e2; color: #991b1b; border-color: #fca5a5;">閉じる</button>
+                <div class="tool-group group-history" style="margin:0;">
+                    <span class="tool-group-label">履歴</span>
+                    <button id="btn-undo-m" title="戻る" disabled>↶</button>
+                    <button id="btn-redo-m" title="進む" disabled>↷</button>
+                </div>
+                <div class="tool-group group-size" style="margin:0;">
+                    <span class="tool-group-label">行・列</span>
+                    <button id="btn-add-row-m">行＋</button>
+                    <button id="btn-delete-row-m" class="btn-del-rowcol">行－</button>
+                    <button id="btn-add-col-m">列＋</button>
+                    <button id="btn-delete-col-m" class="btn-del-rowcol">列－</button>
+                </div>
+                <div class="tool-group group-text" style="margin:0;">
+                    <span class="tool-group-label">文字</span>
+                    <button id="btn-bold-m"><b>B</b></button>
+                    <select id="select-font-size-m">
+                        <option value="0.75rem">小</option>
+                        <option value="0.9rem" selected>標準</option>
+                        <option value="1.1rem">中</option>
+                        <option value="1.3rem">大</option>
+                    </select>
+                </div>
+                <div class="tool-group group-color" style="margin:0;">
+                    <span class="tool-group-label">色</span>
+                    <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m" value="#000000"></div>
+                    <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m" value="#ffffff"></div>
+                </div>
+                <div class="tool-group group-format" style="margin:0;">
+                    <span class="tool-group-label">数字</span>
+                    <button id="btn-format-none-m">標準</button>
+                    <button id="btn-format-comma-m"><b>,</b></button>
+                    <button id="btn-format-currency-m"><b>¥</b></button>
+                </div>
+                <div class="tool-group group-align" style="margin:0;">
+                    <span class="tool-group-label">配置</span>
+                    <select id="select-align-horiz-m">
+                        <option value="left">左</option>
+                        <option value="center">中</option>
+                        <option value="right">右</option>
+                    </select>
+                </div>
+                <button id="btn-clear-m" class="btn-clear-cell">削除</button>
+            </div>
+        </div>
+
+        <!-- PC用ツールバー -->
         <div class="toolbar">
             <div class="tool-group group-history">
                 <span class="tool-group-label">履歴</span>
@@ -322,8 +386,6 @@
                 <button id="btn-add-col" title="選択位置に列を挿入">列＋</button>
                 <button id="btn-delete-col" class="btn-del-rowcol" title="選択列を削除">列－</button>
             </div>
-
-
             <div class="tool-group group-text">
                 <span class="tool-group-label">文字</span>
                 <button id="btn-bold" title="太字"><b>B</b></button>
@@ -368,8 +430,6 @@
                     <option value="right">右</option>
                     <option value="none">無</option>
                 </select>
-
-
                 <select id="select-border-width" title="太さ">
                     <option value="1px">細</option>
                     <option value="2px">中</option>
@@ -512,14 +572,16 @@
     }
 
     function updateUndoRedoButtons() {
-        const btnUndo = document.getElementById('btn-undo');
-        const btnRedo = document.getElementById('btn-redo');
-        if (btnUndo) btnUndo.disabled = undoStack.length === 0;
-        if (btnRedo) btnRedo.disabled = redoStack.length === 0;
+        const disabled = undoStack.length === 0;
+        const rDisabled = redoStack.length === 0;
+        ['btn-undo', 'btn-undo-m'].forEach(id => { const el = document.getElementById(id); if(el) el.disabled = disabled; });
+        ['btn-redo', 'btn-redo-m'].forEach(id => { const el = document.getElementById(id); if(el) el.disabled = rDisabled; });
     }
 
     document.getElementById('btn-undo').addEventListener('click', performUndo);
     document.getElementById('btn-redo').addEventListener('click', performRedo);
+    document.getElementById('btn-undo-m').addEventListener('click', performUndo);
+    document.getElementById('btn-redo-m').addEventListener('click', performRedo);
 
     function getColumnName(index) {
         let name = ''; let n = index;
@@ -887,11 +949,9 @@
         updateUndoRedoButtons();
     }
 
-    document.getElementById('btn-add-row').addEventListener('click', () => {
+    function addRowAction() {
         let targetR = ROWS;
-        if (selectedCells.length > 0) {
-            targetR = parseInt(selectedCells[0].dataset.row);
-        }
+        if (selectedCells.length > 0) targetR = parseInt(selectedCells[0].dataset.row);
         saveState();
         const state = getSheetState();
         let emptyRow = {};
@@ -901,14 +961,14 @@
         state.data.splice(targetR, 0, emptyRow);
         state.rows++;
         restoreSheetState(state);
-    });
+    }
+    document.getElementById('btn-add-row').addEventListener('click', addRowAction);
+    document.getElementById('btn-add-row-m').addEventListener('click', addRowAction);
 
-    document.getElementById('btn-add-col').addEventListener('click', () => {
+    function addColAction() {
         if (COLS >= 26 * 26) return;
         let targetC = COLS;
-        if (selectedCells.length > 0) {
-            targetC = parseInt(selectedCells[0].dataset.col);
-        }
+        if (selectedCells.length > 0) targetC = parseInt(selectedCells[0].dataset.col);
         saveState();
         const state = getSheetState();
         state.cols++;
@@ -919,24 +979,18 @@
             rowObj[targetC] = { val: "", formula: "", format: "", bold: "", fontSize: "", color: "", align: "", vertAlign: "", bg: "", borderTop: defaultBorder, borderBottom: defaultBorder, borderLeft: defaultBorder, borderRight: defaultBorder };
         });
         restoreSheetState(state);
-    });
+    }
+    document.getElementById('btn-add-col').addEventListener('click', addColAction);
+    document.getElementById('btn-add-col-m').addEventListener('click', addColAction);
 
-    document.getElementById('btn-delete-row').addEventListener('click', () => {
-        if (selectedCells.length === 0) {
-            alert('削除する行を選択してください。');
-            return;
-        }
-        if (ROWS <= 1) {
-            alert('これ以上行を削除できません。');
-            return;
-        }
+    function deleteRowAction() {
+        if (selectedCells.length === 0) { alert('削除する行を選択してください。'); return; }
+        if (ROWS <= 1) { alert('これ以上行を削除できません。'); return; }
         const rowsToDelete = [...new Set(selectedCells.map(td => parseInt(td.dataset.row)))].sort((a, b) => b - a);
         if (!confirm(`${rowsToDelete.length}行を削除しますか？`)) return;
         saveState();
         const state = getSheetState();
-        rowsToDelete.forEach(r => {
-            if (r < state.data.length) state.data.splice(r, 1);
-        });
+        rowsToDelete.forEach(r => { if (r < state.data.length) state.data.splice(r, 1); });
         state.rows = state.data.length;
         if (state.rows < 1) {
             let emptyRow = {};
@@ -948,17 +1002,13 @@
         }
         restoreSheetState(state);
         selectedCells = [];
-    });
+    }
+    document.getElementById('btn-delete-row').addEventListener('click', deleteRowAction);
+    document.getElementById('btn-delete-row-m').addEventListener('click', deleteRowAction);
 
-    document.getElementById('btn-delete-col').addEventListener('click', () => {
-        if (selectedCells.length === 0) {
-            alert('削除する列を選択してください。');
-            return;
-        }
-        if (COLS <= 1) {
-            alert('これ以上列を削除できません。');
-            return;
-        }
+    function deleteColAction() {
+        if (selectedCells.length === 0) { alert('削除する列を選択してください。'); return; }
+        if (COLS <= 1) { alert('これ以上列を削除できません。'); return; }
         const colsToDelete = [...new Set(selectedCells.map(td => parseInt(td.dataset.col)))].sort((a, b) => b - a);
         if (!confirm(`${colsToDelete.length}列を削除しますか？`)) return;
         saveState();
@@ -975,7 +1025,9 @@
         if (state.cols < 1) state.cols = 1;
         restoreSheetState(state);
         selectedCells = [];
-    });
+    }
+    document.getElementById('btn-delete-col').addEventListener('click', deleteColAction);
+    document.getElementById('btn-delete-col-m').addEventListener('click', deleteColAction);
 
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
@@ -1078,11 +1130,10 @@
         }
         const info = document.getElementById('selection-info');
         if (info) {
-            const count = selectedCells.length;
             const range = (minR === maxR && minC === maxC)
                 ? `${getColumnName(minC)}${minR+1}`
                 : `${getColumnName(minC)}${minR+1}:${getColumnName(maxC)}${maxR+1}`;
-            info.textContent = `${range} ${count}セル`;
+            info.textContent = range; // セル番地を常時シンプルに表示
         }
         updateToolbarState(selectedCells[0]?.querySelector('input'));
     }
@@ -1143,16 +1194,26 @@
     document.getElementById('btn-format-comma').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'comma')); });
     document.getElementById('btn-format-currency').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'currency')); });
     document.getElementById('btn-format-none').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'none')); });
+    document.getElementById('btn-format-comma-m').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'comma')); });
+    document.getElementById('btn-format-currency-m').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'currency')); });
+    document.getElementById('btn-format-none-m').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'none')); });
 
-    document.getElementById('btn-bold').addEventListener('click', () => {
+    function toggleBoldAction() {
         if (selectedCells.length === 0) return;
         saveState();
         const isBold = selectedCells[0].querySelector('input').style.fontWeight === 'bold';
         selectedCells.forEach(td => { const input = td.querySelector('input'); if (input) input.style.fontWeight = isBold ? 'normal' : 'bold'; });
         document.getElementById('btn-bold').classList.toggle('active', !isBold);
-    });
+    }
+    document.getElementById('btn-bold').addEventListener('click', toggleBoldAction);
+    document.getElementById('btn-bold-m').addEventListener('click', toggleBoldAction);
+
     document.getElementById('select-font-size').addEventListener('change', (e) => { saveState(); selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.fontSize = e.target.value; }); });
+    document.getElementById('select-font-size-m').addEventListener('change', (e) => { saveState(); selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.fontSize = e.target.value; }); });
+    
     document.getElementById('select-align-horiz').addEventListener('change', (e) => { saveState(); selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.textAlign = e.target.value; }); });
+    document.getElementById('select-align-horiz-m').addEventListener('change', (e) => { saveState(); selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.textAlign = e.target.value; }); });
+    
     document.getElementById('select-align-vert').addEventListener('change', (e) => { saveState(); selectedCells.forEach(td => { const inner = td.querySelector('.cell-inner'); if(inner) inner.style.justifyContent = e.target.value; }); });
 
     function toHexColor(color, fallback) {
@@ -1189,15 +1250,14 @@
 
     const colorTextEl = document.getElementById('color-text');
     const colorBgEl = document.getElementById('color-bg');
-    colorTextEl.addEventListener('input', (e) => applyTextColor(e.target.value));
-    colorTextEl.addEventListener('change', (e) => applyTextColor(e.target.value));
-    colorTextEl.addEventListener('click', () => {
-        if (selectedCells.length > 0) applyTextColor(colorTextEl.value);
+    const colorTextMEl = document.getElementById('color-text-m');
+    const colorBgMEl = document.getElementById('color-bg-m');
+
+    [colorTextEl, colorTextMEl].forEach(el => {
+        el.addEventListener('input', (e) => { applyTextColor(e.target.value); if(colorTextEl) colorTextEl.value = e.target.value; if(colorTextMEl) colorTextMEl.value = e.target.value; });
     });
-    colorBgEl.addEventListener('input', (e) => applyBgColor(e.target.value));
-    colorBgEl.addEventListener('change', (e) => applyBgColor(e.target.value));
-    colorBgEl.addEventListener('click', () => {
-        if (selectedCells.length > 0) applyBgColor(colorBgEl.value);
+    [colorBgEl, colorBgMEl].forEach(el => {
+        el.addEventListener('input', (e) => { applyBgColor(e.target.value); if(colorBgEl) colorBgEl.value = e.target.value; if(colorBgMEl) colorBgMEl.value = e.target.value; });
     });
 
     function applySelectedBorders(mode) {
@@ -1247,7 +1307,15 @@
         applyTextColor(e.target.value)
     );
 
-    document.getElementById('btn-clear').addEventListener('click', () => {
+    // スマホ用 全書式ドロワーの開閉制御
+    document.getElementById('btn-open-drawer').addEventListener('click', () => {
+        document.getElementById('mobile-toolbar-drawer').classList.add('open');
+    });
+    document.getElementById('btn-drawer-close').addEventListener('click', () => {
+        document.getElementById('mobile-toolbar-drawer').classList.remove('open');
+    });
+
+    function clearCellAction() {
         if (selectedCells.length === 0) return;
         saveState();
         selectedCells.forEach(td => {
@@ -1257,7 +1325,9 @@
             td.style.backgroundColor = ''; td.style.borderTop = defaultBorder; td.style.borderBottom = defaultBorder; td.style.borderLeft = defaultBorder; td.style.borderRight = defaultBorder;
         });
         recalculateAllFormulas();
-    });
+    }
+    document.getElementById('btn-clear').addEventListener('click', clearCellAction);
+    document.getElementById('btn-clear-m').addEventListener('click', clearCellAction);
 
     function applyBorder() {
         if (selectedCells.length === 0) return;
@@ -1284,15 +1354,30 @@
     });
 
     function updateToolbarState(input) {
-        document.getElementById('btn-bold').classList.toggle('active', input.style.fontWeight === 'bold');
-        if (input.style.fontSize) document.getElementById('select-font-size').value = input.style.fontSize;
-        document.getElementById('color-text').value = toHexColor(input.style.color, '#000000');
-        if (input.style.textAlign) document.getElementById('select-align-horiz').value = input.style.textAlign;
+        const isBold = input.style.fontWeight === 'bold';
+        document.getElementById('btn-bold').classList.toggle('active', isBold);
+        const btnBoldM = document.getElementById('btn-bold-m');
+        if(btnBoldM) btnBoldM.classList.toggle('active', isBold);
+
+        if (input.style.fontSize) {
+            document.getElementById('select-font-size').value = input.style.fontSize;
+            const sfm = document.getElementById('select-font-size-m'); if(sfm) sfm.value = input.style.fontSize;
+        }
+        const hexText = toHexColor(input.style.color, '#000000');
+        document.getElementById('color-text').value = hexText;
+        if(colorTextMEl) colorTextMEl.value = hexText;
+
+        if (input.style.textAlign) {
+            document.getElementById('select-align-horiz').value = input.style.textAlign;
+            const sahm = document.getElementById('select-align-horiz-m'); if(sahm) sahm.value = input.style.textAlign;
+        }
         const td = input.closest('td');
         if (td) {
             const inner = td.querySelector('.cell-inner');
             if (inner && inner.style.justifyContent) document.getElementById('select-align-vert').value = inner.style.justifyContent;
-            document.getElementById('color-bg').value = toHexColor(td.style.backgroundColor, '#ffffff');
+            const hexBg = toHexColor(td.style.backgroundColor, '#ffffff');
+            document.getElementById('color-bg').value = hexBg;
+            if(colorBgMEl) colorBgMEl.value = hexBg;
         }
     }
 
@@ -1307,7 +1392,6 @@
         initSheet(); showPage('page-editor');
     });
 
-    // ① 戻るボタン押下時のカスタムモーダル制御
     document.getElementById('btn-go-home').addEventListener('click', () => {
         document.getElementById('save-confirm-modal').style.display = 'flex';
     });
@@ -1369,7 +1453,6 @@
             
             const actionsDiv = document.createElement('div'); actionsDiv.className = 'memo-actions';
             
-            // ② ExcelとCSVの出力ボタンを「出力」プルダウンに変更
             const exportSelect = document.createElement('select');
             exportSelect.innerHTML = `
                 <option value="" disabled selected>出力</option>
@@ -1383,7 +1466,7 @@
                 } else if (val === 'csv') {
                     exportCSV(memo.title, memo.data, memo.cols || COLS);
                 }
-                e.target.value = ""; // 選択後にリセット
+                e.target.value = "";
             });
 
             const btnDel = document.createElement('button'); btnDel.textContent = '削除'; btnDel.className = 'btn-del';
