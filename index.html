@@ -48,27 +48,33 @@
         }
         .home-header { text-align: center; }
         .home-header h1 { color: var(--primary); font-size: 1.8rem; margin: 0 0 16px 0; }
-        .home-actions-top { display: flex; gap: 10px; }
-        .btn-create {
-            background-color: var(--primary); color: white; border: none; padding: 12px 20px;
-            font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; flex-grow: 1;
+        
+        /* ボタン1段化のための修正 */
+        .home-actions-top { display: flex; gap: 6px; align-items: center; }
+        .btn-create, .btn-import, .btn-json-import {
+            flex: 1; white-space: nowrap; font-size: 0.9rem; padding: 10px 8px;
+            font-weight: bold; border-radius: 6px; cursor: pointer; border: none; color: white;
+            text-align: center;
         }
+        .btn-create { background-color: var(--primary); }
         .btn-create:hover { background-color: var(--primary-hover); }
-        .btn-import {
-            background-color: #0078d4; color: white; border: none; padding: 12px 20px;
-            font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; flex-shrink: 0;
-        }
+        .btn-import { background-color: #0078d4; }
         .btn-import:hover { background-color: #106ebe; }
+        .btn-json-import { background-color: #8a2be2; }
+        .btn-json-import:hover { background-color: #7b1fa2; }
 
         .memo-list { display: flex; flex-direction: column; gap: 8px; max-height: 450px; overflow-y: auto; }
         .memo-item {
             display: flex; justify-content: space-between; align-items: center; background: #fafafa;
             border: 1px solid var(--excel-border); padding: 10px 14px; border-radius: 6px; gap: 10px;
         }
-        .memo-info { display: flex; flex-direction: column; flex-grow: 1; cursor: pointer; gap: 2px; word-break: break-all; }
+        .memo-info { 
+            display: flex; flex-direction: column; flex-grow: 1; cursor: pointer; gap: 2px; word-break: break-all; 
+        }
         .memo-title-text { font-weight: 500; color: #0066cc; }
         .memo-title-text:hover { text-decoration: underline; }
-        .memo-date-text { font-size: 0.75rem; color: #666; }
+        /* ③スマホでも2段にならないように white-space: nowrap を指定 */
+        .memo-date-text { font-size: 0.75rem; color: #666; white-space: nowrap; }
         .memo-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
         .memo-actions select {
             font-size: 0.8rem; padding: 4px 6px; border: 1px solid #ccc;
@@ -306,9 +312,11 @@
             <div class="home-header">
                 <h1>表メモ帳</h1>
                 <div class="home-actions-top">
-                    <button id="btn-create-new" class="btn-create">＋ 表メモを作成</button>
-                    <button id="btn-import-file" class="btn-import">📂 ファイルを開く</button>
+                    <button id="btn-create-new" class="btn-create">＋ 表メモ</button>
+                    <button id="btn-import-file" class="btn-import">📂 開く</button>
+                    <button id="btn-import-json" class="btn-json-import">📥 JSON読込</button>
                     <input type="file" id="file-input" accept=".xlsx, .xls, .csv" style="display: none;">
+                    <input type="file" id="json-file-input" accept=".json" style="display: none;">
                 </div>
             </div>
             <div id="memo-list" class="memo-list"><p style="color: #888; text-align: center; margin: 10px 0;">保存された表メモはありません。</p></div>
@@ -1567,18 +1575,22 @@
             
             const exportSelect = document.createElement('select');
             const defaultOpt = document.createElement('option');
-            defaultOpt.value = ""; defaultOpt.textContent = "出力選択"; defaultOpt.disabled = true; defaultOpt.selected = true;
+            /* ① 出力選択の文字を「出力」に変更 */
+            defaultOpt.value = ""; defaultOpt.textContent = "出力"; defaultOpt.disabled = true; defaultOpt.selected = true;
             exportSelect.appendChild(defaultOpt);
 
             const optLine = document.createElement('option'); optLine.value = "line"; optLine.textContent = "LINE"; exportSelect.appendChild(optLine);
             const optExcel = document.createElement('option'); optExcel.value = "excel"; optExcel.textContent = "Excel"; exportSelect.appendChild(optExcel);
             const optCsv = document.createElement('option'); optCsv.value = "csv"; optCsv.textContent = "CSV"; exportSelect.appendChild(optCsv);
+            /* ② 「JSONで保存（表形式保持）」を「JSON」に変更 */
+            const optJson = document.createElement('option'); optJson.value = "json"; optJson.textContent = "JSON"; exportSelect.appendChild(optJson);
 
             exportSelect.addEventListener('change', () => {
                 const val = exportSelect.value;
                 if (val === 'line') sendToLine(memo.title, memo.data, memo.cols || COLS);
                 else if (val === 'excel') exportExcel(memo.title, memo.data, memo.cols || COLS);
                 else if (val === 'csv') exportCSV(memo.title, memo.data, memo.cols || COLS);
+                else if (val === 'json') exportJSON(memo.title, memo);
                 exportSelect.value = "";
             });
 
@@ -1607,6 +1619,17 @@
         });
         const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`;
         window.open(lineUrl, '_blank');
+    }
+
+    function exportJSON(title, memoObj) {
+        const jsonStr = JSON.stringify(memoObj, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${title}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
     }
 
     function loadMemoToEditor(id) {
@@ -1694,6 +1717,63 @@
             e.target.value = '';
         };
         reader.readAsArrayBuffer(file);
+    });
+
+    document.getElementById('btn-import-json').addEventListener('click', () => {
+        document.getElementById('json-file-input').click();
+    });
+
+    document.getElementById('json-file-input').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            try {
+                const memo = JSON.parse(evt.target.result);
+                if (!memo.data || !memo.cols || !memo.rows) {
+                    throw new Error("無効なJSONフォーマットです。");
+                }
+
+                currentId = null;
+                activeFormulaInput = null;
+                document.getElementById('memo-title').value = memo.title || file.name.replace(/\.[^/.]+$/, "");
+
+                COLS = memo.cols;
+                ROWS = memo.rows;
+                buildSheetStructure();
+
+                memo.data.forEach((rowObj, r) => {
+                    if (r >= ROWS) return;
+                    Object.keys(rowObj).forEach(cStr => {
+                        const c = parseInt(cStr); if (c >= COLS) return;
+                        const cellInfo = rowObj[c]; const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+                        const td = input ? input.closest('td') : null; const inner = td ? td.querySelector('.cell-inner') : null;
+                        if (input && td && inner) {
+                            input.value = cellInfo.val;
+                            if (cellInfo.formula) input.dataset.formula = cellInfo.formula; else delete input.dataset.formula;
+                            if (cellInfo.format) input.dataset.format = cellInfo.format; else delete input.dataset.format;
+                            input.style.fontWeight = cellInfo.bold || 'normal'; input.style.fontSize = cellInfo.fontSize || '0.9rem';
+                            input.style.color = cellInfo.color || ''; input.style.textAlign = cellInfo.align || 'left';
+                            inner.style.justifyContent = cellInfo.vertAlign || 'center';
+                            td.style.backgroundColor = cellInfo.bg || '';
+                            td.style.borderTop = cellInfo.borderTop || defaultBorder; td.style.borderBottom = cellInfo.borderBottom || defaultBorder;
+                            td.style.borderLeft = cellInfo.borderLeft || defaultBorder; td.style.borderRight = cellInfo.borderRight || defaultBorder;
+                        }
+                    });
+                });
+
+                recalculateAllFormulas();
+                showPage('page-editor');
+                saveState();
+                alert("JSONファイルから表を読み込みました！");
+            } catch (err) {
+                alert("JSONファイルの読み込みに失敗しました。");
+                console.error(err);
+            }
+            e.target.value = '';
+        };
+        reader.readAsText(file);
     });
 
     function exportExcel(title, sheetData, totalCols) {
