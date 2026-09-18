@@ -4,19 +4,13 @@
     
     <!-- PWA用設定 -->
     <link rel="manifest" href="./manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes"><html lang="ja"><head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <!-- PWA用設定 -->
-    <link rel="manifest" href="./manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="表メモ帳">
     <meta name="theme-color" content="#107c41">
     <link rel="apple-touch-icon" href="./icon.png">
     <link rel="icon" type="image/png" href="./icon.png">
-        
+    
     <title>表メモ帳</title>
     <!-- SheetJS for Excel (.xlsx) export & import -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -73,7 +67,11 @@
         .memo-title-text { font-weight: 500; color: #0066cc; }
         .memo-title-text:hover { text-decoration: underline; }
         .memo-date-text { font-size: 0.75rem; color: #666; }
-        .memo-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .memo-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+        .memo-actions select {
+            font-size: 0.8rem; padding: 4px 6px; border: 1px solid #ccc;
+            border-radius: 4px; cursor: pointer; background: #fff;
+        }
         .memo-actions button {
             font-size: 0.8rem; padding: 4px 8px; border: 1px solid #ccc;
             border-radius: 4px; cursor: pointer; background: #fff;
@@ -170,7 +168,6 @@
             background: #fff; position: relative; user-select: none; -webkit-user-select: none;
             -webkit-overflow-scrolling: touch;
         }
-        /* 縦・横スクロールバーを太くしてタッチしやすく */
         .spreadsheet-container::-webkit-scrollbar {
             width: 18px;
             height: 18px;
@@ -187,7 +184,6 @@
         .spreadsheet-container::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
-        /* Firefox用 */
         .spreadsheet-container {
             scrollbar-width: auto;
             scrollbar-color: #888 #f1f1f1;
@@ -207,7 +203,6 @@
             padding: 0 4px; box-sizing: border-box; font-family: inherit; font-size: inherit;
             position: relative; z-index: 2;
         }
-        /* 複数選択時のハイライト（背景色を上書きしないように半透明オーバーレイ＋枠線） */
         td.selected {
             outline: 2px solid var(--excel-select-border);
             outline-offset: -2px;
@@ -218,15 +213,13 @@
             content: '';
             position: absolute;
             inset: 0;
-            background-color: rgba(43, 87, 154, 0.18); /* 薄い青オーバーレイ */
+            background-color: rgba(43, 87, 154, 0.18);
             pointer-events: none;
             z-index: 1;
         }
-        /* 数式入力中のセルを強調 */
         td.formula-source { outline: 2px solid #107c41; outline-offset: -2px; z-index: 6; }
-        td.formula-source::after { display: none; } /* 数式強調時は選択オーバーレイを隠す */
+        td.formula-source::after { display: none; }
 
-        /* 選択範囲を広げるための「＋」ハンドル（セルからはみ出る形に調整） */
         .cell-handle {
             position: absolute;
             width: 12px;
@@ -245,7 +238,6 @@
             line-height: 8px;
             cursor: crosshair;
         }
-        /* セルの角に重なり、外側にはみ出るように配置 */
         .cell-handle-tl { top: -6px; left: -6px; }
         .cell-handle-br { bottom: -6px; right: -6px; }
         td.selected .cell-handle { display: block; }
@@ -256,6 +248,26 @@
         .btn-success { background: var(--primary) !important; color: white !important; border-color: var(--primary) !important; }
         .btn-clear-cell { color: #d9534f; border-color: #d9534f !important; font-weight: bold; }
         .btn-del-rowcol { color: #d9534f; border-color: #d9534f !important; }
+
+        /* カスタム確認モーダル（戻るボタン用） */
+        .custom-modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;
+        }
+        .custom-modal {
+            background: #fff; padding: 24px; border-radius: 8px; width: 300px;
+            text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .custom-modal p { font-size: 1rem; margin-bottom: 20px; font-weight: 500; }
+        .custom-modal-buttons { display: flex; flex-direction: column; gap: 10px; }
+        .custom-modal-buttons button {
+            padding: 10px; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: bold; cursor: pointer;
+        }
+        .btn-modal-save { background-color: var(--primary); color: white; }
+        .btn-modal-save:hover { background-color: var(--primary-hover); }
+        .btn-modal-discard { background-color: #e2e8f0; color: #334155; }
+        .btn-modal-discard:hover { background-color: #cbd5e1; }
+        .btn-modal-cancel { background-color: transparent; color: #666; font-size: 0.85rem !important; }
     </style>
 
 </head>
@@ -377,6 +389,18 @@
         </div>
     </div>
 
+    <!-- セーブ確認モーダル -->
+    <div id="save-confirm-modal" class="custom-modal-overlay">
+        <div class="custom-modal">
+            <p>セーブをしますか？</p>
+            <div class="custom-modal-buttons">
+                <button id="modal-btn-save" class="btn-modal-save">セーブをして戻る</button>
+                <button id="modal-btn-discard" class="btn-modal-discard">セーブをせずに戻る</button>
+                <button id="modal-btn-cancel" class="btn-modal-cancel">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
 <script>
     let COLS = 15; 
     let ROWS = 40;  
@@ -389,12 +413,10 @@
     let lastTouchTime = 0;
     let touchStartPos = null;
     let touchMoved = false;
-    let formulaRangeStart = null; // for drag range in formula mode
-    let lastInsertedRefLen = 0; // 数式ドラッグ時の参照置き換え用
+    let formulaRangeStart = null; 
+    let lastInsertedRefLen = 0; 
     const defaultBorder = '1px solid #e6e6e6';
-    const TOUCH_MOVE_THRESHOLD = 12; // px: above this = scroll, not select
-
-
+    const TOUCH_MOVE_THRESHOLD = 12; 
 
     let undoStack = [];
     let redoStack = [];
@@ -516,7 +538,6 @@
         input.addEventListener('compositionend', () => { isComposing = false; });
 
         input.addEventListener('focus', () => {
-            // 数式入力中のセルを強調表示
             document.querySelectorAll('td.formula-source').forEach(el => el.classList.remove('formula-source'));
             if (input.value.startsWith('=') || input.dataset.formula) {
                 td.classList.add('formula-source');
@@ -544,7 +565,6 @@
         input.addEventListener('blur', () => {
             setTimeout(() => {
                 if (!isComposing) {
-                    // 数式入力中に他セルをクリックした場合はフォーカスを戻すので、ここでは処理しない
                     if (document.activeElement === activeFormulaInput) return;
                     if (activeFormulaInput === input) {
                         activeFormulaInput = null;
@@ -558,9 +578,7 @@
             }, 150);
         });
 
-        // 数式用のセル参照挿入（単一 or 範囲）。ドラッグ中は最後の参照を置き換える
         const insertCellRefToFormula = (endR, endC, isDragUpdate = false) => {
-
             if (!activeFormulaInput) return;
             let ref;
             if (formulaRangeStart && (formulaRangeStart.r !== endR || formulaRangeStart.c !== endC)) {
@@ -575,7 +593,6 @@
             const val = activeFormulaInput.value;
             let start, endPos;
             if (isDragUpdate && lastInsertedRefLen > 0) {
-                // 前回挿入した参照を置き換え
                 endPos = activeFormulaInput.selectionStart || val.length;
                 start = endPos - lastInsertedRefLen;
                 if (start < 0) start = 0;
@@ -588,42 +605,34 @@
             const newPos = start + ref.length;
             activeFormulaInput.setSelectionRange(newPos, newPos);
             lastInsertedRefLen = ref.length;
-            // 選択範囲を一時的にハイライト
             selectRange(formulaRangeStart ? formulaRangeStart.r : endR, formulaRangeStart ? formulaRangeStart.c : endC, endR, endC);
         };
 
-
-        // タッチとマウスの重複イベント防止 + スクロール時の誤選択防止
         const handleCellInteraction = (e) => {
             if (e.type === 'touchstart') {
                 lastTouchTime = Date.now();
                 touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
                 touchMoved = false;
-                // タッチ開始時点では選択しない（スクロール判定のため）
                 if (activeFormulaInput && activeFormulaInput !== input) {
-                    // 数式モードではタッチ開始で範囲開始を記録
                     formulaRangeStart = { r, c };
-                    e.preventDefault(); // スクロールを少し抑制しつつフォーカス維持
+                    e.preventDefault();
                 }
                 return;
             } else if (e.type === 'mousedown' && Date.now() - lastTouchTime < 500) {
-                return; // タッチ直後のマウスイベントを無視
+                return;
             }
 
-            // 数式入力中：セル参照を挿入してフォーカスを数式セルに戻す
             if (activeFormulaInput && activeFormulaInput !== input) {
                 e.preventDefault();
                 e.stopPropagation();
                 formulaRangeStart = { r, c };
                 lastInsertedRefLen = 0;
                 insertCellRefToFormula(r, c, false);
-                isMouseDown = true; // ドラッグで範囲選択可能に
+                isMouseDown = true;
                 startCellCoord = { r, c };
                 return;
             }
 
-
-            // 通常モード
             isMouseDown = true;
             startCellCoord = { r, c };
             formulaRangeStart = null;
@@ -637,16 +646,11 @@
             if (dx > TOUCH_MOVE_THRESHOLD || dy > TOUCH_MOVE_THRESHOLD) {
                 touchMoved = true;
             }
-            // 数式モードでドラッグ中なら範囲更新
-            if (activeFormulaInput && formulaRangeStart && isMouseDown && !touchMoved) {
-                // 軽く動いただけなら範囲に
-            }
         };
 
         const handleTouchEnd = (e) => {
             if (e.type === 'touchend' && touchStartPos) {
                 if (!touchMoved) {
-                    // タップと判定 → 選択 or 数式参照挿入
                     if (activeFormulaInput && activeFormulaInput !== input) {
                         lastInsertedRefLen = 0;
                         insertCellRefToFormula(r, c, false);
@@ -656,15 +660,11 @@
                         isMouseDown = false;
                         startCellCoord = { r, c };
                         selectRange(r, c, r, c);
-                        // 既に選択済みのセルを再度タップした場合のみフォーカス（スクロール時の誤フォーカス防止）
-                        // 初回タップは選択のみ、2回目で編集開始
                         if (alreadySelected) {
                             input.focus();
                         }
                     }
                 }
-
-
                 touchStartPos = null;
                 touchMoved = false;
                 isMouseDown = false;
@@ -676,7 +676,6 @@
         td.addEventListener('touchmove', handleTouchMove, { passive: true });
         td.addEventListener('touchend', handleTouchEnd, { passive: true });
 
-        // スマホ：セルを長押しして、そのままドラッグすると範囲選択
         let longPressTimer = null;
         let pointerSelecting = false;
         const beginLongPress = (e) => {
@@ -723,14 +722,12 @@
         td.addEventListener('mouseenter', () => {
             if (isMouseDown && startCellCoord) {
                 if (activeFormulaInput && activeFormulaInput !== input) {
-                    // 数式モードのドラッグで範囲参照を更新（前回分を置き換え）
                     insertCellRefToFormula(r, c, true);
                 } else {
                     selectRange(startCellCoord.r, startCellCoord.c, r, c);
                 }
             }
         });
-
 
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -781,8 +778,6 @@
         });
     }
 
-
-    // 選択ハンドルをドラッグして範囲を広げる
     function initCellHandle(handle, r, c) {
         const onHandleStart = (e) => {
             e.stopPropagation();
@@ -790,7 +785,6 @@
             isMouseDown = true;
 
             if (selectedCells.length > 0) {
-                // 現在の選択範囲の左上を起点にする
                 const rows = selectedCells.map(td => parseInt(td.dataset.row));
                 const cols = selectedCells.map(td => parseInt(td.dataset.col));
                 startCellCoord = { r: Math.min(...rows), c: Math.min(...cols) };
@@ -859,7 +853,6 @@
 
                 const inner = document.createElement('div'); inner.className = 'cell-inner'; inner.style.justifyContent = 'center';
 
-                // セルの角からはみ出る形の選択ハンドル（＋に文字変更）
                 const handleTl = document.createElement('div');
                 handleTl.className = 'cell-handle cell-handle-tl';
                 handleTl.textContent = '+';
@@ -894,10 +887,8 @@
         updateUndoRedoButtons();
     }
 
-    // --- 行・列の挿入／削除（選択位置に対して操作） ---
-    // 行＋ : 選択セルの位置に行を挿入（選択なしなら末尾）
     document.getElementById('btn-add-row').addEventListener('click', () => {
-        let targetR = ROWS; // デフォルトは末尾
+        let targetR = ROWS;
         if (selectedCells.length > 0) {
             targetR = parseInt(selectedCells[0].dataset.row);
         }
@@ -912,10 +903,9 @@
         restoreSheetState(state);
     });
 
-    // 列＋ : 選択セルの位置に列を挿入（選択なしなら末尾）
     document.getElementById('btn-add-col').addEventListener('click', () => {
         if (COLS >= 26 * 26) return;
-        let targetC = COLS; // デフォルトは末尾
+        let targetC = COLS;
         if (selectedCells.length > 0) {
             targetC = parseInt(selectedCells[0].dataset.col);
         }
@@ -931,7 +921,6 @@
         restoreSheetState(state);
     });
 
-    // 行－ : 選択行を削除
     document.getElementById('btn-delete-row').addEventListener('click', () => {
         if (selectedCells.length === 0) {
             alert('削除する行を選択してください。');
@@ -961,7 +950,6 @@
         selectedCells = [];
     });
 
-    // 列－ : 選択列を削除
     document.getElementById('btn-delete-col').addEventListener('click', () => {
         if (selectedCells.length === 0) {
             alert('削除する列を選択してください。');
@@ -989,7 +977,6 @@
         selectedCells = [];
     });
 
-    // グローバルキーボードショートカット (Ctrl+Z / Ctrl+Y)
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
             e.preventDefault();
@@ -1073,12 +1060,10 @@
         if (activeFormulaInput) {
             formulaRangeStart = null;
             lastInsertedRefLen = 0;
-            // 数式セルにフォーカスを戻す
             setTimeout(() => { if (activeFormulaInput) activeFormulaInput.focus(); }, 10);
         }
     });
     document.addEventListener('touchend', () => { isMouseDown = false; });
-
 
     function selectRange(r1, c1, r2 = r1, c2 = c1) {
         selectedCells.forEach(td => td.classList.remove('selected'));
@@ -1170,7 +1155,6 @@
     document.getElementById('select-align-horiz').addEventListener('change', (e) => { saveState(); selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.textAlign = e.target.value; }); });
     document.getElementById('select-align-vert').addEventListener('change', (e) => { saveState(); selectedCells.forEach(td => { const inner = td.querySelector('.cell-inner'); if(inner) inner.style.justifyContent = e.target.value; }); });
 
-    // 色コードを #rrggbb に正規化（rgb(...) や空文字対応）
     function toHexColor(color, fallback) {
         if (!color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)') return fallback;
         if (color.startsWith('#') && (color.length === 7 || color.length === 4)) {
@@ -1203,7 +1187,6 @@
         selectedCells.forEach(td => { td.style.backgroundColor = color; });
     }
 
-    // input + change の両方で適用。click でも現在の色を再適用（同じ色でも効くように）
     const colorTextEl = document.getElementById('color-text');
     const colorBgEl = document.getElementById('color-bg');
     colorTextEl.addEventListener('input', (e) => applyTextColor(e.target.value));
@@ -1217,7 +1200,6 @@
         if (selectedCells.length > 0) applyBgColor(colorBgEl.value);
     });
 
-    // スマホ向け：選択範囲のクイック罫線
     function applySelectedBorders(mode) {
         if (!selectedCells.length) return;
         saveState();
@@ -1277,7 +1259,6 @@
         recalculateAllFormulas();
     });
 
-    // 任意の場所への格子・枠線の適用
     function applyBorder() {
         if (selectedCells.length === 0) return;
         saveState();
@@ -1293,7 +1274,6 @@
         });
     }
 
-
     document.getElementById('select-border-type').addEventListener('change', applyBorder);
     document.getElementById('select-border-width').addEventListener('change', applyBorder);
     const colorBorderEl = document.getElementById('color-border');
@@ -1303,11 +1283,9 @@
         if (selectedCells.length > 0) applyBorder();
     });
 
-
     function updateToolbarState(input) {
         document.getElementById('btn-bold').classList.toggle('active', input.style.fontWeight === 'bold');
         if (input.style.fontSize) document.getElementById('select-font-size').value = input.style.fontSize;
-        // rgb(...) を #rrggbb に変換してカラーピッカーに反映（同じ色を再選択できるようにする）
         document.getElementById('color-text').value = toHexColor(input.style.color, '#000000');
         if (input.style.textAlign) document.getElementById('select-align-horiz').value = input.style.textAlign;
         const td = input.closest('td');
@@ -1317,7 +1295,6 @@
             document.getElementById('color-bg').value = toHexColor(td.style.backgroundColor, '#ffffff');
         }
     }
-
 
     function showPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1330,9 +1307,24 @@
         initSheet(); showPage('page-editor');
     });
 
+    // ① 戻るボタン押下時のカスタムモーダル制御
     document.getElementById('btn-go-home').addEventListener('click', () => {
-        if (confirm("セーブをしますか？")) document.getElementById('btn-save').click();
+        document.getElementById('save-confirm-modal').style.display = 'flex';
+    });
+
+    document.getElementById('modal-btn-save').addEventListener('click', () => {
+        document.getElementById('save-confirm-modal').style.display = 'none';
+        document.getElementById('btn-save').click();
         activeFormulaInput = null; showPage('page-home');
+    });
+
+    document.getElementById('modal-btn-discard').addEventListener('click', () => {
+        document.getElementById('save-confirm-modal').style.display = 'none';
+        activeFormulaInput = null; showPage('page-home');
+    });
+
+    document.getElementById('modal-btn-cancel').addEventListener('click', () => {
+        document.getElementById('save-confirm-modal').style.display = 'none';
     });
 
     document.getElementById('btn-save').addEventListener('click', () => {
@@ -1377,17 +1369,30 @@
             
             const actionsDiv = document.createElement('div'); actionsDiv.className = 'memo-actions';
             
-            const btnEx = document.createElement('button'); btnEx.textContent = 'Excel';
-            btnEx.addEventListener('click', () => exportExcel(memo.title, memo.data, memo.cols || COLS));
-            const btnCsv = document.createElement('button'); btnCsv.textContent = 'CSV';
-            btnCsv.addEventListener('click', () => exportCSV(memo.title, memo.data, memo.cols || COLS));
+            // ② ExcelとCSVの出力ボタンを「出力」プルダウンに変更
+            const exportSelect = document.createElement('select');
+            exportSelect.innerHTML = `
+                <option value="" disabled selected>出力</option>
+                <option value="excel">Excel</option>
+                <option value="csv">CSV</option>
+            `;
+            exportSelect.addEventListener('change', (e) => {
+                const val = e.target.value;
+                if (val === 'excel') {
+                    exportExcel(memo.title, memo.data, memo.cols || COLS);
+                } else if (val === 'csv') {
+                    exportCSV(memo.title, memo.data, memo.cols || COLS);
+                }
+                e.target.value = ""; // 選択後にリセット
+            });
+
             const btnDel = document.createElement('button'); btnDel.textContent = '削除'; btnDel.className = 'btn-del';
             btnDel.addEventListener('click', () => {
                 if (confirm(`「${memo.title}」を削除してもよろしいですか？`)) {
                     delete savedMemos[id]; localStorage.setItem('hyo_memos', JSON.stringify(savedMemos)); renderMemoList();
                 }
             });
-            actionsDiv.appendChild(btnEx); actionsDiv.appendChild(btnCsv); actionsDiv.appendChild(btnDel);
+            actionsDiv.appendChild(exportSelect); actionsDiv.appendChild(btnDel);
             item.appendChild(infoDiv); item.appendChild(actionsDiv); listContainer.appendChild(item);
         });
     }
@@ -1423,7 +1428,6 @@
         recalculateAllFormulas(); showPage('page-editor');
     }
 
-    // --- ファイルインポート（読み込み）機能 ---
     document.getElementById('btn-import-file').addEventListener('click', () => {
         document.getElementById('file-input').click();
     });
