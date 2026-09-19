@@ -49,7 +49,6 @@
         .home-header { text-align: center; }
         .home-header h1 { color: var(--primary); font-size: 1.8rem; margin: 0 0 16px 0; }
         
-        /* ボタン1段化のための修正 */
         .home-actions-top { display: flex; gap: 6px; align-items: center; }
         .btn-create, .btn-import, .btn-json-import {
             flex: 1; white-space: nowrap; font-size: 0.9rem; padding: 10px 8px;
@@ -73,7 +72,6 @@
         }
         .memo-title-text { font-weight: 500; color: #0066cc; }
         .memo-title-text:hover { text-decoration: underline; }
-        /* ③スマホでも2段にならないように white-space: nowrap を指定 */
         .memo-date-text { font-size: 0.75rem; color: #666; white-space: nowrap; }
         .memo-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
         .memo-actions select {
@@ -115,7 +113,6 @@
         }
         #btn-save:active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); transform: translateY(1px); }
 
-        /* ツールバー (PC用) と書式一覧の高さ・デザイン統一 */
         .toolbar {
             display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
             gap: 8px; margin-bottom: 4px; background: #fff; padding: 6px 8px;
@@ -158,7 +155,6 @@
             width: 20px; height: 20px; border: none; cursor: pointer; background: none; padding: 0;
         }
 
-        /* スマホ用クイック書式バー */
         .mobile-selection-bar {
             display: flex; align-items: center; gap: 6px; overflow-x: auto;
             padding: 6px 8px; margin-bottom: 4px; background: #fff;
@@ -182,7 +178,6 @@
         
         .mobile-color-btn input[type=color] { width: 25px; height: 25px; padding: 0; border: 0; background: transparent; }
         
-        /* スマホ用 書式一覧ドロワー */
         .mobile-toolbar-drawer {
             display: none; flex-direction: column; gap: 6px; background: #fff;
             padding: 8px; border: 1px solid #d9d9d9; border-radius: 6px; margin-bottom: 4px;
@@ -233,7 +228,6 @@
             td.data-cell { min-width: 40px; }
         }
 
-        /* スプレッドシート本体 */
         .spreadsheet-container {
             flex-grow: 1; width: 100%; overflow: auto; border: 1px solid var(--excel-border);
             background: #fff; position: relative; user-select: none; -webkit-user-select: none;
@@ -265,17 +259,21 @@
         td.formula-source { outline: 2px solid #107c41; outline-offset: -2px; z-index: 6; }
         td.formula-source::after { display: none; }
 
+        /* ①② クロスアイコン化＆四角い囲みを削除（サイズを拡大） */
         .cell-handle {
-            position: absolute; width: 12px; height: 12px; background-color: #ffffff;
-            border: 2px solid var(--excel-select-border); z-index: 25; display: none;
-            pointer-events: auto; touch-action: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            color: var(--excel-select-border); font-size: 11px; font-weight: bold; text-align: center;
-            line-height: 8px; cursor: crosshair;
+            position: absolute; width: 14px; height: 14px; background-color: transparent;
+            border: none; z-index: 25; display: none;
+            pointer-events: auto; touch-action: none; cursor: crosshair;
         }
-        .cell-handle-tl { top: -6px; left: -6px; }
-        .cell-handle-br { bottom: -6px; right: -6px; }
-        td.selected .cell-handle { display: block; }
+        .cell-handle::before, .cell-handle::after {
+            content: ''; position: absolute; background-color: #000000;
+        }
+        .cell-handle::before { top: 6px; left: 0; width: 14px; height: 2px; }
+        .cell-handle::after { top: 0; left: 6px; width: 2px; height: 14px; }
 
+        .cell-handle-tl { top: -7px; left: -7px; }
+        .cell-handle-br { bottom: -7px; right: -7px; }
+        td.selected .cell-handle { display: block; }
         .resize-col { position: absolute; right: 0; top: 0; width: 8px; height: 100%; cursor: col-resize; z-index: 10; touch-action: none; }
         .resize-row { position: absolute; left: 0; bottom: 0; width: 100%; height: 8px; cursor: row-resize; z-index: 10; touch-action: none; }
 
@@ -283,7 +281,6 @@
         .btn-clear-cell { color: #d9534f; border-color: #d9534f !important; font-weight: bold; border-radius: 4px; }
         .btn-del-rowcol { color: #d9534f; border-color: #d9534f !important; }
 
-        /* カスタム確認モーダル */
         .custom-modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;
@@ -314,7 +311,7 @@
                 <div class="home-actions-top">
                     <button id="btn-create-new" class="btn-create">＋ 表メモ</button>
                     <button id="btn-import-file" class="btn-import">📂 開く</button>
-                    <button id="btn-import-json" class="btn-json-import">📥 JSON読込</button>
+                    <button id="btn-json-import" class="btn-json-import">📥 JSON読込</button>
                     <input type="file" id="file-input" accept=".xlsx, .xls, .csv" style="display: none;">
                     <input type="file" id="json-file-input" accept=".json" style="display: none;">
                 </div>
@@ -346,7 +343,7 @@
             <label class="mobile-color-btn" title="文字色" style="border-radius: 6px;">文字 <input type="color" id="mobile-text-color" value="#000000"></label>
         </div>
 
-        <!-- スマホ用 書式一覧ドロワー (順番: 閉じる・履歴・文字・配置・行列・数字・罫線・削除) -->
+        <!-- スマホ用 書式一覧ドロワー -->
         <div class="mobile-toolbar-drawer" id="mobile-toolbar-drawer">
             <div class="mobile-drawer-row">
                 <button id="btn-drawer-close">閉じる</button>
@@ -749,10 +746,7 @@
                 lastTouchTime = Date.now();
                 touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
                 touchMoved = false;
-                if (activeFormulaInput && activeFormulaInput !== input) {
-                    formulaRangeStart = { r, c };
-                    e.preventDefault();
-                }
+                // ③数式入力時のスクロール改善：スクロール操作を妨げないよう、数式入力中の無条件なpreventDefaultを削除
                 return;
             } else if (e.type === 'mousedown' && Date.now() - lastTouchTime < 500) {
                 return;
@@ -810,7 +804,7 @@
         };
 
         td.addEventListener('mousedown', handleCellInteraction);
-        td.addEventListener('touchstart', handleCellInteraction, { passive: false });
+        td.addEventListener('touchstart', handleCellInteraction, { passive: true });
         td.addEventListener('touchmove', handleTouchMove, { passive: true });
         td.addEventListener('touchend', handleTouchEnd, { passive: true });
 
@@ -1575,14 +1569,12 @@
             
             const exportSelect = document.createElement('select');
             const defaultOpt = document.createElement('option');
-            /* ① 出力選択の文字を「出力」に変更 */
             defaultOpt.value = ""; defaultOpt.textContent = "出力"; defaultOpt.disabled = true; defaultOpt.selected = true;
             exportSelect.appendChild(defaultOpt);
 
             const optLine = document.createElement('option'); optLine.value = "line"; optLine.textContent = "LINE"; exportSelect.appendChild(optLine);
             const optExcel = document.createElement('option'); optExcel.value = "excel"; optExcel.textContent = "Excel"; exportSelect.appendChild(optExcel);
             const optCsv = document.createElement('option'); optCsv.value = "csv"; optCsv.textContent = "CSV"; exportSelect.appendChild(optCsv);
-            /* ② 「JSONで保存（表形式保持）」を「JSON」に変更 */
             const optJson = document.createElement('option'); optJson.value = "json"; optJson.textContent = "JSON"; exportSelect.appendChild(optJson);
 
             exportSelect.addEventListener('change', () => {
