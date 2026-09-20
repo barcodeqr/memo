@@ -259,7 +259,6 @@
         td.formula-source { outline: 2px solid #107c41; outline-offset: -2px; z-index: 6; }
         td.formula-source::after { display: none; }
 
-        /* ①② クロスアイコン化＆四角い囲みを削除（サイズを拡大） */
         .cell-handle {
             position: absolute; width: 14px; height: 14px; background-color: transparent;
             border: none; z-index: 25; display: none;
@@ -667,7 +666,6 @@
         input.addEventListener('compositionend', () => { isComposing = false; });
 
         input.addEventListener('focus', () => {
-            // 現在他のセルで数式を入力中である場合は、フォーカスを移動させずに数式入力欄へ戻すガード処理
             if (activeFormulaInput && activeFormulaInput !== input) {
                 activeFormulaInput.focus();
                 return;
@@ -751,7 +749,6 @@
                 lastTouchTime = Date.now();
                 touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
                 touchMoved = false;
-                // ③数式入力時のスクロール改善：スクロール操作を妨げないよう、数式入力中の無条件なpreventDefaultを削除
                 return;
             } else if (e.type === 'mousedown' && Date.now() - lastTouchTime < 500) {
                 return;
@@ -869,16 +866,18 @@
             }
         });
 
-input.addEventListener('keydown', (e) => {
+        input.addEventListener('keydown', (e) => {
+            // スマホの「次へ」「完了」またはPCの「Enter」に対応
             if (e.key === 'Enter' || e.keyCode === 13) {
                 e.preventDefault();
                 
-                // 数式として確定・計算処理を実行
-                processCellFormula(input);
-                
+                // 数式モード中の場合はアクティブ入力をリセット
                 activeFormulaInput = null;
                 formulaRangeStart = null;
                 td.classList.remove('formula-source');
+
+                // 数式として確定・計算処理を実行
+                processCellFormula(input);
                 input.blur();
                 
                 const nextRow = r + 1;
@@ -886,7 +885,8 @@ input.addEventListener('keydown', (e) => {
                     const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${c}"]`);
                     if (nextInput) { nextInput.focus(); nextInput.select(); }
                 }
-            } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {                copiedCellData = {
+            } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+                copiedCellData = {
                     val: input.value, formula: input.dataset.formula || '', format: input.dataset.format || '',
                     bold: input.style.fontWeight, fontSize: input.style.fontSize, color: input.style.color,
                     align: input.style.textAlign, vertAlign: inner.style.justifyContent, bg: td.style.backgroundColor,
@@ -954,8 +954,13 @@ input.addEventListener('keydown', (e) => {
                 handleBr.className = 'cell-handle cell-handle-br';
                 initCellHandle(handleBr, r, c);
 
-                const input = document.createElement('input'); input.type = 'text'; input.className = 'cell-input';
-                input.dataset.row = r; input.dataset.col = c;
+                const input = document.createElement('input'); 
+                input.type = 'text'; 
+                input.className = 'cell-input';
+                // スマホキーボードで「次へ」を表示・機能させる設定
+                input.setAttribute('enterkeyhint', 'next');
+                input.dataset.row = r; 
+                input.dataset.col = c;
 
                 setupCellEvents(input, td, inner, r, c);
 
@@ -1134,8 +1139,13 @@ input.addEventListener('keydown', (e) => {
     }
 
     function processCellFormula(input) {
-        const raw = input.value.trim();
-        if (raw.startsWith('=') || raw.startsWith('＝')) {
+        let raw = input.value.trim();
+        // 全角の「＝」が入力されていた場合は半角の「=」に正規化
+        if (raw.startsWith('＝')) {
+            raw = '=' + raw.substring(1);
+            input.value = raw;
+        }
+        if (raw.startsWith('=')) {
             const normalized = '=' + raw.substring(1);
             input.dataset.formula = normalized;
             input.value = evaluateFormula(normalized);
@@ -1720,9 +1730,9 @@ input.addEventListener('keydown', (e) => {
         reader.readAsArrayBuffer(file);
     });
 
-      document.getElementById('btn-json-import').addEventListener('click', () => {
-          document.getElementById('json-file-input').click();
-      });
+    document.getElementById('btn-json-import').addEventListener('click', () => {
+        document.getElementById('json-file-input').click();
+    });
 
     document.getElementById('json-file-input').addEventListener('change', (e) => {
         const file = e.target.files[0];
