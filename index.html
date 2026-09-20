@@ -886,9 +886,7 @@ input.addEventListener('keydown', (e) => {
                     const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${c}"]`);
                     if (nextInput) { nextInput.focus(); nextInput.select(); }
                 }
-            }
-            } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-                copiedCellData = {
+            } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {                copiedCellData = {
                     val: input.value, formula: input.dataset.formula || '', format: input.dataset.format || '',
                     bold: input.style.fontWeight, fontSize: input.style.fontSize, color: input.style.color,
                     align: input.style.textAlign, vertAlign: inner.style.justifyContent, bg: td.style.backgroundColor,
