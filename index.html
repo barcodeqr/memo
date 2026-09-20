@@ -869,18 +869,24 @@
             }
         });
 
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
+input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.keyCode === 13) {
                 e.preventDefault();
+                
+                // 数式として確定・計算処理を実行
+                processCellFormula(input);
+                
                 activeFormulaInput = null;
                 formulaRangeStart = null;
                 td.classList.remove('formula-source');
                 input.blur();
+                
                 const nextRow = r + 1;
                 if (nextRow < ROWS) {
                     const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${c}"]`);
                     if (nextInput) { nextInput.focus(); nextInput.select(); }
                 }
+            }
             } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
                 copiedCellData = {
                     val: input.value, formula: input.dataset.formula || '', format: input.dataset.format || '',
