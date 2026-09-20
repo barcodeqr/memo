@@ -667,6 +667,11 @@
         input.addEventListener('compositionend', () => { isComposing = false; });
 
         input.addEventListener('focus', () => {
+            // 現在他のセルで数式を入力中である場合は、フォーカスを移動させずに数式入力欄へ戻すガード処理
+            if (activeFormulaInput && activeFormulaInput !== input) {
+                activeFormulaInput.focus();
+                return;
+            }
             document.querySelectorAll('td.formula-source').forEach(el => el.classList.remove('formula-source'));
             const valStr = input.value;
             if (valStr.startsWith('=') || valStr.startsWith('＝') || input.dataset.formula) {
