@@ -1711,9 +1711,9 @@
         reader.readAsArrayBuffer(file);
     });
 
-    document.getElementById('btn-import-json').addEventListener('click', () => {
-        document.getElementById('json-file-input').click();
-    });
+      document.getElementById('btn-json-import').addEventListener('click', () => {
+          document.getElementById('json-file-input').click();
+      });
 
     document.getElementById('json-file-input').addEventListener('change', (e) => {
         const file = e.target.files[0];
