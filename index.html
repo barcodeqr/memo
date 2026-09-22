@@ -76,11 +76,11 @@
         .memo-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
         .memo-actions select {
             font-size: 0.8rem; padding: 4px 6px; border: 1px solid #ccc;
-            border-radius: 4px; cursor: pointer; background: #fff;
+            border-radius: 6px; cursor: pointer; background: #fff;
         }
         .memo-actions button {
             font-size: 0.8rem; padding: 4px 8px; border: 1px solid #ccc;
-            border-radius: 4px; cursor: pointer; background: #fff;
+            border-radius: 6px; cursor: pointer; background: #fff;
         }
         .memo-actions button:hover { background: #eee; }
         .btn-del { color: #d9534f; border-color: #d9534f !important; }
@@ -89,7 +89,7 @@
         /* エディタ画面トップバー */
         .editor-top-bar {
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
-            background: #fff; padding: 4px 8px; border: 1px solid var(--excel-border); border-radius: 4px;
+            background: #fff; padding: 4px 8px; border: 1px solid var(--excel-border); border-radius: 6px;
         }
         .editor-top-left { display: flex; gap: 6px; align-items: center; flex-grow: 1; }
         
@@ -104,7 +104,7 @@
 
         .editor-top-left input {
             font-size: 0.9rem; padding: 2px 4px; border: 1px solid #ccc;
-            border-radius: 4px; font-weight: bold; width: 100%; max-width: 200px;
+            border-radius: 6px; font-weight: bold; width: 100%; max-width: 200px;
         }
         
         #btn-save {
@@ -116,12 +116,12 @@
         .toolbar {
             display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
             gap: 8px; margin-bottom: 4px; background: #fff; padding: 6px 8px;
-            border: 1px solid var(--excel-border); border-radius: 4px; align-items: center;
+            border: 1px solid var(--excel-border); border-radius: 6px; align-items: center;
             flex-shrink: 0;
         }
         .toolbar button, .toolbar select, .toolbar label, .color-picker-wrapper {
             font-size: 0.85rem; padding: 0 8px; cursor: pointer; border: 1px solid #ccc;
-            background: #fff; border-radius: 4px; height: 34px; display: inline-flex;
+            background: #fff; border-radius: 6px; height: 34px; display: inline-flex;
             align-items: center; justify-content: center; flex-shrink: 0;
             box-sizing: border-box; vertical-align: middle;
         }
@@ -131,12 +131,14 @@
 
         .tool-group {
             display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px;
-            border-radius: 4px; border: 1px solid #cbd5e1; flex-shrink: 0; height: 38px;
+            border-radius: 6px; border: 1px solid #cbd5e1; flex-shrink: 0; height: 38px;
         }
         .tool-group-label { font-size: 0.75rem; font-weight: bold; margin-right: 2px; }
         
         .group-history { background: #f8fafc; border-color: #cbd5e1; }
         .group-history .tool-group-label { color: #475569; }
+        .group-clipboard { background: #f8fafc; border-color: #cbd5e1; }
+        .group-clipboard .tool-group-label { color: #475569; }
         .group-size { background: #f8fafc; border-color: #cbd5e1; }
         .group-size .tool-group-label { color: #475569; }
         .group-text { background: #f8fafc; border-color: #cbd5e1; }
@@ -150,9 +152,10 @@
         .group-border { background: #f8fafc; border-color: #cbd5e1; }
         .group-border .tool-group-label { color: #475569; }
 
-        .color-picker-wrapper { gap: 3px; height: 34px; padding: 0 6px; }
+        .color-picker-wrapper { gap: 3px; height: 34px; padding: 0 6px; border-radius: 6px; }
         .color-picker-wrapper input[type="color"] {
             width: 20px; height: 20px; border: none; cursor: pointer; background: none; padding: 0;
+            border-radius: 4px;
         }
 
         .mobile-selection-bar {
@@ -163,7 +166,7 @@
         }
         .mobile-selection-bar button, .mobile-color-btn {
             height: 38px; min-width: 58px; padding: 0 9px; border: 1px solid #c9c9c9;
-            border-radius: 7px; background: #fff; font-size: 14px; font-weight: 600;
+            border-radius: 6px; background: #fff; font-size: 14px; font-weight: 600;
             display: inline-flex; align-items: center; justify-content: center; gap: 3px;
             white-space: nowrap; flex-shrink: 0; touch-action: manipulation;
         }
@@ -200,17 +203,12 @@
             vertical-align: middle;
             font-size: 13px;
             padding: 0 8px;
+            border-radius: 6px !important;
         }
-        .mobile-toolbar-drawer select { padding: 0 4px; }
+        .mobile-toolbar-drawer select { padding: 0 6px; background-color: #fff; border: 1px solid #ccc; }
         .mobile-toolbar-drawer .color-picker-wrapper input[type="color"] { width: 22px; height: 22px; }
 
-        #btn-drawer-close {
-            border-radius: 6px !important; font-weight: bold; writing-mode: horizontal-tb !important;
-            background: linear-gradient(to bottom, #f1f5f9, #cbd5e1) !important; color: #334155 !important;
-            border: 1px solid #94a3b8 !important; box-shadow: 0 1px 3px rgba(0,0,0,0.15); white-space: nowrap;
-        }
-
-        #btn-clear-m { border-radius: 6px !important; font-weight: bold; writing-mode: horizontal-tb !important; white-space: nowrap; }
+        #btn-clear-m { border-radius: 6px !important; font-weight: bold; white-space: nowrap; }
 
         #btn-open-drawer {
             background: linear-gradient(to bottom, #d8b4fe, #9333ea) !important; color: #ffffff !important;
@@ -231,7 +229,7 @@
         .spreadsheet-container {
             flex-grow: 1; width: 100%; overflow: auto; border: 1px solid var(--excel-border);
             background: #fff; position: relative; user-select: none; -webkit-user-select: none;
-            -webkit-overflow-scrolling: touch;
+            -webkit-overflow-scrolling: touch; border-radius: 6px;
         }
         .spreadsheet-container::-webkit-scrollbar { width: 18px; height: 18px; }
         .spreadsheet-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 9px; }
@@ -247,7 +245,7 @@
         td.data-cell { border: 1px solid var(--excel-border); display: table-cell; }
         .cell-inner { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 2; }
         th { background-color: var(--excel-header); text-align: center; font-weight: normal; color: #555; border: 1px solid var(--excel-border); }
-        .row-header { width: 45px; min-width: 35px; touch-action: auto; }
+        .row-header { width: 45px; min-width: 35px; touch-action: auto; cursor: pointer; }
         .col-header { width: 90px; min-width: 40px; touch-action: auto; }
         .cell-input {
             width: 100%; border: none; outline: none; background: transparent;
@@ -276,8 +274,8 @@
         .resize-col { position: absolute; right: 0; top: 0; width: 8px; height: 100%; cursor: col-resize; z-index: 10; touch-action: none; }
         .resize-row { position: absolute; left: 0; bottom: 0; width: 100%; height: 8px; cursor: row-resize; z-index: 10; touch-action: none; }
 
-        .btn-success { background: var(--primary) !important; color: white !important; border-color: var(--primary) !important; }
-        .btn-clear-cell { color: #d9534f; border-color: #d9534f !important; font-weight: bold; border-radius: 4px; }
+        .btn-success { background: var(--primary) !important; color: white !important; border-color: var(--primary) !important; border-radius: 6px !important; }
+        .btn-clear-cell { color: #d9534f; border-color: #d9534f !important; font-weight: bold; border-radius: 6px; }
         .btn-del-rowcol { color: #d9534f; border-color: #d9534f !important; }
 
         .custom-modal-overlay {
@@ -329,30 +327,41 @@
             <button id="btn-save" class="btn-success">セーブ</button>
         </div>
 
-        <!-- スマホ用クイック書式バー -->
+        <!-- スマホ用クイック書式バー (全選択ボタンを削除) -->
         <div class="mobile-selection-bar" id="mobile-selection-bar">
             <span id="selection-info">A1</span>
-            <button id="btn-open-drawer" title="全書式を開く" style="border-radius: 6px;">全書式</button>
-            <button id="btn-select-all" title="表全体を選択" style="border-radius: 6px;">全選択</button>
-            <button id="btn-border-all" title="選択範囲に格子" style="border-radius: 6px;">▦ 枠</button>
-            <button id="btn-border-outer" title="選択範囲の外枠" style="border-radius: 6px;">□ 外枠</button>
-            <button id="btn-border-none" title="罫線を消す" style="border-radius: 6px;">□̸ 消す</button>
-            <label class="mobile-color-btn" title="枠の色" style="border-radius: 6px;">線 <input type="color" id="mobile-border-color" value="#e6e6e6"></label>
-            <label class="mobile-color-btn" title="背景色" style="border-radius: 6px;">背景 <input type="color" id="mobile-bg-color" value="#fff2cc"></label>
-            <label class="mobile-color-btn" title="文字色" style="border-radius: 6px;">文字 <input type="color" id="mobile-text-color" value="#000000"></label>
+            <button id="btn-open-drawer" title="全書式を開く">全書式</button>
+            <button id="btn-border-all" title="選択範囲に格子">▦ 枠</button>
+            <button id="btn-border-outer" title="選択範囲の外枠">□ 外枠</button>
+            <button id="btn-border-none" title="罫線を消す">□̸ 消す</button>
+            <label class="mobile-color-btn" title="枠の色">線 <input type="color" id="mobile-border-color" value="#ff0000"></label>
+            <label class="mobile-color-btn" title="背景色">背景 <input type="color" id="mobile-bg-color" value="#ffff00"></label>
+            <label class="mobile-color-btn" title="文字色">文字 <input type="color" id="mobile-text-color" value="#0000ff"></label>
         </div>
 
-        <!-- スマホ用 書式一覧ドロワー -->
+        <!-- スマホ用 全書式ドロワー -->
         <div class="mobile-toolbar-drawer" id="mobile-toolbar-drawer">
             <div class="mobile-drawer-row">
-                <button id="btn-drawer-close">閉じる</button>
-                
+                <!-- 履歴グループ -->
                 <div class="tool-group group-history" style="margin:0;">
                     <span class="tool-group-label">履歴</span>
                     <button id="btn-undo-m" title="戻る" disabled>↶</button>
                     <button id="btn-redo-m" title="進む" disabled>↷</button>
                 </div>
                 
+                <!-- コピー・貼付グループ -->
+                <div class="tool-group group-clipboard" style="margin:0;">
+                    <span class="tool-group-label">クリップボード</span>
+                    <button id="btn-copy-m" title="コピー">コピー</button>
+                    <select id="select-paste-m" title="貼付選択">
+                        <option value="" disabled selected>貼付</option>
+                        <option value="all">すべて</option>
+                        <option value="value">値のみ</option>
+                        <option value="transpose">行列入替</option>
+                    </select>
+                </div>
+
+                <!-- 文字グループ -->
                 <div class="tool-group group-text" style="margin:0;">
                     <span class="tool-group-label">文字</span>
                     <button id="btn-bold-m"><b>B</b></button>
@@ -363,10 +372,11 @@
                         <option value="1.1rem">中</option>
                         <option value="1.3rem">大</option>
                     </select>
-                    <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m" value="#000000"></div>
-                    <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m" value="#ffffff"></div>
+                    <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m" value="#0000ff"></div>
+                    <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m" value="#ffff00"></div>
                 </div>
                 
+                <!-- 配置グループ -->
                 <div class="tool-group group-align" style="margin:0;">
                     <span class="tool-group-label">配置</span>
                     <select id="select-align-horiz-m">
@@ -383,6 +393,7 @@
                     </select>
                 </div>
                 
+                <!-- 行・列グループ -->
                 <div class="tool-group group-size" style="margin:0;">
                     <span class="tool-group-label">行・列</span>
                     <button id="btn-add-row-m">行＋</button>
@@ -391,6 +402,7 @@
                     <button id="btn-delete-col-m" class="btn-del-rowcol">列－</button>
                 </div>
                 
+                <!-- 数字グループ -->
                 <div class="tool-group group-format" style="margin:0;">
                     <span class="tool-group-label">数字</span>
                     <button id="btn-format-none-m">標準</button>
@@ -398,11 +410,13 @@
                     <button id="btn-format-currency-m"><b>¥</b></button>
                 </div>
                 
+                <!-- 罫線グループ -->
                 <div class="tool-group group-border" style="margin:0;">
                     <span class="tool-group-label">罫線</span>
                     <select id="select-border-type-m">
                         <option value="" disabled selected>罫線</option>
                         <option value="all">格子</option>
+                        <option value="outer">外枠</option>
                         <option value="top">上</option>
                         <option value="bottom">下</option>
                         <option value="left">左</option>
@@ -414,21 +428,33 @@
                         <option value="2px">中</option>
                         <option value="3px">太</option>
                     </select>
-                    <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m" value="#e6e6e6"></div>
+                    <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m" value="#ff0000"></div>
                 </div>
                 
+                <!-- 削除ボタン -->
                 <button id="btn-clear-m" class="btn-clear-cell">削除</button>
             </div>
         </div>
 
         <!-- PC用ツールバー -->
         <div class="toolbar">
-            <span id="selection-info-pc" style="font-size: 14px; font-weight: bold; color: #1e293b; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; padding: 0 8px; height: 34px; display: inline-flex; align-items: center; justify-content: center; min-width: 55px; flex-shrink: 0;">A1</span>
+            <span id="selection-info-pc" style="font-size: 14px; font-weight: bold; color: #1e293b; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 8px; height: 34px; display: inline-flex; align-items: center; justify-content: center; min-width: 55px; flex-shrink: 0;">A1</span>
             
             <div class="tool-group group-history">
                 <span class="tool-group-label">履歴</span>
                 <button id="btn-undo" title="戻る (Ctrl+Z)" disabled>↶ 戻る</button>
                 <button id="btn-redo" title="進む (Ctrl+Y)" disabled>↷ 進む</button>
+            </div>
+
+            <div class="tool-group group-clipboard">
+                <span class="tool-group-label">クリップボード</span>
+                <button id="btn-copy" title="コピー">コピー</button>
+                <select id="select-paste" title="貼付選択">
+                    <option value="" disabled selected>貼付</option>
+                    <option value="all">すべて</option>
+                    <option value="value">値のみ</option>
+                    <option value="transpose">行列入替</option>
+                </select>
             </div>
 
             <div class="tool-group group-text">
@@ -441,8 +467,8 @@
                     <option value="1.1rem">中(16)</option>
                     <option value="1.3rem">大(20)</option>
                 </select>
-                <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text" value="#000000"></div>
-                <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg" value="#ffffff"></div>
+                <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text" value="#0000ff"></div>
+                <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg" value="#ffff00"></div>
             </div>
 
             <div class="tool-group group-align">
@@ -481,6 +507,7 @@
                 <select id="select-border-type" title="罫線パターン">
                     <option value="" disabled selected>罫線</option>
                     <option value="all">格子</option>
+                    <option value="outer">外枠</option>
                     <option value="top">上</option>
                     <option value="bottom">下</option>
                     <option value="left">左</option>
@@ -492,7 +519,7 @@
                     <option value="2px">中</option>
                     <option value="3px">太</option>
                 </select>
-                <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border" value="#e6e6e6"></div>
+                <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border" value="#ff0000"></div>
             </div>
 
             <button id="btn-clear" class="btn-clear-cell" title="セル削除">削除</button>
@@ -501,7 +528,11 @@
         <!-- 表エリア -->
         <div class="spreadsheet-container" id="scroll-container">
             <table id="spreadsheet">
-                <thead><tr id="col-header-row"><th class="row-header"></th></tr></thead>
+                <thead>
+                    <tr id="col-header-row">
+                        <th class="row-header" id="select-all-corner" title="すべて選択"></th>
+                    </tr>
+                </thead>
                 <tbody id="sheet-body"></tbody>
             </table>
         </div>
@@ -524,7 +555,7 @@
     let ROWS = 40;  
     let selectedCells = []; 
     let currentId = null;
-    let copiedCellData = null;
+    let copiedRangeData = null; // コピーデータ保持用
     let isMouseDown = false;
     let startCellCoord = null;
     let activeFormulaInput = null;
@@ -658,6 +689,136 @@
         const infoPcEl = document.getElementById('selection-info-pc');
         if (infoEl) infoEl.textContent = refText;
         if (infoPcEl) infoPcEl.textContent = refText;
+    }
+
+    // コピー処理の共通化
+    function executeCopy() {
+        if (selectedCells.length === 0) return;
+        let minR = ROWS, maxR = -1, minC = COLS, maxC = -1;
+        selectedCells.forEach(td => {
+            const r = parseInt(td.dataset.row);
+            const c = parseInt(td.dataset.col);
+            if (r < minR) minR = r;
+            if (r > maxR) maxR = r;
+            if (c < minC) minC = c;
+            if (c > maxC) maxC = c;
+        });
+
+        let dataMatrix = [];
+        for (let r = minR; r <= maxR; r++) {
+            let rowArr = [];
+            for (let c = minC; c <= maxC; c++) {
+                const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+                const td = input ? input.closest('td') : null;
+                const inner = td ? td.querySelector('.cell-inner') : null;
+                rowArr.push({
+                    val: input ? input.value : "",
+                    formula: input ? (input.dataset.formula || "") : "",
+                    format: input ? (input.dataset.format || "") : "",
+                    bold: input ? input.style.fontWeight : "",
+                    fontSize: input ? input.style.fontSize : "",
+                    color: input ? input.style.color : "",
+                    align: input ? input.style.textAlign : "",
+                    vertAlign: inner ? inner.style.justifyContent : "",
+                    bg: td ? td.style.backgroundColor : "",
+                    borderTop: td ? td.style.borderTop : defaultBorder,
+                    borderBottom: td ? td.style.borderBottom : defaultBorder,
+                    borderLeft: td ? td.style.borderLeft : defaultBorder,
+                    borderRight: td ? td.style.borderRight : defaultBorder
+                });
+            }
+            dataMatrix.push(rowArr);
+        }
+        copiedRangeData = { matrix: dataMatrix, rows: maxR - minR + 1, cols: maxC - minC + 1 };
+        alert("選択範囲をコピーしました（書式・数式含む）");
+    }
+
+    // 貼付処理の共通化 (mode: 'all' | 'value' | 'transpose')
+    function executePaste(mode) {
+        if (!copiedRangeData || selectedCells.length === 0) return;
+        saveState();
+
+        const firstTd = selectedCells[0];
+        const startR = parseInt(firstTd.dataset.row);
+        const startC = parseInt(firstTd.dataset.col);
+
+        let matrix = copiedRangeData.matrix;
+        if (mode === 'transpose') {
+            // 行列の入れ替え
+            let transposed = [];
+            let oldRows = copiedRangeData.rows;
+            let oldCols = copiedRangeData.cols;
+            for (let c = 0; c < oldCols; c++) {
+                let newRow = [];
+                for (let r = 0; r < oldRows; r++) {
+                    newRow.push(matrix[r][c]);
+                }
+                transposed.push(newRow);
+            }
+            matrix = transposed;
+        }
+
+        const mRows = matrix.length;
+        const mCols = matrix[0].length;
+
+        for (let rIdx = 0; rIdx < mRows; rIdx++) {
+            const targetR = startR + rIdx;
+            if (targetR >= ROWS) continue;
+            for (let cIdx = 0; cIdx < mCols; cIdx++) {
+                const targetC = startC + cIdx;
+                if (targetC >= COLS) continue;
+
+                const cellData = matrix[rIdx][cIdx];
+                const input = document.querySelector(`input[data-row="${targetR}"][data-col="${targetC}"]`);
+                const td = input ? input.closest('td') : null;
+                const inner = td ? td.querySelector('.cell-inner') : null;
+
+                if (input && td) {
+                    if (mode === 'value') {
+                        // 値のみ
+                        let rawVal = cellData.formula ? evaluateFormula(cellData.formula) : cellData.val;
+                        input.value = rawVal;
+                        delete input.dataset.formula;
+                    } else {
+                        // すべて / 行列入替
+                        input.value = cellData.val;
+                        if (cellData.formula) input.dataset.formula = cellData.formula; else delete input.dataset.formula;
+                        if (cellData.format) input.dataset.format = cellData.format; else delete input.dataset.format;
+                        input.style.fontWeight = cellData.bold || 'normal';
+                        input.style.fontSize = cellData.fontSize || '0.9rem';
+                        input.style.color = cellData.color || '';
+                        input.style.textAlign = cellData.align || 'left';
+                        if (inner) inner.style.justifyContent = cellData.vertAlign || 'center';
+                        td.style.backgroundColor = cellData.bg || '';
+                        td.style.borderTop = cellData.borderTop || defaultBorder;
+                        td.style.borderBottom = cellData.borderBottom || defaultBorder;
+                        td.style.borderLeft = cellData.borderLeft || defaultBorder;
+                        td.style.borderRight = cellData.borderRight || defaultBorder;
+                    }
+                    processCellFormula(input);
+                }
+            }
+        }
+        recalculateAllFormulas();
+    }
+
+    document.getElementById('btn-copy').addEventListener('click', executeCopy);
+    const btnCopyM = document.getElementById('btn-copy-m');
+    if (btnCopyM) btnCopyM.addEventListener('click', executeCopy);
+
+    const selectPaste = document.getElementById('select-paste');
+    if (selectPaste) {
+        selectPaste.addEventListener('change', (e) => {
+            executePaste(e.target.value);
+            e.target.value = "";
+        });
+    }
+    const selectPasteM = document.getElementById('select-paste-m');
+    if (selectPasteM) {
+        selectPasteM.addEventListener('change', (e) => {
+            executePaste(e.target.value);
+            e.target.value = "";
+        });
     }
 
     function setupCellEvents(input, td, inner, r, c) {
@@ -867,49 +1028,16 @@
         });
 
         input.addEventListener('keydown', (e) => {
-            // スマホの「次へ」「完了」またはPCの「Enter」に対応
-            if (e.key === 'Enter' || e.keyCode === 13) {
+            if (e.key === 'Enter') {
                 e.preventDefault();
-                
-                // 数式モード中の場合はアクティブ入力をリセット
                 activeFormulaInput = null;
                 formulaRangeStart = null;
                 td.classList.remove('formula-source');
-
-                // 数式として確定・計算処理を実行
-                processCellFormula(input);
                 input.blur();
-                
                 const nextRow = r + 1;
                 if (nextRow < ROWS) {
                     const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${c}"]`);
                     if (nextInput) { nextInput.focus(); nextInput.select(); }
-                }
-            } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-                copiedCellData = {
-                    val: input.value, formula: input.dataset.formula || '', format: input.dataset.format || '',
-                    bold: input.style.fontWeight, fontSize: input.style.fontSize, color: input.style.color,
-                    align: input.style.textAlign, vertAlign: inner.style.justifyContent, bg: td.style.backgroundColor,
-                    borderTop: td.style.borderTop, borderBottom: td.style.borderBottom, borderLeft: td.style.borderLeft, borderRight: td.style.borderRight
-                };
-            } else if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
-                if (copiedCellData !== null) {
-                    e.preventDefault();
-                    saveState();
-                    selectedCells.forEach(targetTd => {
-                        const tInput = targetTd.querySelector('input'); const tInner = targetTd.querySelector('.cell-inner');
-                        if (tInput) {
-                            tInput.value = copiedCellData.val; tInput.dataset.formula = copiedCellData.formula; tInput.dataset.format = copiedCellData.format;
-                            tInput.style.fontWeight = copiedCellData.bold || 'normal'; tInput.style.fontSize = copiedCellData.fontSize || '0.9rem';
-                            tInput.style.color = copiedCellData.color || ''; tInput.style.textAlign = copiedCellData.align || 'left';
-                            processCellFormula(tInput);
-                        }
-                        if (tInner) tInner.style.justifyContent = copiedCellData.vertAlign || 'center';
-                        targetTd.style.backgroundColor = copiedCellData.bg || '';
-                        targetTd.style.borderTop = copiedCellData.borderTop || defaultBorder; targetTd.style.borderBottom = copiedCellData.borderBottom || defaultBorder;
-                        targetTd.style.borderLeft = copiedCellData.borderLeft || defaultBorder; targetTd.style.borderRight = copiedCellData.borderRight || defaultBorder;
-                    });
-                    recalculateAllFormulas(); updateToolbarState(input);
                 }
             }
         });
@@ -922,7 +1050,14 @@
 
     function buildSheetStructure() {
         const colHeaderRow = document.getElementById('col-header-row');
-        colHeaderRow.innerHTML = '<th class="row-header"></th>';
+        colHeaderRow.innerHTML = '<th class="row-header" id="select-all-corner" title="すべて選択"></th>';
+        
+        // 左上の交点クリックで全選択
+        document.getElementById('select-all-corner').addEventListener('click', () => {
+            selectRange(0, 0, ROWS - 1, COLS - 1);
+            updateSelectionInfo(0, 0);
+        });
+
         const sheetBody = document.getElementById('sheet-body');
         sheetBody.innerHTML = '';
 
@@ -954,13 +1089,8 @@
                 handleBr.className = 'cell-handle cell-handle-br';
                 initCellHandle(handleBr, r, c);
 
-                const input = document.createElement('input'); 
-                input.type = 'text'; 
-                input.className = 'cell-input';
-                // スマホキーボードで「次へ」を表示・機能させる設定
-                input.setAttribute('enterkeyhint', 'next');
-                input.dataset.row = r; 
-                input.dataset.col = c;
+                const input = document.createElement('input'); input.type = 'text'; input.className = 'cell-input';
+                input.dataset.row = r; input.dataset.col = c;
 
                 setupCellEvents(input, td, inner, r, c);
 
@@ -1139,13 +1269,8 @@
     }
 
     function processCellFormula(input) {
-        let raw = input.value.trim();
-        // 全角の「＝」が入力されていた場合は半角の「=」に正規化
-        if (raw.startsWith('＝')) {
-            raw = '=' + raw.substring(1);
-            input.value = raw;
-        }
-        if (raw.startsWith('=')) {
+        const raw = input.value.trim();
+        if (raw.startsWith('=') || raw.startsWith('＝')) {
             const normalized = '=' + raw.substring(1);
             input.dataset.formula = normalized;
             input.value = evaluateFormula(normalized);
@@ -1489,11 +1614,6 @@
         applyBorderCustom('none', 'select-border-width-m', mobileBorderColor ? 'mobile-border-color' : 'color-border-m');
     });
 
-    document.getElementById('btn-select-all').addEventListener('click', () => {
-        selectRange(0, 0, ROWS - 1, COLS - 1);
-        updateSelectionInfo(0, 0);
-    });
-
     function updateToolbarState(input) {
         document.getElementById('btn-bold').classList.toggle('active', input.style.fontWeight === 'bold');
         const boldM = document.getElementById('btn-bold-m');
@@ -1820,7 +1940,6 @@
 
     const drawer = document.getElementById('mobile-toolbar-drawer');
     document.getElementById('btn-open-drawer').addEventListener('click', () => { drawer.classList.toggle('open'); });
-    document.getElementById('btn-drawer-close').addEventListener('click', () => { drawer.classList.remove('open'); });
 
     renderMemoList();
 
