@@ -180,6 +180,21 @@
             min-width: 65px; text-align: center; white-space: nowrap; display: inline-flex;
             align-items: center; justify-content: center; height: 38px; flex-shrink: 0;
         }
+
+        /* クイックバー歯車ボタン */
+        .btn-quickbar-config {
+            background: linear-gradient(to bottom, #f1f5f9, #cbd5e1) !important;
+            color: #334155 !important;
+            border: 1px solid #94a3b8 !important;
+            border-radius: 6px !important;
+            font-weight: bold;
+            padding: 0 10px;
+            min-width: 38px !important;
+            flex-shrink: 0;
+        }
+        .btn-quickbar-config:active {
+            background: linear-gradient(to bottom, #cbd5e1, #94a3b8) !important;
+        }
         
         .mobile-color-btn input[type=color] { width: 25px; height: 25px; padding: 0; border: 0; background: transparent; }
         
@@ -309,6 +324,35 @@
         .btn-modal-discard { background-color: #e2e8f0; color: #334155; }
         .btn-modal-discard:hover { background-color: #cbd5e1; }
         .btn-modal-cancel { background-color: transparent; color: #666; font-size: 0.85rem !important; }
+
+        /* クイックバー設定モーダル用スタイル */
+        .config-modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000;
+        }
+        .config-modal {
+            background: #fff; padding: 20px; border-radius: 8px; width: 320px;
+            max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .config-modal h3 { margin-top: 0; margin-bottom: 12px; font-size: 1.1rem; color: var(--primary); text-align: center; }
+        .config-item-list {
+            display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: 50vh;
+            margin-bottom: 16px; padding-right: 4px;
+        }
+        .config-item-row {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #f8fafc; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 6px;
+        }
+        .config-item-row label { font-size: 0.9rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .config-item-row input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .config-modal-buttons { display: flex; gap: 8px; }
+        .config-modal-buttons button {
+            flex: 1; padding: 10px; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: bold; cursor: pointer;
+        }
+        .btn-config-save { background-color: var(--primary); color: white; }
+        .btn-config-save:hover { background-color: var(--primary-hover); }
+        .btn-config-cancel { background-color: #e2e8f0; color: #334155; }
+        .btn-config-cancel:hover { background-color: #cbd5e1; }
     </style>
 </head>
 <body>
@@ -343,12 +387,8 @@
         <!-- スマホ用クイック書式バー -->
         <div class="mobile-selection-bar" id="mobile-selection-bar">
             <span id="selection-info">A1</span>
-            <button id="btn-open-drawer" title="全書式を開く" style="border-radius: 6px;">全書式</button>
-            <button id="btn-border-all" title="選択範囲に格子" style="border-radius: 6px;">▦ 枠</button>
-            <button id="btn-border-none" title="罫線を消す" style="border-radius: 6px;">□̸ 消す</button>
-            <label class="mobile-color-btn" title="枠の色" style="border-radius: 6px;">線 <input type="color" id="mobile-border-color" value="#e6e6e6"></label>
-            <label class="mobile-color-btn" title="背景色" style="border-radius: 6px;">背景 <input type="color" id="mobile-bg-color" value="#ffffff"></label>
-            <label class="mobile-color-btn" title="文字色" style="border-radius: 6px;">文字 <input type="color" id="mobile-text-color" value="#000000"></label>
+            <button id="btn-open-config" class="btn-quickbar-config" title="クイックバーの設定">⚙️</button>
+            <!-- 動的項目はJSでここに挿入されます -->
         </div>
 
         <!-- スマホ用 書式一覧ドロワー -->
@@ -542,6 +582,21 @@
         </div>
     </div>
 
+    <!-- クイックバー設定モーダル -->
+    <div id="quickbar-config-modal" class="config-modal-overlay">
+        <div class="config-modal">
+            <h3>クイックバーのカスタマイズ</h3>
+            <p style="font-size: 0.8rem; color: #666; margin-top: 0; margin-bottom: 10px;">表示する項目を選択してください。</p>
+            <div id="config-item-list" class="config-item-list">
+                <!-- チェックボックス一覧がここに動的に入ります -->
+            </div>
+            <div class="config-modal-buttons">
+                <button id="modal-btn-config-save" class="btn-config-save">保存</button>
+                <button id="modal-btn-config-cancel" class="btn-config-cancel">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
 <script>
     let COLS = 15; 
     let ROWS = 40;  
@@ -562,6 +617,143 @@
     let undoStack = [];
     let redoStack = [];
     const MAX_HISTORY = 30;
+
+    // --- クイックバー カスタマイズ設定関連 ---
+    const QUICKBAR_ITEMS_CONFIG = [
+        { id: 'qb-allformat', label: '全書式', render: () => { const b = document.createElement('button'); b.id = 'btn-open-drawer'; b.textContent = '全書式'; b.addEventListener('click', () => { drawer.classList.toggle('open'); }); return b; } },
+        { id: 'qb-history', label: '履歴', render: () => { 
+            const wrap = document.createElement('div'); wrap.className = 'tool-group group-history'; wrap.style.margin = '0';
+            wrap.innerHTML = '<span class="tool-group-label">履歴</span><button id="btn-undo-m2" title="戻る">↶</button><button id="btn-redo-m2" title="進む">↷</button>';
+            setTimeout(() => {
+                const u = wrap.querySelector('#btn-undo-m2'); const r = wrap.querySelector('#btn-redo-m2');
+                if(u) u.addEventListener('click', performUndo);
+                if(r) r.addEventListener('click', performRedo);
+                updateUndoRedoButtons();
+            }, 50);
+            return wrap;
+        }},
+        { id: 'qb-clipboard', label: 'コピー貼付', render: () => {
+            const wrap = document.createElement('div'); wrap.className = 'tool-group group-clipboard'; wrap.style.margin = '0';
+            wrap.innerHTML = '<span class="tool-group-label">クリップボード</span><button id="btn-copy-m2">コピー</button><button id="btn-paste-m2">貼付</button>';
+            setTimeout(() => {
+                const cp = wrap.querySelector('#btn-copy-m2'); const ps = wrap.querySelector('#btn-paste-m2');
+                if(cp) cp.addEventListener('click', copySelectedCell);
+                if(ps) ps.addEventListener('click', pasteSelectedCell);
+            }, 50);
+            return wrap;
+        }},
+        { id: 'qb-text', label: '文字', render: () => {
+            const wrap = document.createElement('div'); wrap.className = 'tool-group group-text'; wrap.style.margin = '0';
+            wrap.innerHTML = '<span class="tool-group-label">文字</span><button id="btn-bold-m2"><b>B</b></button><div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m2" value="#000000"></div><div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m2" value="#ffffff"></div>';
+            setTimeout(() => {
+                const b = wrap.querySelector('#btn-bold-m2'); const ct = wrap.querySelector('#color-text-m2'); const cb = wrap.querySelector('#color-bg-m2');
+                if(b) b.addEventListener('click', () => {
+                    if (selectedCells.length === 0) return;
+                    saveState();
+                    const isBold = selectedCells[0].querySelector('input').style.fontWeight === 'bold';
+                    selectedCells.forEach(td => { const input = td.querySelector('input'); if (input) input.style.fontWeight = isBold ? 'normal' : 'bold'; });
+                    b.classList.toggle('active', !isBold);
+                });
+                if(ct) { ct.addEventListener('click', () => applyTextColor(ct.value)); ct.addEventListener('input', (e) => applyTextColor(e.target.value)); }
+                if(cb) { cb.addEventListener('click', () => applyBgColor(cb.value)); cb.addEventListener('input', (e) => applyBgColor(e.target.value)); }
+            }, 50);
+            return wrap;
+        }},
+        { id: 'qb-align', label: '配置', render: () => {
+            const wrap = document.createElement('div'); wrap.className = 'tool-group group-align'; wrap.style.margin = '0';
+            wrap.innerHTML = '<span class="tool-group-label">配置</span><select id="select-align-horiz-m2"><option value="" disabled selected>左右</option><option value="left">左</option><option value="center">中</option><option value="right">右</option></select>';
+            setTimeout(() => {
+                const sa = wrap.querySelector('#select-align-horiz-m2');
+                if(sa) sa.addEventListener('change', (e) => {
+                    saveState(); const val = e.target.value;
+                    selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.textAlign = val; });
+                    e.target.value = "";
+                });
+            }, 50);
+            return wrap;
+        }},
+        { id: 'qb-matrix', label: '行列', render: () => {
+            const wrap = document.createElement('div'); wrap.className = 'tool-group group-size'; wrap.style.margin = '0';
+            wrap.innerHTML = '<span class="tool-group-label">行・列</span><button id="btn-add-row-m2">行＋</button><button id="btn-delete-row-m2" class="btn-del-rowcol">行－</button><button id="btn-add-col-m2">列＋</button><button id="btn-delete-col-m2" class="btn-del-rowcol">列－</button>';
+            setTimeout(() => {
+                const ar = wrap.querySelector('#btn-add-row-m2'); const dr = wrap.querySelector('#btn-delete-row-m2');
+                const ac = wrap.querySelector('#btn-add-col-m2'); const dc = wrap.querySelector('#btn-delete-col-m2');
+                if(ar) ar.addEventListener('click', () => insertRowAt(selectedCells.length > 0 ? parseInt(selectedCells[0].dataset.row) : ROWS));
+                if(dr) dr.addEventListener('click', () => deleteRowAt(selectedCells.length > 0 ? parseInt(selectedCells[0].dataset.row) : 0));
+                if(ac) ac.addEventListener('click', () => insertColAt(selectedCells.length > 0 ? parseInt(selectedCells[0].dataset.col) : COLS));
+                if(dc) dc.addEventListener('click', () => deleteColAt(selectedCells.length > 0 ? parseInt(selectedCells[0].dataset.col) : 0));
+            }, 50);
+            return wrap;
+        }},
+        { id: 'qb-number', label: '数字', render: () => {
+            const wrap = document.createElement('div'); wrap.className = 'tool-group group-format'; wrap.style.margin = '0';
+            wrap.innerHTML = '<span class="tool-group-label">数字</span><button id="btn-format-none-m2">標準</button><button id="btn-format-comma-m2"><b>,</b></button><button id="btn-format-currency-m2"><b>¥</b></button>';
+            setTimeout(() => {
+                const fn = wrap.querySelector('#btn-format-none-m2'); const fc = wrap.querySelector('#btn-format-comma-m2'); const fcurr = wrap.querySelector('#btn-format-currency-m2');
+                if(fn) fn.addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'none')); });
+                if(fc) fc.addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'comma')); });
+                if(fcurr) fcurr.addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'currency')); });
+            }, 50);
+            return wrap;
+        }},
+        { id: 'qb-border', label: '罫線', render: () => {
+            const wrap = document.createElement('div'); wrap.className = 'tool-group group-border'; wrap.style.margin = '0';
+            wrap.innerHTML = '<span class="tool-group-label">罫線</span><button id="btn-border-all-m2" title="格子">▦ 枠</button><button id="btn-border-none-m2" title="消す">□̸ 消す</button><div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m2" value="#e6e6e6"></div>';
+            setTimeout(() => {
+                const ba = wrap.querySelector('#btn-border-all-m2'); const bn = wrap.querySelector('#btn-border-none-m2'); const bc = wrap.querySelector('#color-border-m2');
+                if(ba) ba.addEventListener('click', () => applyBorderCustom('all', 'select-border-width-m', bc ? 'color-border-m2' : 'color-border'));
+                if(bn) bn.addEventListener('click', () => applyBorderCustom('none', 'select-border-width-m', bc ? 'color-border-m2' : 'color-border'));
+                if(bc && colorBorderM) {
+                    bc.addEventListener('input', (e) => { colorBorderM.value = e.target.value; });
+                }
+            }, 50);
+            return wrap;
+        }},
+        { id: 'qb-delete', label: '削除', render: () => {
+            const b = document.createElement('button'); b.id = 'btn-clear-m2'; b.className = 'btn-clear-cell'; b.textContent = '削除';
+            b.addEventListener('click', () => {
+                if (selectedCells.length === 0) return;
+                saveState();
+                selectedCells.forEach(td => {
+                    const input = td.querySelector('input'); const inner = td.querySelector('.cell-inner');
+                    if (input) { input.value = ''; delete input.dataset.formula; delete input.dataset.format; input.style.fontWeight = 'normal'; input.style.fontSize = '0.9rem'; input.style.color = ''; input.style.textAlign = 'left'; }
+                    if (inner) inner.style.justifyContent = 'center';
+                    td.style.backgroundColor = ''; td.style.borderTop = defaultBorder; td.style.borderBottom = defaultBorder; td.style.borderLeft = defaultBorder; td.style.borderRight = defaultBorder;
+                });
+                recalculateAllFormulas();
+            });
+            return b;
+        }}
+    ];
+
+    const DEFAULT_QUICKBAR_ITEMS = ['qb-allformat', 'qb-clipboard', 'qb-text', 'qb-matrix', 'qb-border', 'qb-delete'];
+
+    function getActiveQuickbarItems() {
+        const saved = localStorage.getItem('hyo_quickbar_settings');
+        if (saved) {
+            try { return JSON.parse(saved); } catch(e) {}
+        }
+        return DEFAULT_QUICKBAR_ITEMS;
+    }
+
+    function renderMobileQuickbar() {
+        const bar = document.getElementById('mobile-selection-bar');
+        if (!bar) return;
+        
+        const info = document.getElementById('selection-info');
+        const configBtn = document.getElementById('btn-open-config');
+        bar.innerHTML = '';
+        if (info) bar.appendChild(info);
+        if (configBtn) bar.appendChild(configBtn);
+
+        const activeIds = getActiveQuickbarItems();
+        activeIds.forEach(id => {
+            const conf = QUICKBAR_ITEMS_CONFIG.find(item => item.id === id);
+            if (conf) {
+                bar.appendChild(conf.render());
+            }
+        });
+    }
 
     function getSheetState() {
         let sheetData = [];
@@ -655,14 +847,16 @@
     function updateUndoRedoButtons() {
         const disabled = undoStack.length === 0;
         const rDisabled = redoStack.length === 0;
-        ['btn-undo', 'btn-undo-m'].forEach(id => { const el = document.getElementById(id); if(el) el.disabled = disabled; });
-        ['btn-redo', 'btn-redo-m'].forEach(id => { const el = document.getElementById(id); if(el) el.disabled = rDisabled; });
+        ['btn-undo', 'btn-undo-m', 'btn-undo-m2'].forEach(id => { const el = document.getElementById(id); if(el) el.disabled = disabled; });
+        ['btn-redo', 'btn-redo-m', 'btn-redo-m2'].forEach(id => { const el = document.getElementById(id); if(el) el.disabled = rDisabled; });
     }
 
     document.getElementById('btn-undo').addEventListener('click', performUndo);
     document.getElementById('btn-redo').addEventListener('click', performRedo);
-    document.getElementById('btn-undo-m').addEventListener('click', performUndo);
-    document.getElementById('btn-redo-m').addEventListener('click', performRedo);
+    const btnUndoM = document.getElementById('btn-undo-m');
+    const btnRedoM = document.getElementById('btn-redo-m');
+    if(btnUndoM) btnUndoM.addEventListener('click', performUndo);
+    if(btnRedoM) btnRedoM.addEventListener('click', performRedo);
 
     function getColumnName(index) {
         let name = ''; let n = index;
@@ -940,7 +1134,6 @@
         const colHeaderRow = document.getElementById('col-header-row');
         colHeaderRow.innerHTML = '<th class="row-header" id="select-all-corner" title="表全体を選択" style="cursor: pointer;"></th>';
         
-        // A列1行の交点（左上隅のセル）の全選択イベント設定
         document.getElementById('select-all-corner').addEventListener('click', () => {
             selectRange(0, 0, ROWS - 1, COLS - 1);
             updateSelectionInfo(0, 0);
@@ -1253,7 +1446,6 @@
         function onMouseUp() { cleanup(); } function onTouchEnd() { cleanup(); }
     }
 
-    // クリップボード操作用関数
     function copySelectedCell() {
         if (selectedCells.length === 0) return;
         const targetTd = selectedCells[0];
@@ -1291,10 +1483,6 @@
 
     document.getElementById('btn-copy').addEventListener('click', copySelectedCell);
     document.getElementById('btn-paste').addEventListener('click', pasteSelectedCell);
-    const btnCopyM = document.getElementById('btn-copy-m');
-    const btnPasteM = document.getElementById('btn-paste-m');
-    if (btnCopyM) btnCopyM.addEventListener('click', copySelectedCell);
-    if (btnPasteM) btnPasteM.addEventListener('click', pasteSelectedCell);
 
     function handlePaste(e, startR, startC) {
         const pastedText = (e.clipboardData || window.clipboardData).getData('text/plain');
@@ -1331,9 +1519,6 @@
     document.getElementById('btn-format-comma').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'comma')); });
     document.getElementById('btn-format-currency').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'currency')); });
     document.getElementById('btn-format-none').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'none')); });
-    document.getElementById('btn-format-comma-m').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'comma')); });
-    document.getElementById('btn-format-currency-m').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'currency')); });
-    document.getElementById('btn-format-none-m').addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'none')); });
 
     document.getElementById('btn-bold').addEventListener('click', () => {
         if (selectedCells.length === 0) return;
@@ -1342,15 +1527,8 @@
         selectedCells.forEach(td => { const input = td.querySelector('input'); if (input) input.style.fontWeight = isBold ? 'normal' : 'bold'; });
         document.getElementById('btn-bold').classList.toggle('active', !isBold);
     });
-    document.getElementById('btn-bold-m').addEventListener('click', () => {
-        if (selectedCells.length === 0) return;
-        saveState();
-        const isBold = selectedCells[0].querySelector('input').style.fontWeight === 'bold';
-        selectedCells.forEach(td => { const input = td.querySelector('input'); if (input) input.style.fontWeight = isBold ? 'normal' : 'bold'; });
-        document.getElementById('btn-bold-m').classList.toggle('active', !isBold);
-    });
 
-    ['select-font-size', 'select-font-size-m'].forEach(id => {
+    ['select-font-size'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.addEventListener('change', (e) => {
@@ -1365,8 +1543,6 @@
     const colorText = document.getElementById('color-text');
     const colorBg = document.getElementById('color-bg');
     const colorBorder = document.getElementById('color-border');
-    const colorTextM = document.getElementById('color-text-m');
-    const colorBgM = document.getElementById('color-bg-m');
     const colorBorderM = document.getElementById('color-border-m');
 
     function applyTextColor(colorVal) {
@@ -1390,33 +1566,7 @@
     colorBg.addEventListener('click', () => applyBgColor(colorBg.value));
     colorBg.addEventListener('input', (e) => applyBgColor(e.target.value));
 
-    if (colorTextM) {
-        colorTextM.addEventListener('click', () => applyTextColor(colorTextM.value));
-        colorTextM.addEventListener('input', (e) => applyTextColor(e.target.value));
-    }
-    if (colorBgM) {
-        colorBgM.addEventListener('click', () => applyBgColor(colorBgM.value));
-        colorBgM.addEventListener('input', (e) => applyBgColor(e.target.value));
-    }
-
-    const mobileBgColor = document.getElementById('mobile-bg-color');
-    const mobileTextColor = document.getElementById('mobile-text-color');
-    const mobileBorderColor = document.getElementById('mobile-border-color');
-
-    if (mobileBgColor) {
-        mobileBgColor.addEventListener('click', () => applyBgColor(mobileBgColor.value));
-        mobileBgColor.addEventListener('input', (e) => applyBgColor(e.target.value));
-    }
-    if (mobileTextColor) {
-        mobileTextColor.addEventListener('click', () => applyTextColor(mobileTextColor.value));
-        mobileTextColor.addEventListener('input', (e) => applyTextColor(e.target.value));
-    }
-    if (mobileBorderColor && colorBorderM) {
-        mobileBorderColor.addEventListener('input', (e) => { colorBorderM.value = e.target.value; });
-        colorBorderM.addEventListener('input', (e) => { mobileBorderColor.value = e.target.value; });
-    }
-    
-    ['select-align-horiz', 'select-align-horiz-m'].forEach(id => {
+    ['select-align-horiz'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.addEventListener('change', (e) => {
@@ -1428,7 +1578,7 @@
         }
     });
 
-    ['select-align-vert', 'select-align-vert-m'].forEach(id => {
+    ['select-align-vert'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.addEventListener('change', (e) => {
@@ -1452,27 +1602,12 @@
         recalculateAllFormulas();
     });
 
-    const btnClearM = document.getElementById('btn-clear-m');
-    if (btnClearM) {
-        btnClearM.addEventListener('click', () => {
-            if (selectedCells.length === 0) return;
-            saveState();
-            selectedCells.forEach(td => {
-                const input = td.querySelector('input'); const inner = td.querySelector('.cell-inner');
-                if (input) { input.value = ''; delete input.dataset.formula; delete input.dataset.format; input.style.fontWeight = 'normal'; input.style.fontSize = '0.9rem'; input.style.color = ''; input.style.textAlign = 'left'; }
-                if (inner) inner.style.justifyContent = 'center';
-                td.style.backgroundColor = ''; td.style.borderTop = defaultBorder; td.style.borderBottom = defaultBorder; td.style.borderLeft = defaultBorder; td.style.borderRight = defaultBorder;
-            });
-            recalculateAllFormulas();
-        });
-    }
-
     function applyBorderCustom(type, widthId, colorId) {
         if (selectedCells.length === 0 || !type) return;
         saveState();
         
-        const widthVal = document.getElementById(widthId).value;
-        const colorVal = document.getElementById(colorId).value;
+        const widthVal = document.getElementById(widthId) ? document.getElementById(widthId).value : '1px';
+        const colorVal = document.getElementById(colorId) ? document.getElementById(colorId).value : '#e6e6e6';
         const customBorder = `${widthVal} solid ${colorVal}`;
 
         if (type === 'all') {
@@ -1527,36 +1662,15 @@
         });
     }
 
-    const typeSelectM = document.getElementById('select-border-type-m');
-    if (typeSelectM) {
-        typeSelectM.addEventListener('change', (e) => {
-            applyBorderCustom(e.target.value, 'select-border-width-m', 'color-border-m');
-            e.target.value = "";
-        });
-    }
-
-    document.getElementById('btn-border-all').addEventListener('click', () => {
-        applyBorderCustom('all', 'select-border-width-m', mobileBorderColor ? 'mobile-border-color' : 'color-border-m');
-    });
-    document.getElementById('btn-border-none').addEventListener('click', () => {
-        applyBorderCustom('none', 'select-border-width-m', mobileBorderColor ? 'mobile-border-color' : 'color-border-m');
-    });
-
     function updateToolbarState(input) {
         document.getElementById('btn-bold').classList.toggle('active', input.style.fontWeight === 'bold');
-        const boldM = document.getElementById('btn-bold-m');
-        if (boldM) boldM.classList.toggle('active', input.style.fontWeight === 'bold');
 
         if (input.style.color) {
             document.getElementById('color-text').value = input.style.color;
-            if (colorTextM) colorTextM.value = input.style.color;
-            if (mobileTextColor) mobileTextColor.value = input.style.color;
         }
         const td = input.closest('td');
         if (td && td.style.backgroundColor) {
             document.getElementById('color-bg').value = td.style.backgroundColor;
-            if (colorBgM) colorBgM.value = td.style.backgroundColor;
-            if (mobileBgColor) mobileBgColor.value = td.style.backgroundColor;
         }
     }
 
@@ -1867,9 +1981,45 @@
     }
 
     const drawer = document.getElementById('mobile-toolbar-drawer');
-    document.getElementById('btn-open-drawer').addEventListener('click', () => { drawer.classList.toggle('open'); });
-    document.getElementById('btn-drawer-close').addEventListener('click', () => { drawer.classList.remove('open'); });
+    const btnDrawerClose = document.getElementById('btn-drawer-close');
+    if (btnDrawerClose) {
+        btnDrawerClose.addEventListener('click', () => { drawer.classList.remove('open'); });
+    }
 
+    // 設定モーダルのイベント処理
+    document.getElementById('btn-open-config').addEventListener('click', () => {
+        const listContainer = document.getElementById('config-item-list');
+        listContainer.innerHTML = '';
+        const activeIds = getActiveQuickbarItems();
+
+        QUICKBAR_ITEMS_CONFIG.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'config-item-row';
+            const isChecked = activeIds.includes(item.id) ? 'checked' : '';
+            row.innerHTML = `<label><input type="checkbox" value="${item.id}" ${isChecked}> ${item.label}</label>`;
+            listContainer.appendChild(row);
+        });
+
+        document.getElementById('quickbar-config-modal').style.display = 'flex';
+    });
+
+    document.getElementById('modal-btn-config-save').addEventListener('click', () => {
+        const checkboxes = document.querySelectorAll('#config-item-list input[type="checkbox"]');
+        const newActive = [];
+        checkboxes.forEach(cb => {
+            if (cb.checked) newActive.push(cb.value);
+        });
+        localStorage.setItem('hyo_quickbar_settings', JSON.stringify(newActive));
+        document.getElementById('quickbar-config-modal').style.display = 'none';
+        renderMobileQuickbar();
+    });
+
+    document.getElementById('modal-btn-config-cancel').addEventListener('click', () => {
+        document.getElementById('quickbar-config-modal').style.display = 'none';
+    });
+
+    // 初期化
+    renderMobileQuickbar();
     renderMemoList();
 
     if ('serviceWorker' in navigator) {
