@@ -1028,67 +1028,51 @@
         });
 
        input.addEventListener('keydown', (e) => {
-            // Androidの「次へ」やタブ移動、Enter、Nextなどに対応
-            if (e.key === 'Enter' || e.keyCode === 13 || e.key === 'Next' || e.key === 'Tab' || e.keyCode === 9) {
+            if (e.key === 'Enter') {
                 e.preventDefault();
-                
-                // 1. 状態の保存と数式の確定・再計算
-                saveState();
-                if (typeof processCellFormula === 'function') {
-                    processCellFormula(input);
-                }
-                if (typeof recalculateAllFormulas === 'function') {
-                    recalculateAllFormulas();
-                }
-
-                // 2. 数式モードや緑枠を確実にクリア
                 activeFormulaInput = null;
                 formulaRangeStart = null;
                 td.classList.remove('formula-source');
-                
                 input.blur();
-                
-                // 3. 真下のセルへフォーカスを強制移動
                 const nextRow = r + 1;
                 if (nextRow < ROWS) {
                     const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${c}"]`);
-                    if (nextInput) { 
-                        nextInput.focus(); 
-                        nextInput.select(); 
-                    }
+                    if (nextInput) { nextInput.focus(); nextInput.select(); }
+                }
+            } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+                copiedCellData = {
+                    val: input.value, formula: input.dataset.formula || '', format: input.dataset.format || '',
+                    bold: input.style.fontWeight, fontSize: input.style.fontSize, color: input.style.color,
+                    align: input.style.textAlign, vertAlign: inner.style.justifyContent, bg: td.style.backgroundColor,
+                    borderTop: td.style.borderTop, borderBottom: td.style.borderBottom, borderLeft: td.style.borderLeft, borderRight: td.style.borderRight
+                };
+            } else if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+                if (copiedCellData !== null) {
+                    e.preventDefault();
+                    saveState();
+                    selectedCells.forEach(targetTd => {
+                        const tInput = targetTd.querySelector('input'); const tInner = targetTd.querySelector('.cell-inner');
+                        if (tInput) {
+                            tInput.value = copiedCellData.val; tInput.dataset.formula = copiedCellData.formula; tInput.dataset.format = copiedCellData.format;
+                            tInput.style.fontWeight = copiedCellData.bold || 'normal'; tInput.style.fontSize = copiedCellData.fontSize || '0.9rem';
+                            tInput.style.color = copiedCellData.color || ''; tInput.style.textAlign = copiedCellData.align || 'left';
+                            processCellFormula(tInput);
+                        }
+                        if (tInner) tInner.style.justifyContent = copiedCellData.vertAlign || 'center';
+                        targetTd.style.backgroundColor = copiedCellData.bg || '';
+                        targetTd.style.borderTop = copiedCellData.borderTop || defaultBorder; targetTd.style.borderBottom = copiedCellData.borderBottom || defaultBorder;
+                        targetTd.style.borderLeft = copiedCellData.borderLeft || defaultBorder; targetTd.style.borderRight = copiedCellData.borderRight || defaultBorder;
+                    });
+                    recalculateAllFormulas(); updateToolbarState(input);
                 }
             }
         });
 
-        // 【修正】blurイベントは1つにまとめ、重複実行による数式破壊を防ぐ
-        input.addEventListener('blur', () => {
-            setTimeout(() => {
-                // まだ別の入力欄にフォーカスが移動中の場合は無視
-                if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
-                
-                if (!isComposing) {
-                    if (activeFormulaInput === input) {
-                        activeFormulaInput = null;
-                        formulaRangeStart = null;
-                    }
-                    td.classList.remove('formula-source');
-                    
-                    // ここで安全に1回だけ確定処理を行う
-                    saveState();
-                    if (typeof processCellFormula === 'function') {
-                        processCellFormula(input);
-                    }
-                    if (typeof recalculateAllFormulas === 'function') {
-                        recalculateAllFormulas();
-                    }
-                }
-            }, 50);
-        });
-        
         input.addEventListener('paste', (e) => {
             saveState();
             handlePaste(e, r, c);
         });
+
     }
 
     function buildSheetStructure() {
