@@ -113,6 +113,7 @@
         }
         #btn-save:active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); transform: translateY(1px); }
 
+        /* ツールバー (PC用) と書式一覧の高さ・デザイン統一 */
         .toolbar {
             display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
             gap: 8px; margin-bottom: 4px; background: #fff; padding: 6px 8px;
@@ -137,8 +138,6 @@
         
         .group-history { background: #f8fafc; border-color: #cbd5e1; }
         .group-history .tool-group-label { color: #475569; }
-        .group-clipboard { background: #f8fafc; border-color: #cbd5e1; }
-        .group-clipboard .tool-group-label { color: #475569; }
         .group-size { background: #f8fafc; border-color: #cbd5e1; }
         .group-size .tool-group-label { color: #475569; }
         .group-text { background: #f8fafc; border-color: #cbd5e1; }
@@ -158,6 +157,7 @@
             border-radius: 4px;
         }
 
+        /* スマホ用クイック書式バー */
         .mobile-selection-bar {
             display: flex; align-items: center; gap: 6px; overflow-x: auto;
             padding: 6px 8px; margin-bottom: 4px; background: #fff;
@@ -181,6 +181,7 @@
         
         .mobile-color-btn input[type=color] { width: 25px; height: 25px; padding: 0; border: 0; background: transparent; }
         
+        /* スマホ用 書式一覧ドロワー */
         .mobile-toolbar-drawer {
             display: none; flex-direction: column; gap: 6px; background: #fff;
             padding: 8px; border: 1px solid #d9d9d9; border-radius: 6px; margin-bottom: 4px;
@@ -208,7 +209,13 @@
         .mobile-toolbar-drawer select { padding: 0 6px; background-color: #fff; border: 1px solid #ccc; }
         .mobile-toolbar-drawer .color-picker-wrapper input[type="color"] { width: 22px; height: 22px; }
 
-        #btn-clear-m { border-radius: 6px !important; font-weight: bold; white-space: nowrap; }
+        #btn-drawer-close {
+            border-radius: 6px !important; font-weight: bold; writing-mode: horizontal-tb !important;
+            background: linear-gradient(to bottom, #f1f5f9, #cbd5e1) !important; color: #334155 !important;
+            border: 1px solid #94a3b8 !important; box-shadow: 0 1px 3px rgba(0,0,0,0.15); white-space: nowrap;
+        }
+
+        #btn-clear-m { border-radius: 6px !important; font-weight: bold; writing-mode: horizontal-tb !important; white-space: nowrap; }
 
         #btn-open-drawer {
             background: linear-gradient(to bottom, #d8b4fe, #9333ea) !important; color: #ffffff !important;
@@ -226,6 +233,7 @@
             td.data-cell { min-width: 40px; }
         }
 
+        /* スプレッドシート本体 */
         .spreadsheet-container {
             flex-grow: 1; width: 100%; overflow: auto; border: 1px solid var(--excel-border);
             background: #fff; position: relative; user-select: none; -webkit-user-select: none;
@@ -257,6 +265,7 @@
         td.formula-source { outline: 2px solid #107c41; outline-offset: -2px; z-index: 6; }
         td.formula-source::after { display: none; }
 
+        /* セル選択ハンドルを十字（0923仕様）に変更[cite: 20] */
         .cell-handle {
             position: absolute; width: 14px; height: 14px; background-color: transparent;
             border: none; z-index: 25; display: none;
@@ -271,6 +280,7 @@
         .cell-handle-tl { top: -7px; left: -7px; }
         .cell-handle-br { bottom: -7px; right: -7px; }
         td.selected .cell-handle { display: block; }
+
         .resize-col { position: absolute; right: 0; top: 0; width: 8px; height: 100%; cursor: col-resize; z-index: 10; touch-action: none; }
         .resize-row { position: absolute; left: 0; bottom: 0; width: 100%; height: 8px; cursor: row-resize; z-index: 10; touch-action: none; }
 
@@ -278,6 +288,7 @@
         .btn-clear-cell { color: #d9534f; border-color: #d9534f !important; font-weight: bold; border-radius: 6px; }
         .btn-del-rowcol { color: #d9534f; border-color: #d9534f !important; }
 
+        /* カスタム確認モーダル */
         .custom-modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;
@@ -308,7 +319,7 @@
                 <div class="home-actions-top">
                     <button id="btn-create-new" class="btn-create">＋ 表メモ</button>
                     <button id="btn-import-file" class="btn-import">📂 開く</button>
-                    <button id="btn-json-import" class="btn-json-import">📥 JSON読込</button>
+                    <button id="btn-import-json" class="btn-json-import">📥 JSON読込</button>
                     <input type="file" id="file-input" accept=".xlsx, .xls, .csv" style="display: none;">
                     <input type="file" id="json-file-input" accept=".json" style="display: none;">
                 </div>
@@ -330,38 +341,27 @@
         <!-- スマホ用クイック書式バー -->
         <div class="mobile-selection-bar" id="mobile-selection-bar">
             <span id="selection-info">A1</span>
-            <button id="btn-open-drawer" title="全書式を開く">全書式</button>
-            <button id="btn-border-all" title="選択範囲に格子">▦ 枠</button>
-            <button id="btn-border-outer" title="選択範囲の外枠">□ 外枠</button>
-            <button id="btn-border-none" title="罫線を消す">□̸ 消す</button>
-            <label class="mobile-color-btn" title="枠の色">線 <input type="color" id="mobile-border-color" value="#ff0000"></label>
-            <label class="mobile-color-btn" title="背景色">背景 <input type="color" id="mobile-bg-color" value="#ffff00"></label>
-            <label class="mobile-color-btn" title="文字色">文字 <input type="color" id="mobile-text-color" value="#0000ff"></label>
+            <button id="btn-open-drawer" title="全書式を開く" style="border-radius: 6px;">全書式</button>
+            <button id="btn-select-all" title="表全体を選択" style="border-radius: 6px;">全選択</button>
+            <button id="btn-border-all" title="選択範囲に格子" style="border-radius: 6px;">▦ 枠</button>
+            <button id="btn-border-outer" title="選択範囲の外枠" style="border-radius: 6px;">□ 外枠</button>
+            <button id="btn-border-none" title="罫線を消す" style="border-radius: 6px;">□̸ 消す</button>
+            <label class="mobile-color-btn" title="枠の色" style="border-radius: 6px;">線 <input type="color" id="mobile-border-color" value="#e6e6e6"></label>
+            <label class="mobile-color-btn" title="背景色" style="border-radius: 6px;">背景 <input type="color" id="mobile-bg-color" value="#fff2cc"></label>
+            <label class="mobile-color-btn" title="文字色" style="border-radius: 6px;">文字 <input type="color" id="mobile-text-color" value="#000000"></label>
         </div>
 
-        <!-- スマホ用 全書式ドロワー -->
+        <!-- スマホ用 書式一覧ドロワー -->
         <div class="mobile-toolbar-drawer" id="mobile-toolbar-drawer">
             <div class="mobile-drawer-row">
-                <!-- 履歴グループ -->
+                <button id="btn-drawer-close">閉じる</button>
+                
                 <div class="tool-group group-history" style="margin:0;">
                     <span class="tool-group-label">履歴</span>
                     <button id="btn-undo-m" title="戻る" disabled>↶</button>
                     <button id="btn-redo-m" title="進む" disabled>↷</button>
                 </div>
                 
-                <!-- コピー・貼付グループ -->
-                <div class="tool-group group-clipboard" style="margin:0;">
-                    <span class="tool-group-label">クリップボード</span>
-                    <button id="btn-copy-m" title="コピー">コピー</button>
-                    <select id="select-paste-m" title="貼付選択">
-                        <option value="" disabled selected>貼付</option>
-                        <option value="all">すべて</option>
-                        <option value="value">値のみ</option>
-                        <option value="transpose">行列入替</option>
-                    </select>
-                </div>
-
-                <!-- 文字グループ -->
                 <div class="tool-group group-text" style="margin:0;">
                     <span class="tool-group-label">文字</span>
                     <button id="btn-bold-m"><b>B</b></button>
@@ -372,11 +372,10 @@
                         <option value="1.1rem">中</option>
                         <option value="1.3rem">大</option>
                     </select>
-                    <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m" value="#0000ff"></div>
-                    <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m" value="#ffff00"></div>
+                    <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m" value="#000000"></div>
+                    <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m" value="#ffffff"></div>
                 </div>
                 
-                <!-- 配置グループ -->
                 <div class="tool-group group-align" style="margin:0;">
                     <span class="tool-group-label">配置</span>
                     <select id="select-align-horiz-m">
@@ -393,7 +392,6 @@
                     </select>
                 </div>
                 
-                <!-- 行・列グループ -->
                 <div class="tool-group group-size" style="margin:0;">
                     <span class="tool-group-label">行・列</span>
                     <button id="btn-add-row-m">行＋</button>
@@ -402,7 +400,6 @@
                     <button id="btn-delete-col-m" class="btn-del-rowcol">列－</button>
                 </div>
                 
-                <!-- 数字グループ -->
                 <div class="tool-group group-format" style="margin:0;">
                     <span class="tool-group-label">数字</span>
                     <button id="btn-format-none-m">標準</button>
@@ -410,13 +407,11 @@
                     <button id="btn-format-currency-m"><b>¥</b></button>
                 </div>
                 
-                <!-- 罫線グループ -->
                 <div class="tool-group group-border" style="margin:0;">
                     <span class="tool-group-label">罫線</span>
                     <select id="select-border-type-m">
                         <option value="" disabled selected>罫線</option>
                         <option value="all">格子</option>
-                        <option value="outer">外枠</option>
                         <option value="top">上</option>
                         <option value="bottom">下</option>
                         <option value="left">左</option>
@@ -428,10 +423,9 @@
                         <option value="2px">中</option>
                         <option value="3px">太</option>
                     </select>
-                    <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m" value="#ff0000"></div>
+                    <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m" value="#e6e6e6"></div>
                 </div>
                 
-                <!-- 削除ボタン -->
                 <button id="btn-clear-m" class="btn-clear-cell">削除</button>
             </div>
         </div>
@@ -446,17 +440,6 @@
                 <button id="btn-redo" title="進む (Ctrl+Y)" disabled>↷ 進む</button>
             </div>
 
-            <div class="tool-group group-clipboard">
-                <span class="tool-group-label">クリップボード</span>
-                <button id="btn-copy" title="コピー">コピー</button>
-                <select id="select-paste" title="貼付選択">
-                    <option value="" disabled selected>貼付</option>
-                    <option value="all">すべて</option>
-                    <option value="value">値のみ</option>
-                    <option value="transpose">行列入替</option>
-                </select>
-            </div>
-
             <div class="tool-group group-text">
                 <span class="tool-group-label">文字</span>
                 <button id="btn-bold" title="太字"><b>B</b></button>
@@ -467,8 +450,8 @@
                     <option value="1.1rem">中(16)</option>
                     <option value="1.3rem">大(20)</option>
                 </select>
-                <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text" value="#0000ff"></div>
-                <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg" value="#ffff00"></div>
+                <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text" value="#000000"></div>
+                <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg" value="#ffffff"></div>
             </div>
 
             <div class="tool-group group-align">
@@ -507,7 +490,6 @@
                 <select id="select-border-type" title="罫線パターン">
                     <option value="" disabled selected>罫線</option>
                     <option value="all">格子</option>
-                    <option value="outer">外枠</option>
                     <option value="top">上</option>
                     <option value="bottom">下</option>
                     <option value="left">左</option>
@@ -519,7 +501,7 @@
                     <option value="2px">中</option>
                     <option value="3px">太</option>
                 </select>
-                <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border" value="#ff0000"></div>
+                <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border" value="#e6e6e6"></div>
             </div>
 
             <button id="btn-clear" class="btn-clear-cell" title="セル削除">削除</button>
@@ -528,11 +510,7 @@
         <!-- 表エリア -->
         <div class="spreadsheet-container" id="scroll-container">
             <table id="spreadsheet">
-                <thead>
-                    <tr id="col-header-row">
-                        <th class="row-header" id="select-all-corner" title="すべて選択"></th>
-                    </tr>
-                </thead>
+                <thead><tr id="col-header-row"><th class="row-header"></th></tr></thead>
                 <tbody id="sheet-body"></tbody>
             </table>
         </div>
@@ -555,7 +533,7 @@
     let ROWS = 40;  
     let selectedCells = []; 
     let currentId = null;
-    let copiedRangeData = null; // コピーデータ保持用
+    let copiedCellData = null;
     let isMouseDown = false;
     let startCellCoord = null;
     let activeFormulaInput = null;
@@ -691,141 +669,12 @@
         if (infoPcEl) infoPcEl.textContent = refText;
     }
 
-    function executeCopy() {
-        if (selectedCells.length === 0) return;
-        let minR = ROWS, maxR = -1, minC = COLS, maxC = -1;
-        selectedCells.forEach(td => {
-            const r = parseInt(td.dataset.row);
-            const c = parseInt(td.dataset.col);
-            if (r < minR) minR = r;
-            if (r > maxR) maxR = r;
-            if (c < minC) minC = c;
-            if (c > maxC) maxC = c;
-        });
-
-        let dataMatrix = [];
-        for (let r = minR; r <= maxR; r++) {
-            let rowArr = [];
-            for (let c = minC; c <= maxC; c++) {
-                const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
-                const td = input ? input.closest('td') : null;
-                const inner = td ? td.querySelector('.cell-inner') : null;
-                rowArr.push({
-                    val: input ? input.value : "",
-                    formula: input ? (input.dataset.formula || "") : "",
-                    format: input ? (input.dataset.format || "") : "",
-                    bold: input ? input.style.fontWeight : "",
-                    fontSize: input ? input.style.fontSize : "",
-                    color: input ? input.style.color : "",
-                    align: input ? input.style.textAlign : "",
-                    vertAlign: inner ? inner.style.justifyContent : "",
-                    bg: td ? td.style.backgroundColor : "",
-                    borderTop: td ? td.style.borderTop : defaultBorder,
-                    borderBottom: td ? td.style.borderBottom : defaultBorder,
-                    borderLeft: td ? td.style.borderLeft : defaultBorder,
-                    borderRight: td ? td.style.borderRight : defaultBorder
-                });
-            }
-            dataMatrix.push(rowArr);
-        }
-        copiedRangeData = { matrix: dataMatrix, rows: maxR - minR + 1, cols: maxC - minC + 1 };
-        alert("選択範囲をコピーしました（書式・数式含む）");
-    }
-
-    function executePaste(mode) {
-        if (!copiedRangeData || selectedCells.length === 0) return;
-        saveState();
-
-        const firstTd = selectedCells[0];
-        const startR = parseInt(firstTd.dataset.row);
-        const startC = parseInt(firstTd.dataset.col);
-
-        let matrix = copiedRangeData.matrix;
-        if (mode === 'transpose') {
-            let transposed = [];
-            let oldRows = copiedRangeData.rows;
-            let oldCols = copiedRangeData.cols;
-            for (let c = 0; c < oldCols; c++) {
-                let newRow = [];
-                for (let r = 0; r < oldRows; r++) {
-                    newRow.push(matrix[r][c]);
-                }
-                transposed.push(newRow);
-            }
-            matrix = transposed;
-        }
-
-        const mRows = matrix.length;
-        const mCols = matrix[0].length;
-
-        for (let rIdx = 0; rIdx < mRows; rIdx++) {
-            const targetR = startR + rIdx;
-            if (targetR >= ROWS) continue;
-            for (let cIdx = 0; cIdx < mCols; cIdx++) {
-                const targetC = startC + cIdx;
-                if (targetC >= COLS) continue;
-
-                const cellData = matrix[rIdx][cIdx];
-                const input = document.querySelector(`input[data-row="${targetR}"][data-col="${targetC}"]`);
-                const td = input ? input.closest('td') : null;
-                const inner = td ? td.querySelector('.cell-inner') : null;
-
-                if (input && td) {
-                    if (mode === 'value') {
-                        let rawVal = cellData.formula ? evaluateFormula(cellData.formula) : cellData.val;
-                        input.value = rawVal;
-                        delete input.dataset.formula;
-                    } else {
-                        input.value = cellData.val;
-                        if (cellData.formula) input.dataset.formula = cellData.formula; else delete input.dataset.formula;
-                        if (cellData.format) input.dataset.format = cellData.format; else delete input.dataset.format;
-                        input.style.fontWeight = cellData.bold || 'normal';
-                        input.style.fontSize = cellData.fontSize || '0.9rem';
-                        input.style.color = cellData.color || '';
-                        input.style.textAlign = cellData.align || 'left';
-                        if (inner) inner.style.justifyContent = cellData.vertAlign || 'center';
-                        td.style.backgroundColor = cellData.bg || '';
-                        td.style.borderTop = cellData.borderTop || defaultBorder;
-                        td.style.borderBottom = cellData.borderBottom || defaultBorder;
-                        td.style.borderLeft = cellData.borderLeft || defaultBorder;
-                        td.style.borderRight = cellData.borderRight || defaultBorder;
-                    }
-                    processCellFormula(input);
-                }
-            }
-        }
-        recalculateAllFormulas();
-    }
-
-    document.getElementById('btn-copy').addEventListener('click', executeCopy);
-    const btnCopyM = document.getElementById('btn-copy-m');
-    if (btnCopyM) btnCopyM.addEventListener('click', executeCopy);
-
-    const selectPaste = document.getElementById('select-paste');
-    if (selectPaste) {
-        selectPaste.addEventListener('change', (e) => {
-            executePaste(e.target.value);
-            e.target.value = "";
-        });
-    }
-    const selectPasteM = document.getElementById('select-paste-m');
-    if (selectPasteM) {
-        selectPasteM.addEventListener('change', (e) => {
-            executePaste(e.target.value);
-            e.target.value = "";
-        });
-    }
-
     function setupCellEvents(input, td, inner, r, c) {
         let isComposing = false;
         input.addEventListener('compositionstart', () => { isComposing = true; });
         input.addEventListener('compositionend', () => { isComposing = false; });
 
         input.addEventListener('focus', () => {
-            if (activeFormulaInput && activeFormulaInput !== input) {
-                activeFormulaInput.focus();
-                return;
-            }
             document.querySelectorAll('td.formula-source').forEach(el => el.classList.remove('formula-source'));
             const valStr = input.value;
             if (valStr.startsWith('=') || valStr.startsWith('＝') || input.dataset.formula) {
@@ -853,7 +702,6 @@
             }
         });
 
-        // 修正：blurイベントで数式データが誤って消去されないように保護
         input.addEventListener('blur', () => {
             setTimeout(() => {
                 if (!isComposing) {
@@ -864,13 +712,7 @@
                     }
                     td.classList.remove('formula-source');
                     saveState();
-                    
-                    if (input.dataset.formula) {
-                        input.value = evaluateFormula(input.dataset.formula);
-                        if (input.dataset.format) applyFormat(input, input.dataset.format);
-                    } else {
-                        processCellFormula(input);
-                    }
+                    processCellFormula(input);
                     recalculateAllFormulas();
                 }
             }, 150);
@@ -912,6 +754,10 @@
                 lastTouchTime = Date.now();
                 touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
                 touchMoved = false;
+                if (activeFormulaInput && activeFormulaInput !== input) {
+                    formulaRangeStart = { r, c };
+                    e.preventDefault();
+                }
                 return;
             } else if (e.type === 'mousedown' && Date.now() - lastTouchTime < 500) {
                 return;
@@ -969,7 +815,7 @@
         };
 
         td.addEventListener('mousedown', handleCellInteraction);
-        td.addEventListener('touchstart', handleCellInteraction, { passive: true });
+        td.addEventListener('touchstart', handleCellInteraction, { passive: false });
         td.addEventListener('touchmove', handleTouchMove, { passive: true });
         td.addEventListener('touchend', handleTouchEnd, { passive: true });
 
@@ -1029,31 +875,16 @@
             }
         });
 
-        // Enterキー押下時の挙動（数式・値を確定させて答えを出し、右のセルへ移動する）
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                
-                saveState();
                 activeFormulaInput = null;
                 formulaRangeStart = null;
                 td.classList.remove('formula-source');
-                
-                // 数式・値を確定して計算結果（答え）を表示
-                processCellFormula(input);
-                recalculateAllFormulas();
-                
                 input.blur();
-                
-                // セルを右に移動（右端の場合は次の行の先頭へ）
-                let nextCol = c + 1;
-                let nextRow = r;
-                if (nextCol >= COLS) {
-                    nextCol = 0;
-                    nextRow = r + 1;
-                }
+                const nextRow = r + 1;
                 if (nextRow < ROWS) {
-                    const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${nextCol}"]`);
+                    const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${c}"]`);
                     if (nextInput) { nextInput.focus(); nextInput.select(); }
                 }
             } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
@@ -1084,17 +915,16 @@
                 }
             }
         });
+
+        input.addEventListener('paste', (e) => {
+            saveState();
+            handlePaste(e, r, c);
+        });
     }
 
     function buildSheetStructure() {
         const colHeaderRow = document.getElementById('col-header-row');
-        colHeaderRow.innerHTML = '<th class="row-header" id="select-all-corner" title="すべて選択"></th>';
-        
-        document.getElementById('select-all-corner').addEventListener('click', () => {
-            selectRange(0, 0, ROWS - 1, COLS - 1);
-            updateSelectionInfo(0, 0);
-        });
-
+        colHeaderRow.innerHTML = '<th class="row-header"></th>';
         const sheetBody = document.getElementById('sheet-body');
         sheetBody.innerHTML = '';
 
@@ -1402,6 +1232,24 @@
         function onMouseUp() { cleanup(); } function onTouchEnd() { cleanup(); }
     }
 
+    function handlePaste(e, startR, startC) {
+        const pastedText = (e.clipboardData || window.clipboardData).getData('text/plain');
+        if (!pastedText) return;
+        if (pastedText.includes('\t') || pastedText.includes('\n')) {
+            e.preventDefault();
+            const lines = pastedText.split(/\r\n|\n/).map(line => line.split('\t'));
+            lines.forEach((rowCols, rIdx) => {
+                const targetR = startR + rIdx; if (targetR >= ROWS) return;
+                rowCols.forEach((val, cIdx) => {
+                    const targetC = startC + cIdx; if (targetC >= COLS) return;
+                    const input = document.querySelector(`input[data-row="${targetR}"][data-col="${targetC}"]`);
+                    if (input) { input.value = val.trim(); processCellFormula(input); }
+                });
+            });
+            recalculateAllFormulas();
+        }
+    }
+
     function applyFormat(input, formatType) {
         input.dataset.format = formatType;
         let val = input.dataset.formula ? evaluateFormula(input.dataset.formula) : input.value;
@@ -1631,6 +1479,11 @@
     });
     document.getElementById('btn-border-none').addEventListener('click', () => {
         applyBorderCustom('none', 'select-border-width-m', mobileBorderColor ? 'mobile-border-color' : 'color-border-m');
+    });
+
+    document.getElementById('btn-select-all').addEventListener('click', () => {
+        selectRange(0, 0, ROWS - 1, COLS - 1);
+        updateSelectionInfo(0, 0);
     });
 
     function updateToolbarState(input) {
@@ -1869,7 +1722,7 @@
         reader.readAsArrayBuffer(file);
     });
 
-    document.getElementById('btn-json-import').addEventListener('click', () => {
+    document.getElementById('btn-import-json').addEventListener('click', () => {
         document.getElementById('json-file-input').click();
     });
 
@@ -1959,6 +1812,7 @@
 
     const drawer = document.getElementById('mobile-toolbar-drawer');
     document.getElementById('btn-open-drawer').addEventListener('click', () => { drawer.classList.toggle('open'); });
+    document.getElementById('btn-drawer-close').addEventListener('click', () => { drawer.classList.remove('open'); });
 
     renderMemoList();
 
