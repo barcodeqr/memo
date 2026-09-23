@@ -113,7 +113,7 @@
         }
         #btn-save:active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); transform: translateY(1px); }
 
-        /* ツールバー (PC用) と書式一覧の高さ・デザイン統一 */
+        /* ツールバー */
         .toolbar {
             display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
             gap: 8px; margin-bottom: 4px; background: #fff; padding: 6px 8px;
@@ -138,6 +138,8 @@
         
         .group-history { background: #f8fafc; border-color: #cbd5e1; }
         .group-history .tool-group-label { color: #475569; }
+        .group-clipboard { background: #f8fafc; border-color: #cbd5e1; }
+        .group-clipboard .tool-group-label { color: #475569; }
         .group-size { background: #f8fafc; border-color: #cbd5e1; }
         .group-size .tool-group-label { color: #475569; }
         .group-text { background: #f8fafc; border-color: #cbd5e1; }
@@ -265,7 +267,7 @@
         td.formula-source { outline: 2px solid #107c41; outline-offset: -2px; z-index: 6; }
         td.formula-source::after { display: none; }
 
-        /* セル選択ハンドルを十字（0923仕様）に変更[cite: 20] */
+        /* セル選択ハンドルを十字に変更 */
         .cell-handle {
             position: absolute; width: 14px; height: 14px; background-color: transparent;
             border: none; z-index: 25; display: none;
@@ -342,12 +344,10 @@
         <div class="mobile-selection-bar" id="mobile-selection-bar">
             <span id="selection-info">A1</span>
             <button id="btn-open-drawer" title="全書式を開く" style="border-radius: 6px;">全書式</button>
-            <button id="btn-select-all" title="表全体を選択" style="border-radius: 6px;">全選択</button>
             <button id="btn-border-all" title="選択範囲に格子" style="border-radius: 6px;">▦ 枠</button>
-            <button id="btn-border-outer" title="選択範囲の外枠" style="border-radius: 6px;">□ 外枠</button>
             <button id="btn-border-none" title="罫線を消す" style="border-radius: 6px;">□̸ 消す</button>
             <label class="mobile-color-btn" title="枠の色" style="border-radius: 6px;">線 <input type="color" id="mobile-border-color" value="#e6e6e6"></label>
-            <label class="mobile-color-btn" title="背景色" style="border-radius: 6px;">背景 <input type="color" id="mobile-bg-color" value="#fff2cc"></label>
+            <label class="mobile-color-btn" title="背景色" style="border-radius: 6px;">背景 <input type="color" id="mobile-bg-color" value="#ffffff"></label>
             <label class="mobile-color-btn" title="文字色" style="border-radius: 6px;">文字 <input type="color" id="mobile-text-color" value="#000000"></label>
         </div>
 
@@ -360,6 +360,12 @@
                     <span class="tool-group-label">履歴</span>
                     <button id="btn-undo-m" title="戻る" disabled>↶</button>
                     <button id="btn-redo-m" title="進む" disabled>↷</button>
+                </div>
+
+                <div class="tool-group group-clipboard" style="margin:0;">
+                    <span class="tool-group-label">クリップボード</span>
+                    <button id="btn-copy-m" title="コピー">コピー</button>
+                    <button id="btn-paste-m" title="貼付">貼付</button>
                 </div>
                 
                 <div class="tool-group group-text" style="margin:0;">
@@ -412,6 +418,7 @@
                     <select id="select-border-type-m">
                         <option value="" disabled selected>罫線</option>
                         <option value="all">格子</option>
+                        <option value="outer">外枠</option>
                         <option value="top">上</option>
                         <option value="bottom">下</option>
                         <option value="left">左</option>
@@ -438,6 +445,12 @@
                 <span class="tool-group-label">履歴</span>
                 <button id="btn-undo" title="戻る (Ctrl+Z)" disabled>↶ 戻る</button>
                 <button id="btn-redo" title="進む (Ctrl+Y)" disabled>↷ 進む</button>
+            </div>
+
+            <div class="tool-group group-clipboard">
+                <span class="tool-group-label">クリップボード</span>
+                <button id="btn-copy" title="コピー (Ctrl+C)">コピー</button>
+                <button id="btn-paste" title="貼付 (Ctrl+V)">貼付</button>
             </div>
 
             <div class="tool-group group-text">
@@ -490,6 +503,7 @@
                 <select id="select-border-type" title="罫線パターン">
                     <option value="" disabled selected>罫線</option>
                     <option value="all">格子</option>
+                    <option value="outer">外枠</option>
                     <option value="top">上</option>
                     <option value="bottom">下</option>
                     <option value="left">左</option>
@@ -510,7 +524,7 @@
         <!-- 表エリア -->
         <div class="spreadsheet-container" id="scroll-container">
             <table id="spreadsheet">
-                <thead><tr id="col-header-row"><th class="row-header"></th></tr></thead>
+                <thead><tr id="col-header-row"><th class="row-header" id="select-all-corner" title="表全体を選択" style="cursor: pointer;"></th></tr></thead>
                 <tbody id="sheet-body"></tbody>
             </table>
         </div>
@@ -924,7 +938,14 @@
 
     function buildSheetStructure() {
         const colHeaderRow = document.getElementById('col-header-row');
-        colHeaderRow.innerHTML = '<th class="row-header"></th>';
+        colHeaderRow.innerHTML = '<th class="row-header" id="select-all-corner" title="表全体を選択" style="cursor: pointer;"></th>';
+        
+        // A列1行の交点（左上隅のセル）の全選択イベント設定
+        document.getElementById('select-all-corner').addEventListener('click', () => {
+            selectRange(0, 0, ROWS - 1, COLS - 1);
+            updateSelectionInfo(0, 0);
+        });
+
         const sheetBody = document.getElementById('sheet-body');
         sheetBody.innerHTML = '';
 
@@ -1232,6 +1253,49 @@
         function onMouseUp() { cleanup(); } function onTouchEnd() { cleanup(); }
     }
 
+    // クリップボード操作用関数
+    function copySelectedCell() {
+        if (selectedCells.length === 0) return;
+        const targetTd = selectedCells[0];
+        const input = targetTd.querySelector('input');
+        const inner = targetTd.querySelector('.cell-inner');
+        if (input) {
+            copiedCellData = {
+                val: input.value, formula: input.dataset.formula || '', format: input.dataset.format || '',
+                bold: input.style.fontWeight, fontSize: input.style.fontSize, color: input.style.color,
+                align: input.style.textAlign, vertAlign: inner.style.justifyContent, bg: targetTd.style.backgroundColor,
+                borderTop: targetTd.style.borderTop, borderBottom: targetTd.style.borderBottom, borderLeft: targetTd.style.borderLeft, borderRight: targetTd.style.borderRight
+            };
+            alert("セルをコピーしました");
+        }
+    }
+
+    function pasteSelectedCell() {
+        if (copiedCellData === null || selectedCells.length === 0) return;
+        saveState();
+        selectedCells.forEach(targetTd => {
+            const tInput = targetTd.querySelector('input'); const tInner = targetTd.querySelector('.cell-inner');
+            if (tInput) {
+                tInput.value = copiedCellData.val; tInput.dataset.formula = copiedCellData.formula; tInput.dataset.format = copiedCellData.format;
+                tInput.style.fontWeight = copiedCellData.bold || 'normal'; tInput.style.fontSize = copiedCellData.fontSize || '0.9rem';
+                tInput.style.color = copiedCellData.color || ''; tInput.style.textAlign = copiedCellData.align || 'left';
+                processCellFormula(tInput);
+            }
+            if (tInner) tInner.style.justifyContent = copiedCellData.vertAlign || 'center';
+            targetTd.style.backgroundColor = copiedCellData.bg || '';
+            targetTd.style.borderTop = copiedCellData.borderTop || defaultBorder; targetTd.style.borderBottom = copiedCellData.borderBottom || defaultBorder;
+            targetTd.style.borderLeft = copiedCellData.borderLeft || defaultBorder; targetTd.style.borderRight = copiedCellData.borderRight || defaultBorder;
+        });
+        recalculateAllFormulas();
+    }
+
+    document.getElementById('btn-copy').addEventListener('click', copySelectedCell);
+    document.getElementById('btn-paste').addEventListener('click', pasteSelectedCell);
+    const btnCopyM = document.getElementById('btn-copy-m');
+    const btnPasteM = document.getElementById('btn-paste-m');
+    if (btnCopyM) btnCopyM.addEventListener('click', copySelectedCell);
+    if (btnPasteM) btnPasteM.addEventListener('click', pasteSelectedCell);
+
     function handlePaste(e, startR, startC) {
         const pastedText = (e.clipboardData || window.clipboardData).getData('text/plain');
         if (!pastedText) return;
@@ -1474,16 +1538,8 @@
     document.getElementById('btn-border-all').addEventListener('click', () => {
         applyBorderCustom('all', 'select-border-width-m', mobileBorderColor ? 'mobile-border-color' : 'color-border-m');
     });
-    document.getElementById('btn-border-outer').addEventListener('click', () => {
-        applyBorderCustom('outer', 'select-border-width-m', mobileBorderColor ? 'mobile-border-color' : 'color-border-m');
-    });
     document.getElementById('btn-border-none').addEventListener('click', () => {
         applyBorderCustom('none', 'select-border-width-m', mobileBorderColor ? 'mobile-border-color' : 'color-border-m');
-    });
-
-    document.getElementById('btn-select-all').addEventListener('click', () => {
-        selectRange(0, 0, ROWS - 1, COLS - 1);
-        updateSelectionInfo(0, 0);
     });
 
     function updateToolbarState(input) {
