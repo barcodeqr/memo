@@ -1028,29 +1028,33 @@
         });
 
        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-
-                // 【追加】数式入力中で末尾が演算子（=, +, -, *, / など）で終わっている場合、セル番地を自動補完する
-                if (activeFormulaInput) {
-                    const val = activeFormulaInput.value.trim();
-                    if (/[=+\-*/(]$/.test(val)) {
-                        const refCell = getColumnName(c) + (r + 1);
-                        activeFormulaInput.value += refCell;
-                    }
-                }
-
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        
+        // 数式モード中の場合、セル番地をクリックする動作をシミュレートして確定させる
+        if (activeFormulaInput) {
+            const targetSelectionInfo = window.innerWidth < 700 ? document.getElementById('selection-info') : document.getElementById('selection-info-pc');
+            if (targetSelectionInfo) {
+                targetSelectionInfo.click(); // セル番地をクリック（数式確定）
+            } else {
+                activeFormulaInput.blur();
                 activeFormulaInput = null;
-                formulaRangeState = null;
-                td.classList.remove('formula-source');
-                input.blur(); // 数式を確定
+                formulaRangeStart = null;
+            }
+            td.classList.remove('formula-source');
+            return;
+        }
 
-                // 次の行のセルにフォーカスを移動
-                const nextRow = r + 1;
-                if (nextRow < ROWS) {
-                    const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${c}"]`);
-                    if (nextInput) { nextInput.focus(); nextInput.select(); }
-                }
+        // 通常時のEnter挙動
+        activeFormulaInput = null;
+        formulaRangeStart = null;
+        td.classList.remove('formula-source');
+        input.blur();
+        const nextRow = r + 1;
+        if (nextRow < ROWS) {
+            const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${c}"]`);
+            if (nextInput) { nextInput.focus(); nextInput.select(); }
+        }
             } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
                 copiedCellData = {
                     val: input.value, formula: input.dataset.formula || '', format: input.dataset.format || '',
@@ -1078,11 +1082,6 @@
                     recalculateAllFormulas(); updateToolbarState(input);
                 }
             }
-        });
-
-        input.addEventListener('paste', (e) => {
-            saveState();
-            handlePaste(e, r, c);
         });
 
     }
@@ -1979,6 +1978,29 @@
 
     const drawer = document.getElementById('mobile-toolbar-drawer');
     document.getElementById('btn-open-drawer').addEventListener('click', () => { drawer.classList.toggle('open'); });
+
+// セル番地をクリックした時に数式を確定させる処理
+const selectionInfoEl = document.getElementById('selection-info');
+if (selectionInfoEl) {
+    selectionInfoEl.addEventListener('click', () => {
+        if (activeFormulaInput) {
+            activeFormulaInput.blur(); // フォーカスを外して数式を確定
+            activeFormulaInput = null;
+            formulaRangeStart = null;
+        }
+    });
+}
+// PC用のセル番地表示（#selection-info-pc）も同様にする場合
+const selectionInfoPcEl = document.getElementById('selection-info-pc');
+if (selectionInfoPcEl) {
+    selectionInfoPcEl.addEventListener('click', () => {
+        if (activeFormulaInput) {
+            activeFormulaInput.blur();
+            activeFormulaInput = null;
+            formulaRangeStart = null;
+        }
+    });
+}
 
     renderMemoList();
 
