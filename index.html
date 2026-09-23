@@ -364,14 +364,17 @@
         </div>
     </div>
 
-    <!-- ページ2：表エディタ画面 -->
+<!-- ページ2：表エディタ画面 -->
     <div id="page-editor" class="page">
         <div class="editor-top-bar">
             <div class="editor-top-left">
                 <button id="btn-go-home" class="btn-back">戻る</button>
                 <input type="text" id="memo-title" value="無題の表">
             </div>
-            <button id="btn-save" class="btn-success">セーブ</button>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <button id="btn-save" class="btn-success">セーブ</button>
+                <button id="btn-open-config" class="btn-quickbar-config" title="クイックバーの設定">⚙️</button>
+            </div>
         </div>
 
         <!-- スマホ用クイック書式バー -->
@@ -383,7 +386,6 @@
         <!-- スマホ用 書式一覧ドロワー -->
         <div class="mobile-toolbar-drawer" id="mobile-toolbar-drawer">
             <div class="mobile-drawer-row">
-                
                 <div class="tool-group group-history" style="margin:0;">
                     <span class="tool-group-label">履歴</span>
                     <button id="btn-undo-m" title="戻る" disabled>↶</button>
@@ -462,7 +464,6 @@
                 </div>
                 
                 <button id="btn-clear-m" class="btn-clear-cell">削除</button>
-                <button id="btn-open-config" class="btn-quickbar-config" title="クイックバーの設定">⚙️</button>
             </div>
         </div>
 
@@ -740,6 +741,7 @@
         }}
     ];
 
+    // 全書式('qb-allformat')を一番左（最初）に配置するよう修正
     const DEFAULT_QUICKBAR_ITEMS = ['qb-allformat', 'qb-clipboard', 'qb-text', 'qb-align', 'qb-matrix', 'qb-border', 'qb-delete'];
 
     function getActiveQuickbarItems() {
@@ -758,14 +760,76 @@
         const configBtn = document.getElementById('btn-open-config');
         bar.innerHTML = '';
         if (info) bar.appendChild(info);
-        if (configBtn) bar.appendChild(configBtn);
 
         const activeIds = getActiveQuickbarItems();
+        
+        // 順番通りにアクティブなアイテムを描画（DEFAULT_QUICKBAR_ITEMSの先頭にqb-allformatがあるためそのまま左から順番に展開されます）
         activeIds.forEach(id => {
             const conf = QUICKBAR_ITEMS_CONFIG.find(item => item.id === id);
             if (conf) {
                 bar.appendChild(conf.render());
             }
+        });
+
+        // 歯車設定ボタンを右端に配置
+        if (configBtn) bar.appendChild(configBtn);
+    }
+
+    // --- クイックバー設定モーダルのロジック ---
+    const configModalOverlay = document.getElementById('quickbar-config-modal');
+    const btnOpenConfig = document.getElementById('btn-open-config');
+    const modalBtnConfigSave = document.getElementById('modal-btn-config-save');
+    const modalBtnConfigCancel = document.getElementById('modal-btn-config-cancel');
+    const configItemList = document.getElementById('config-item-list');
+    const drawer = document.getElementById('mobile-toolbar-drawer');
+
+    if (btnOpenConfig) {
+        btnOpenConfig.addEventListener('click', () => {
+            openConfigModal();
+        });
+    }
+
+    function openConfigModal() {
+        configItemList.innerHTML = '';
+        const currentActive = getActiveQuickbarItems();
+
+        QUICKBAR_ITEMS_CONFIG.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'config-item-row';
+            
+            const label = document.createElement('label');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = item.id;
+            checkbox.checked = currentActive.includes(item.id);
+            
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(item.label));
+            
+            row.appendChild(label);
+            row.appendChild(checkbox);
+            configItemList.appendChild(row);
+        });
+
+        configModalOverlay.style.display = 'flex';
+    }
+
+    if (modalBtnConfigSave) {
+        modalBtnConfigSave.addEventListener('click', () => {
+            const checkboxes = configItemList.querySelectorAll('input[type="checkbox"]');
+            let newActive = [];
+            checkboxes.forEach(cb => {
+                if (cb.checked) newActive.push(cb.value);
+            });
+            localStorage.setItem('hyo_quickbar_settings', JSON.stringify(newActive));
+            configModalOverlay.style.display = 'none';
+            renderMobileQuickbar();
+        });
+    }
+
+    if (modalBtnConfigCancel) {
+        modalBtnConfigCancel.addEventListener('click', () => {
+            configModalOverlay.style.display = 'none';
         });
     }
 
@@ -1921,52 +1985,72 @@
                 let val = cell ? (cell.formula ? evaluateFormula(cell.formula) : cell.val) : "";
                 if (val !== "") rowValues.push(val);
             }
-            if (rowValues.length > 0) text += rowValues.join(" / ") + "\n";
+            if (rowValues.length > 0) text += rowValues.join("\t") + "\n";
         });
-        const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`;
-        window.open(lineUrl, '_blank');
+        if (navigator.share) {
+            navigator.share({ title: title, text: text }).catch(() => {});
+        } else {
+            const encoded = encodeURIComponent(text);
+            window.open(`https://social-plugins.line.me/lineit/share?text=${encoded}`, '_blank');
+        }
     }
 
-    function exportJSON(title, memoObj) {
-        const jsonStr = JSON.stringify(memoObj, null, 2);
-        const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+    function exportExcel(title, sheetData, totalCols) {
+        let aoa = [];
+        sheetData.forEach(rowObj => {
+            let rowArr = [];
+            for (let c = 0; c < totalCols; c++) {
+                let cell = rowObj[c];
+                let val = cell ? (cell.formula ? evaluateFormula(cell.formula) : cell.val) : "";
+                rowArr.push(val);
+            }
+            aoa.push(rowArr);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(aoa);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.writeFile(wb, `${title}.xlsx`);
+    }
+
+    function exportCSV(title, sheetData, totalCols) {
+        let csvContent = "";
+        sheetData.forEach(rowObj => {
+            let rowArr = [];
+            for (let c = 0; c < totalCols; c++) {
+                let cell = rowObj[c];
+                let val = cell ? (cell.formula ? evaluateFormula(cell.formula) : cell.val) : "";
+                if (typeof val === 'string' && (val.includes(',') || val.includes('"') || val.includes('\n'))) {
+                    val = `"${val.replace(/"/g, '""')}"`;
+                }
+                rowArr.push(val);
+            }
+            csvContent += rowArr.join(",") + "\r\n";
+        });
+        const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${title}.json`;
+        a.download = `${title}.csv`;
         a.click();
         URL.revokeObjectURL(url);
     }
 
-    function loadMemoToEditor(id) {
-        const savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
-        const memo = savedMemos[id]; if (!memo) return;
-        currentId = id; activeFormulaInput = null; document.getElementById('memo-title').value = memo.title;
-        
-        COLS = memo.cols || 15;
-        ROWS = memo.rows || 40;
-        buildSheetStructure();
+    function exportJSON(title, memoObj) {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(memoObj, null, 2));
+        const a = document.createElement('a');
+        a.href = dataStr;
+        a.download = `${title}.json`;
+        a.click();
+    }
 
-        memo.data.forEach((rowObj, r) => {
-            if (r >= ROWS) return;
-            Object.keys(rowObj).forEach(cStr => {
-                const c = parseInt(cStr); if (c >= COLS) return;
-                const cellInfo = rowObj[c]; const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
-                const td = input ? input.closest('td') : null; const inner = td ? td.querySelector('.cell-inner') : null;
-                if (input && td && inner) {
-                    input.value = cellInfo.val;
-                    if (cellInfo.formula) input.dataset.formula = cellInfo.formula; else delete input.dataset.formula;
-                    if (cellInfo.format) input.dataset.format = cellInfo.format; else delete input.dataset.format;
-                    input.style.fontWeight = cellInfo.bold || 'normal'; input.style.fontSize = cellInfo.fontSize || '0.9rem';
-                    input.style.color = cellInfo.color || ''; input.style.textAlign = cellInfo.align || 'left';
-                    inner.style.justifyContent = cellInfo.vertAlign || 'center';
-                    td.style.backgroundColor = cellInfo.bg || '';
-                    td.style.borderTop = cellInfo.borderTop || defaultBorder; td.style.borderBottom = cellInfo.borderBottom || defaultBorder;
-                    td.style.borderLeft = cellInfo.borderLeft || defaultBorder; td.style.borderRight = cellInfo.borderRight || defaultBorder;
-                }
-            });
-        });
-        recalculateAllFormulas(); showPage('page-editor');
+    function loadMemoToEditor(id) {
+        currentId = id;
+        const savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
+        const memo = savedMemos[id];
+        if (!memo) return;
+        document.getElementById('memo-title').value = memo.title || "無題の表";
+        restoreSheetState({ cols: memo.cols || 15, rows: memo.rows || 40, data: memo.data });
+        showPage('page-editor');
     }
 
     document.getElementById('btn-import-file').addEventListener('click', () => {
@@ -1976,7 +2060,6 @@
     document.getElementById('file-input').addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = function(evt) {
             try {
@@ -1984,24 +2067,23 @@
                 const workbook = XLSX.read(data, { type: 'array' });
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
-                const jsonRows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-                currentId = null;
-                activeFormulaInput = null;
+                const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
                 
-                let baseTitle = file.name.replace(/\.[^/.]+$/, "");
-                document.getElementById('memo-title').value = baseTitle || "インポートした表";
+                currentId = null;
+                document.getElementById('memo-title').value = file.name.replace(/\.[^/.]+$/, "");
+                initSheet();
+                
+                let maxR = Math.min(json.length, ROWS);
+                let maxC = COLS;
+                json.forEach(row => { if (row.length > maxC) maxC = Math.min(row.length, 26 * 26); });
+                
+                if (maxR > ROWS || maxC > COLS) {
+                    ROWS = Math.max(ROWS, maxR);
+                    COLS = Math.max(COLS, maxC);
+                    buildSheetStructure();
+                }
 
-                let maxR = Math.max(40, jsonRows.length);
-                let maxC = 15;
-                jsonRows.forEach(row => { if (row.length > maxC) maxC = row.length; });
-                maxC = Math.min(maxC, 26 * 26);
-
-                ROWS = maxR;
-                COLS = maxC;
-                buildSheetStructure();
-
-                jsonRows.forEach((row, r) => {
+                json.forEach((row, r) => {
                     if (r >= ROWS) return;
                     row.forEach((val, c) => {
                         if (c >= COLS) return;
@@ -2012,15 +2094,12 @@
                         }
                     });
                 });
-
                 recalculateAllFormulas();
                 showPage('page-editor');
-                saveState();
             } catch (err) {
                 alert("ファイルの読み込みに失敗しました。");
-                console.error(err);
             }
-            e.target.value = '';
+            e.target.value = "";
         };
         reader.readAsArrayBuffer(file);
     });
@@ -2032,133 +2111,25 @@
     document.getElementById('json-file-input').addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = function(evt) {
             try {
-                const memo = JSON.parse(evt.target.result);
-                if (!memo.data || !memo.cols || !memo.rows) {
-                    throw new Error("無効なJSONフォーマットです。");
-                }
-
-                currentId = null;
-                activeFormulaInput = null;
-                document.getElementById('memo-title').value = memo.title || file.name.replace(/\.[^/.]+$/, "");
-
-                COLS = memo.cols;
-                ROWS = memo.rows;
-                buildSheetStructure();
-
-                memo.data.forEach((rowObj, r) => {
-                    if (r >= ROWS) return;
-                    Object.keys(rowObj).forEach(cStr => {
-                        const c = parseInt(cStr); if (c >= COLS) return;
-                        const cellInfo = rowObj[c]; const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
-                        const td = input ? input.closest('td') : null; const inner = td ? td.querySelector('.cell-inner') : null;
-                        if (input && td && inner) {
-                            input.value = cellInfo.val;
-                            if (cellInfo.formula) input.dataset.formula = cellInfo.formula; else delete input.dataset.formula;
-                            if (cellInfo.format) input.dataset.format = cellInfo.format; else delete input.dataset.format;
-                            input.style.fontWeight = cellInfo.bold || 'normal'; input.style.fontSize = cellInfo.fontSize || '0.9rem';
-                            input.style.color = cellInfo.color || ''; input.style.textAlign = cellInfo.align || 'left';
-                            inner.style.justifyContent = cellInfo.vertAlign || 'center';
-                            td.style.backgroundColor = cellInfo.bg || '';
-                            td.style.borderTop = cellInfo.borderTop || defaultBorder; td.style.borderBottom = cellInfo.borderBottom || defaultBorder;
-                            td.style.borderLeft = cellInfo.borderLeft || defaultBorder; td.style.borderRight = cellInfo.borderRight || defaultBorder;
-                        }
-                    });
-                });
-
-                recalculateAllFormulas();
+                const memoObj = JSON.parse(evt.target.result);
+                if (!memoObj.data) throw new Error("Invalid format");
+                currentId = 'memo_' + Date.now();
+                document.getElementById('memo-title').value = memoObj.title || "インポートした表";
+                restoreSheetState(memoObj);
                 showPage('page-editor');
-                saveState();
-                alert("JSONファイルから表を読み込みました！");
             } catch (err) {
-                alert("JSONファイルの読み込みに失敗しました。");
-                console.error(err);
+                alert("JSONファイルの形式が正しくありません。");
             }
-            e.target.value = '';
+            e.target.value = "";
         };
         reader.readAsText(file);
     });
 
-    function exportExcel(title, sheetData, totalCols) {
-        let data = [];
-        sheetData.forEach(rowObj => {
-            let row = [];
-            for (let c = 0; c < totalCols; c++) {
-                let cell = rowObj[c];
-                row.push(cell ? (cell.formula ? evaluateFormula(cell.formula) : cell.val) : "");
-            }
-            data.push(row);
-        });
-        const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "シート1"); XLSX.writeFile(wb, `${title}.xlsx`);
-    }
-
-    function exportCSV(title, sheetData, totalCols) {
-        let csvContent = "";
-        sheetData.forEach(rowObj => {
-            let rowData = [];
-            for (let c = 0; c < totalCols; c++) {
-                let val = rowObj[c] ? (rowObj[c].formula ? evaluateFormula(rowObj[c].formula) : rowObj[c].val) : "";
-                if(typeof val === 'string') val = val.replace(/[¥,]/g, '');
-                val = '"' + String(val).replace(/"/g, '""') + '"'; 
-                rowData.push(val);
-            }
-            csvContent += rowData.join(',') + "\r\n";
-        });
-        const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob); const a = document.createElement('a');
-        a.href = url; a.download = `${title}.csv`; a.click(); URL.revokeObjectURL(url);
-    }
-
-    const drawer = document.getElementById('mobile-toolbar-drawer');
-
-    // 設定モーダルのイベント処理
-    document.getElementById('btn-open-config').addEventListener('click', () => {
-        const listContainer = document.getElementById('config-item-list');
-        listContainer.innerHTML = '';
-        const activeIds = getActiveQuickbarItems();
-
-        QUICKBAR_ITEMS_CONFIG.forEach(item => {
-            const row = document.createElement('div');
-            row.className = 'config-item-row';
-            const isChecked = activeIds.includes(item.id) ? 'checked' : '';
-            row.innerHTML = `<label><input type="checkbox" value="${item.id}" ${isChecked}> ${item.label}</label>`;
-            listContainer.appendChild(row);
-        });
-
-        document.getElementById('quickbar-config-modal').style.display = 'flex';
-    });
-
-    document.getElementById('modal-btn-config-save').addEventListener('click', () => {
-        const checkboxes = document.querySelectorAll('#config-item-list input[type="checkbox"]');
-        const newActive = [];
-        checkboxes.forEach(cb => {
-            if (cb.checked) newActive.push(cb.value);
-        });
-        localStorage.setItem('hyo_quickbar_settings', JSON.stringify(newActive));
-        document.getElementById('quickbar-config-modal').style.display = 'none';
-        renderMobileQuickbar();
-    });
-
-    document.getElementById('modal-btn-config-cancel').addEventListener('click', () => {
-        document.getElementById('quickbar-config-modal').style.display = 'none';
-    });
-
-    // 初期化
-    renderMobileQuickbar();
     renderMemoList();
-
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(r => console.log('ServiceWorker 登録完了'))
-                .catch(e => console.log('ServiceWorker 登録失敗', e));
-        });
-    }
+    showPage('page-home');
 </script>
-
 </body>
 </html>
