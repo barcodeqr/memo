@@ -1028,14 +1028,12 @@
         });
 
        input.addEventListener('keydown', (e) => {
-            // Android等の「次へ」や「完了/Enter」に加え、Tabキー（次へ）も判定に含める
+            // Androidの「次へ」やタブ移動、Enter、Nextなどに対応
             if (e.key === 'Enter' || e.keyCode === 13 || e.key === 'Next' || e.key === 'Tab' || e.keyCode === 9) {
                 e.preventDefault();
                 
-                // 【重要】数式を壊さずに安全に確定・再計算させるための元の処理を維持
+                // 1. 状態の保存と数式の確定・再計算
                 saveState();
-                
-                // もし元のコードで数式を計算・保持していた関数があればそのまま呼ぶ
                 if (typeof processCellFormula === 'function') {
                     processCellFormula(input);
                 }
@@ -1043,14 +1041,14 @@
                     recalculateAllFormulas();
                 }
 
-                // 数式モードや緑枠をクリア
+                // 2. 数式モードや緑枠を確実にクリア
                 activeFormulaInput = null;
                 formulaRangeStart = null;
                 td.classList.remove('formula-source');
                 
                 input.blur();
                 
-                // 真下のセルへフォーカスを移動
+                // 3. 真下のセルへフォーカスを強制移動
                 const nextRow = r + 1;
                 if (nextRow < ROWS) {
                     const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${c}"]`);
@@ -1060,6 +1058,21 @@
                     }
                 }
             }
+        });
+
+        // 【重要】blurイベントでの上書きや競合を防ぐための対策
+        input.addEventListener('blur', () => {
+            setTimeout(() => {
+                // まだアクティブな入力欄の場合は処理しない
+                if (document.activeElement === activeFormulaInput) return;
+                
+                // フォーカスが完全に外れたときの安全な処理
+                if (activeFormulaInput === input) {
+                    activeFormulaInput = null;
+                    formulaRangeStart = null;
+                }
+                td.classList.remove('formula-source');
+            }, 50);
         });
 
         // 念のため blur イベント側でも確実に緑枠が消えるようにする
