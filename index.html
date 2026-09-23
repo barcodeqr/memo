@@ -1060,36 +1060,29 @@
             }
         });
 
-        // 【重要】blurイベントでの上書きや競合を防ぐための対策
+        // 【修正】blurイベントは1つにまとめ、重複実行による数式破壊を防ぐ
         input.addEventListener('blur', () => {
             setTimeout(() => {
-                // まだアクティブな入力欄の場合は処理しない
-                if (document.activeElement === activeFormulaInput) return;
+                // まだ別の入力欄にフォーカスが移動中の場合は無視
+                if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
                 
-                // フォーカスが完全に外れたときの安全な処理
-                if (activeFormulaInput === input) {
-                    activeFormulaInput = null;
-                    formulaRangeStart = null;
-                }
-                td.classList.remove('formula-source');
-            }, 50);
-        });
-
-        // 念のため blur イベント側でも確実に緑枠が消えるようにする
-        input.addEventListener('blur', () => {
-            setTimeout(() => {
                 if (!isComposing) {
-                    if (document.activeElement === activeFormulaInput) return;
                     if (activeFormulaInput === input) {
                         activeFormulaInput = null;
                         formulaRangeStart = null;
                     }
-                    td.classList.remove('formula-source'); // ここで確実に緑枠を外す
+                    td.classList.remove('formula-source');
+                    
+                    // ここで安全に1回だけ確定処理を行う
                     saveState();
-                    processCellFormula(input);
-                    recalculateAllFormulas();
+                    if (typeof processCellFormula === 'function') {
+                        processCellFormula(input);
+                    }
+                    if (typeof recalculateAllFormulas === 'function') {
+                        recalculateAllFormulas();
+                    }
                 }
-            }, 50); // 遅延を短くして反応を良くする
+            }, 50);
         });
         
         input.addEventListener('paste', (e) => {
