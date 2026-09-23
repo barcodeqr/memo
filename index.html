@@ -853,6 +853,7 @@
             }
         });
 
+        // 修正：blurイベントで数式データが誤って消去されないように保護
         input.addEventListener('blur', () => {
             setTimeout(() => {
                 if (!isComposing) {
@@ -863,7 +864,13 @@
                     }
                     td.classList.remove('formula-source');
                     saveState();
-                    processCellFormula(input);
+                    
+                    if (input.dataset.formula) {
+                        input.value = evaluateFormula(input.dataset.formula);
+                        if (input.dataset.format) applyFormat(input, input.dataset.format);
+                    } else {
+                        processCellFormula(input);
+                    }
                     recalculateAllFormulas();
                 }
             }, 150);
@@ -1022,19 +1029,31 @@
             }
         });
 
-        // 修正箇所：Enterキー押下時の挙動（数式モード中でも通常通り確定して次のセルへ移動）
+        // Enterキー押下時の挙動（数式・値を確定させて答えを出し、右のセルへ移動する）
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 
+                saveState();
                 activeFormulaInput = null;
                 formulaRangeStart = null;
                 td.classList.remove('formula-source');
+                
+                // 数式・値を確定して計算結果（答え）を表示
+                processCellFormula(input);
+                recalculateAllFormulas();
+                
                 input.blur();
                 
-                const nextRow = r + 1;
+                // セルを右に移動（右端の場合は次の行の先頭へ）
+                let nextCol = c + 1;
+                let nextRow = r;
+                if (nextCol >= COLS) {
+                    nextCol = 0;
+                    nextRow = r + 1;
+                }
                 if (nextRow < ROWS) {
-                    const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${c}"]`);
+                    const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${nextCol}"]`);
                     if (nextInput) { nextInput.focus(); nextInput.select(); }
                 }
             } else if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
