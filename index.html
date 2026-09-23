@@ -909,13 +909,34 @@
             }
             sheetData.push(rowObj);
         }
-        return { cols: COLS, rows: ROWS, data: sheetData };
+
+        // 列幅の保存を追加
+        let colWidths = {};
+        for (let c = 0; c < COLS; c++) {
+            const th = document.querySelector(`th.col-header[data-col="${c}"]`);
+            if (th && th.style.width) {
+                colWidths[c] = th.style.width;
+            }
+        }
+
+        return { cols: COLS, rows: ROWS, data: sheetData, colWidths: colWidths };
     }
 
     function restoreSheetState(state) {
         COLS = state.cols;
         ROWS = state.rows;
         buildSheetStructure();
+
+        // 列幅の復元
+        if (state.colWidths) {
+            Object.keys(state.colWidths).forEach(cStr => {
+                const c = parseInt(cStr);
+                const th = document.querySelector(`th.col-header[data-col="${c}"]`);
+                if (th && state.colWidths[c]) {
+                    th.style.width = state.colWidths[c];
+                }
+            });
+        }
 
         state.data.forEach((rowObj, r) => {
             if (r >= ROWS) return;
@@ -1254,7 +1275,10 @@
         sheetBody.innerHTML = '';
 
         for (let c = 0; c < COLS; c++) {
-            const th = document.createElement('th'); th.className = 'col-header'; th.textContent = getColumnName(c);
+            const th = document.createElement('th'); 
+            th.className = 'col-header'; 
+            th.dataset.col = c; // 列幅保存のためにインデックスを保持
+            th.textContent = getColumnName(c);
             const handle = document.createElement('div'); handle.className = 'resize-col';
             initColResizer(handle, th); th.appendChild(handle); colHeaderRow.appendChild(th);
         }
@@ -1965,7 +1989,14 @@
         titleVal = finalTitle; document.getElementById('memo-title').value = titleVal;
 
         let sheetData = getSheetState();
-        savedMemos[currentId] = { title: titleVal, data: sheetData.data, cols: sheetData.cols, rows: sheetData.rows, updatedAt: Date.now() };
+        savedMemos[currentId] = { 
+            title: titleVal, 
+            data: sheetData.data, 
+            cols: sheetData.cols, 
+            rows: sheetData.rows, 
+            colWidths: sheetData.colWidths, // 列幅を保存対象に追加
+            updatedAt: Date.now() 
+        };
         localStorage.setItem('hyo_memos', JSON.stringify(savedMemos));
         renderMemoList(); alert(`「${titleVal}」をセーブしました！`);
     });
@@ -2094,7 +2125,12 @@
         const memo = savedMemos[id];
         if (!memo) return;
         document.getElementById('memo-title').value = memo.title || "無題の表";
-        restoreSheetState({ cols: memo.cols || 15, rows: memo.rows || 40, data: memo.data });
+        restoreSheetState({ 
+            cols: memo.cols || 15, 
+            rows: memo.rows || 40, 
+            data: memo.data, 
+            colWidths: memo.colWidths || {} 
+        });
         showPage('page-editor');
     }
 
@@ -2161,22 +2197,24 @@
                 const memoObj = JSON.parse(evt.target.result);
                 if (!memoObj.data) throw new Error("無効なJSON");
                 currentId = 'memo_' + Date.now();
-                document.getElementById('memo-title').value = memoObj.title || "読み込んだ表";
-                restoreSheetState({ cols: memoObj.cols || 15, rows: memoObj.rows || 40, data: memoObj.data });
+                document.getElementById('memo-title').value = memoObj.title || "無題の表";
+                restoreSheetState({ 
+                    cols: memoObj.cols || 15, 
+                    rows: memoObj.rows || 40, 
+                    data: memoObj.data, 
+                    colWidths: memoObj.colWidths || {} 
+                });
                 showPage('page-editor');
-                alert("JSONを読み込みました！");
-            } catch(err) {
-                alert("JSONの読み込みに失敗しました。");
+                alert("JSONファイルを読み込みました！");
+            } catch (err) {
+                alert("JSONファイルの読み込みに失敗しました。");
             }
         };
         reader.readAsText(file);
     });
 
-    // 初期化実行
-    renderMobileQuickbar();
-    
-    // 【修正点】アプリ起動時に保存済みメモの一覧を表示する関数を呼び出す
     renderMemoList();
+    renderMobileQuickbar();
 </script>
 </body>
 </html>
