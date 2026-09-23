@@ -1030,10 +1030,22 @@
        input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
+
+                // 【追加】数式入力中で末尾が演算子（=, +, -, *, / など）で終わっている場合、セル番地を自動補完する
+                if (activeFormulaInput) {
+                    const val = activeFormulaInput.value.trim();
+                    if (/[=+\-*/(]$/.test(val)) {
+                        const refCell = getColumnName(c) + (r + 1);
+                        activeFormulaInput.value += refCell;
+                    }
+                }
+
                 activeFormulaInput = null;
-                formulaRangeStart = null;
+                formulaRangeState = null;
                 td.classList.remove('formula-source');
-                input.blur();
+                input.blur(); // 数式を確定
+
+                // 次の行のセルにフォーカスを移動
                 const nextRow = r + 1;
                 if (nextRow < ROWS) {
                     const nextInput = document.querySelector(`input[data-row="${nextRow}"][data-col="${c}"]`);
