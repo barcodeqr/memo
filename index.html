@@ -1031,17 +1031,14 @@
     if (e.key === 'Enter') {
         e.preventDefault();
         
-        // 数式モード中の場合、セル番地をクリックする動作をシミュレートして確定させる
-        if (activeFormulaInput) {
-            const targetSelectionInfo = window.innerWidth < 700 ? document.getElementById('selection-info') : document.getElementById('selection-info-pc');
-            if (targetSelectionInfo) {
-                targetSelectionInfo.click(); // セル番地をクリック（数式確定）
-            } else {
-                activeFormulaInput.blur();
-                activeFormulaInput = null;
-                formulaRangeStart = null;
-            }
+       if (activeFormulaInput) {
+            activeFormulaInput.blur();
+            activeFormulaInput = null;
+            formulaRangeStart = null;
             td.classList.remove('formula-source');
+            saveState();
+            processCellFormula(input);
+            recalculateAllFormulas();
             return;
         }
 
