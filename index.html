@@ -399,7 +399,7 @@
                 </div>
 
                 <div class="tool-group group-clipboard" style="margin:0;">
-                    <span class="tool-group-label">クリップボード</span>
+                    <span class="tool-group-label">コピペ</span>
                     <button id="btn-copy-m" title="コピー">コピー</button>
                     <button id="btn-paste-m" title="貼付">貼付</button>
                 </div>
@@ -484,7 +484,7 @@
             </div>
 
             <div class="tool-group group-clipboard">
-                <span class="tool-group-label">クリップボード</span>
+                <span class="tool-group-label">コピペ</span>
                 <button id="btn-copy" title="コピー (Ctrl+C)">コピー</button>
                 <button id="btn-paste" title="貼付 (Ctrl+V)">貼付</button>
             </div>
@@ -641,7 +641,7 @@
         }},
         { id: 'qb-clipboard', label: 'コピー貼付', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-clipboard'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">クリップボード</span><button id="btn-copy-m2">コピー</button><button id="btn-paste-m2">貼付</button>';
+            wrap.innerHTML = '<span class="tool-group-label">コピペ</span><button id="btn-copy-m2">コピー</button><button id="btn-paste-m2">貼付</button>';
             setTimeout(() => {
                 const cp = wrap.querySelector('#btn-copy-m2'); const ps = wrap.querySelector('#btn-paste-m2');
                 if(cp) cp.addEventListener('click', copySelectedCell);
