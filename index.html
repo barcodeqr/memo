@@ -409,10 +409,11 @@
                     <button id="btn-bold-m"><b>B</b></button>
                     <select id="select-font-size-m">
                         <option value="" disabled selected>サイズ</option>
-                        <option value="0.75rem">小</option>
-                        <option value="0.9rem">標準</option>
-                        <option value="1.1rem">中</option>
-                        <option value="1.3rem">大</option>
+                        <option value="1.1rem">小</option>
+                        <option value="1.3rem">標準</option>
+                        <option value="1.6rem">中</option>
+                        <option value="2.0rem">大</option>
+                        <option value="2.4rem">超</option>
                     </select>
                     <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m" value="#ff0000"></div>
                     <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m" value="#ffff00"></div>
@@ -494,10 +495,11 @@
                 <button id="btn-bold" title="太字"><b>B</b></button>
                 <select id="select-font-size" title="文字サイズ">
                     <option value="" disabled selected>サイズ</option>
-                    <option value="0.75rem">小(12)</option>
-                    <option value="0.9rem">標準(14)</option>
-                    <option value="1.1rem">中(16)</option>
-                    <option value="1.3rem">大(20)</option>
+                    <option value="1.1rem">小</option>
+                    <option value="1.3rem">標準</option>
+                    <option value="1.6rem">中</option>
+                    <option value="2.0rem">大</option>
+                    <option value="2.4rem">超</option>
                 </select>
                 <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text" value="#ff0000"></div>
                 <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg" value="#ffff00"></div>
@@ -651,15 +653,24 @@
         }},
         { id: 'qb-text', label: '文字', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-text'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">文字</span><button id="btn-bold-m2"><b>B</b></button><div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m2" value="#ff0000"></div><div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m2" value="#ffff00"></div>';
+            wrap.innerHTML = '<span class="tool-group-label">文字</span><button id="btn-bold-m2"><b>B</b></button><select id="select-font-size-m2"><option value="" disabled selected>サイズ</option><option value="1.1rem">小</option><option value="1.3rem">標準</option><option value="1.6rem">中</option><option value="2.0rem">大</option><option value="2.4rem">超</option></select><div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m2" value="#ff0000"></div><div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m2" value="#ffff00"></div>';
             setTimeout(() => {
-                const b = wrap.querySelector('#btn-bold-m2'); const ct = wrap.querySelector('#color-text-m2'); const cb = wrap.querySelector('#color-bg-m2');
+                const b = wrap.querySelector('#btn-bold-m2'); 
+                const fs = wrap.querySelector('#select-font-size-m2');
+                const ct = wrap.querySelector('#color-text-m2'); 
+                const cb = wrap.querySelector('#color-bg-m2');
                 if(b) b.addEventListener('click', () => {
                     if (selectedCells.length === 0) return;
                     saveState();
                     const isBold = selectedCells[0].querySelector('input').style.fontWeight === 'bold';
                     selectedCells.forEach(td => { const input = td.querySelector('input'); if (input) input.style.fontWeight = isBold ? 'normal' : 'bold'; });
                     b.classList.toggle('active', !isBold);
+                });
+                if(fs) fs.addEventListener('change', (e) => {
+                    saveState();
+                    const val = e.target.value;
+                    selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.fontSize = val; });
+                    e.target.value = "";
                 });
                 if(ct) { ct.addEventListener('click', () => applyTextColor(ct.value)); ct.addEventListener('input', (e) => applyTextColor(e.target.value)); }
                 if(cb) { cb.addEventListener('click', () => applyBgColor(cb.value)); cb.addEventListener('input', (e) => applyBgColor(e.target.value)); }
@@ -771,7 +782,6 @@
 
         const activeIds = getActiveQuickbarItems();
         
-        // 保存されている設定のうち、有効なIDかつ設定で除外されていないものだけを描画
         const savedRaw = localStorage.getItem('hyo_quickbar_settings');
         let enabledIds = activeIds;
         if (savedRaw) {
@@ -886,18 +896,11 @@
                     newActive.push(row.dataset.id);
                 }
             });
-            // チェックを外されたものも含めて順番自体は保持しつつ、有効なものだけを保存
-            // 設定モーダルに並んでいる順番通りに全IDを維持しつつ、チェック状態を反映
             let allOrdered = [];
             rows.forEach(row => {
                 allOrdered.push(row.dataset.id);
             });
             localStorage.setItem('hyo_quickbar_settings', JSON.stringify(allOrdered));
-            
-            // 実際に表示する有効なIDリストを保存するための専用キー、あるいは現在の仕組みに合わせて調整
-            // ここではチェックがついているものだけを有効として保存するか、あるいは非表示リストを管理する
-            // 既存の renderMobileQuickbar では JSON.parse(saved) に含まれるかを見ているため、
-            // チェックが入っているものだけを保存するように変更する。
             localStorage.setItem('hyo_quickbar_settings', JSON.stringify(newActive));
             
             configModalOverlay.style.display = 'none';
@@ -938,7 +941,6 @@
             sheetData.push(rowObj);
         }
 
-        // 列幅の保存
         let colWidths = {};
         for (let c = 0; c < COLS; c++) {
             const th = document.querySelector(`th.col-header[data-col="${c}"]`);
@@ -947,7 +949,6 @@
             }
         }
 
-        // 行幅の保存
         let rowHeights = {};
         const trElements = document.querySelectorAll('#sheet-body tr');
         trElements.forEach((tr, r) => {
@@ -964,7 +965,6 @@
         ROWS = state.rows;
         buildSheetStructure();
 
-        // 列幅の復元
         if (state.colWidths) {
             Object.keys(state.colWidths).forEach(cStr => {
                 const c = parseInt(cStr);
@@ -975,7 +975,6 @@
             });
         }
 
-        // 行幅の復元
         if (state.rowHeights) {
             Object.keys(state.rowHeights).forEach(rStr => {
                 const r = parseInt(rStr);
@@ -1821,7 +1820,7 @@
         selectedCells.forEach(td => { const input = td.querySelector('input'); if (input) input.style.fontWeight = isBold ? 'normal' : 'bold'; });
     });
 
-    ['select-font-size', 'select-font-size-m'].forEach(id => {
+    ['select-font-size', 'select-font-size-m', 'select-font-size-m2'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.addEventListener('change', (e) => {
@@ -2045,7 +2044,7 @@
             cols: sheetData.cols, 
             rows: sheetData.rows, 
             colWidths: sheetData.colWidths, 
-            rowHeights: sheetData.rowHeights, // 行幅の保存を追加
+            rowHeights: sheetData.rowHeights, 
             updatedAt: Date.now() 
         };
         localStorage.setItem('hyo_memos', JSON.stringify(savedMemos));
@@ -2254,11 +2253,12 @@
                     cols: memoObj.cols || 15, 
                     rows: memoObj.rows || 40, 
                     data: memoObj.data, 
-                    colWidths: memoObj.colWidths || {}, 
-                    rowHeights: memoObj.rowHeights || {} 
+                    colWidths: memoObj.colWidths || {},
+                    rowHeights: memoObj.rowHeights || {}
                 });
                 showPage('page-editor');
-                alert("JSONファイルを読み込みました！");
+                renderMemoList();
+                alert("JSONを読み込みました！");
             } catch (err) {
                 alert("JSONファイルの読み込みに失敗しました。");
             }
@@ -2266,8 +2266,11 @@
         reader.readAsText(file);
     });
 
-    renderMemoList();
-    renderMobileQuickbar();
+    window.addEventListener('DOMContentLoaded', () => {
+        initSheet();
+        renderMemoList();
+        renderMobileQuickbar();
+    });
 </script>
 </body>
 </html>
