@@ -651,7 +651,7 @@
         }},
         { id: 'qb-text', label: '文字', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-text'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">文字</span><button id="btn-bold-m2"><b>B</b></button><div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m2" value="#000000"></div><div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m2" value="#ffffff"></div>';
+            wrap.innerHTML = '<span class="tool-group-label">文字</span><button id="btn-bold-m2"><b>B</b></button><div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m2" value="#ff0000"></div><div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m2" value="#ffff00"></div>';
             setTimeout(() => {
                 const b = wrap.querySelector('#btn-bold-m2'); const ct = wrap.querySelector('#color-text-m2'); const cb = wrap.querySelector('#color-bg-m2');
                 if(b) b.addEventListener('click', () => {
