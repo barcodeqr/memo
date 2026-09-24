@@ -771,7 +771,17 @@
 
         const activeIds = getActiveQuickbarItems();
         
-        activeIds.forEach(id => {
+        // 保存されている設定のうち、有効なIDかつ設定で除外されていないものだけを描画
+        const savedRaw = localStorage.getItem('hyo_quickbar_settings');
+        let enabledIds = activeIds;
+        if (savedRaw) {
+            try {
+                let parsed = JSON.parse(savedRaw);
+                enabledIds = activeIds.filter(id => parsed.includes(id));
+            } catch(e) {}
+        }
+        
+        enabledIds.forEach(id => {
             const conf = QUICKBAR_ITEMS_CONFIG.find(item => item.id === id);
             if (conf) {
                 bar.appendChild(conf.render());
@@ -802,6 +812,11 @@
     function buildConfigItemList() {
         configItemList.innerHTML = '';
         let currentItems = getActiveQuickbarItems();
+        const savedRaw = localStorage.getItem('hyo_quickbar_settings');
+        let currentEnabled = currentItems;
+        if (savedRaw) {
+            try { currentEnabled = JSON.parse(savedRaw); } catch(e) {}
+        }
 
         currentItems.forEach((id, index) => {
             const conf = QUICKBAR_ITEMS_CONFIG.find(item => item.id === id);
@@ -815,7 +830,7 @@
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.value = id;
-            checkbox.checked = true; 
+            checkbox.checked = currentEnabled.includes(id); 
             
             label.appendChild(checkbox);
             label.appendChild(document.createTextNode(conf.label));
@@ -871,7 +886,20 @@
                     newActive.push(row.dataset.id);
                 }
             });
+            // チェックを外されたものも含めて順番自体は保持しつつ、有効なものだけを保存
+            // 設定モーダルに並んでいる順番通りに全IDを維持しつつ、チェック状態を反映
+            let allOrdered = [];
+            rows.forEach(row => {
+                allOrdered.push(row.dataset.id);
+            });
+            localStorage.setItem('hyo_quickbar_settings', JSON.stringify(allOrdered));
+            
+            // 実際に表示する有効なIDリストを保存するための専用キー、あるいは現在の仕組みに合わせて調整
+            // ここではチェックがついているものだけを有効として保存するか、あるいは非表示リストを管理する
+            // 既存の renderMobileQuickbar では JSON.parse(saved) に含まれるかを見ているため、
+            // チェックが入っているものだけを保存するように変更する。
             localStorage.setItem('hyo_quickbar_settings', JSON.stringify(newActive));
+            
             configModalOverlay.style.display = 'none';
             renderMobileQuickbar();
         });
@@ -910,7 +938,7 @@
             sheetData.push(rowObj);
         }
 
-        // 列幅の保存を追加
+        // 列幅の保存
         let colWidths = {};
         for (let c = 0; c < COLS; c++) {
             const th = document.querySelector(`th.col-header[data-col="${c}"]`);
@@ -919,7 +947,16 @@
             }
         }
 
-        return { cols: COLS, rows: ROWS, data: sheetData, colWidths: colWidths };
+        // 行幅の保存
+        let rowHeights = {};
+        const trElements = document.querySelectorAll('#sheet-body tr');
+        trElements.forEach((tr, r) => {
+            if (tr.style.height) {
+                rowHeights[r] = tr.style.height;
+            }
+        });
+
+        return { cols: COLS, rows: ROWS, data: sheetData, colWidths: colWidths, rowHeights: rowHeights };
     }
 
     function restoreSheetState(state) {
@@ -934,6 +971,19 @@
                 const th = document.querySelector(`th.col-header[data-col="${c}"]`);
                 if (th && state.colWidths[c]) {
                     th.style.width = state.colWidths[c];
+                }
+            });
+        }
+
+        // 行幅の復元
+        if (state.rowHeights) {
+            Object.keys(state.rowHeights).forEach(rStr => {
+                const r = parseInt(rStr);
+                const trElements = document.querySelectorAll('#sheet-body tr');
+                if (trElements[r] && state.rowHeights[r]) {
+                    const h = state.rowHeights[r];
+                    trElements[r].style.height = h;
+                    trElements[r].querySelectorAll('td, th').forEach(el => el.style.height = h);
                 }
             });
         }
@@ -1277,7 +1327,7 @@
         for (let c = 0; c < COLS; c++) {
             const th = document.createElement('th'); 
             th.className = 'col-header'; 
-            th.dataset.col = c; // 列幅保存のためにインデックスを保持
+            th.dataset.col = c; 
             th.textContent = getColumnName(c);
             const handle = document.createElement('div'); handle.className = 'resize-col';
             initColResizer(handle, th); th.appendChild(handle); colHeaderRow.appendChild(th);
@@ -1994,7 +2044,8 @@
             data: sheetData.data, 
             cols: sheetData.cols, 
             rows: sheetData.rows, 
-            colWidths: sheetData.colWidths, // 列幅を保存対象に追加
+            colWidths: sheetData.colWidths, 
+            rowHeights: sheetData.rowHeights, // 行幅の保存を追加
             updatedAt: Date.now() 
         };
         localStorage.setItem('hyo_memos', JSON.stringify(savedMemos));
@@ -2129,7 +2180,8 @@
             cols: memo.cols || 15, 
             rows: memo.rows || 40, 
             data: memo.data, 
-            colWidths: memo.colWidths || {} 
+            colWidths: memo.colWidths || {}, 
+            rowHeights: memo.rowHeights || {} 
         });
         showPage('page-editor');
     }
@@ -2202,7 +2254,8 @@
                     cols: memoObj.cols || 15, 
                     rows: memoObj.rows || 40, 
                     data: memoObj.data, 
-                    colWidths: memoObj.colWidths || {} 
+                    colWidths: memoObj.colWidths || {}, 
+                    rowHeights: memoObj.rowHeights || {} 
                 });
                 showPage('page-editor');
                 alert("JSONファイルを読み込みました！");
