@@ -113,39 +113,47 @@
         }
         #btn-save:active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); transform: translateY(1px); }
 
-        /* ぷっくりボタン共通スタイル（共通立体感・下矢印対応） */
-        .pukuri-btn {
-            background: linear-gradient(to bottom, #ffffff, #e2e8f0) !important;
-            color: #1e293b !important;
-            border: 1px solid #94a3b8 !important;
-            border-radius: 6px !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.12) !important;
-            font-weight: 600;
+        /* ぷっくりボタン共通スタイル（全ボタン・セレクト代替用） */
+        .puck-btn {
+            background: linear-gradient(to bottom, #f8fafc, #cbd5e1);
+            color: #334155;
+            border: 1px solid #94a3b8;
+            padding: 0 10px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            height: 34px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 4px;
-            transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            transition: background 0.2s, box-shadow 0.2s;
+            flex-shrink: 0;
+            white-space: nowrap;
+            text-decoration: none;
+            vertical-align: middle;
         }
-        .pukuri-btn:hover {
-            background: linear-gradient(to bottom, #f8fafc, #cbd5e1) !important;
+        .puck-btn:hover { background: linear-gradient(to bottom, #e2e8f0, #94a3b8); }
+        .puck-btn:active, .puck-btn.active { 
+            background: linear-gradient(to bottom, #cbd5e1, #94a3b8); 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); 
+            transform: translateY(1px); 
         }
-        .pukuri-btn:active {
-            background: linear-gradient(to bottom, #cbd5e1, #94a3b8) !important;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
-            transform: translateY(1px);
-        }
-        .pukuri-btn.active {
-            background: linear-gradient(to bottom, #bfdbfe, #93c5fd) !important;
-            border-color: #3b82f6 !important;
-        }
-        /* プルダウン風ボタン用下矢印マーク */
-        .has-dropdown::after {
-            content: ' ▼';
-            font-size: 0.7rem;
-            color: #64748b;
+        .puck-btn.arrow::after {
+            content: '▼';
+            font-size: 0.65rem;
             margin-left: 2px;
+        }
+        .puck-btn.btn-del-rowcol, .puck-btn.btn-clear-cell {
+            color: #d9534f;
+            border-color: #d9534f;
+            background: linear-gradient(to bottom, #fff5f5, #f5c6cb);
+        }
+        .puck-btn.btn-del-rowcol:hover, .puck-btn.btn-clear-cell:hover {
+            background: linear-gradient(to bottom, #f5c6cb, #e0a899);
         }
 
         /* ツールバー */
@@ -155,18 +163,12 @@
             border: 1px solid var(--excel-border); border-radius: 6px; align-items: center;
             flex-shrink: 0;
         }
-        .toolbar button, .toolbar label, .color-picker-wrapper {
-            font-size: 0.85rem; padding: 0 8px; cursor: pointer;
-            height: 34px; display: inline-flex;
+        .toolbar .color-picker-wrapper {
+            font-size: 0.85rem; padding: 0 8px; cursor: pointer; border: 1px solid #94a3b8;
+            background: linear-gradient(to bottom, #f8fafc, #cbd5e1); border-radius: 6px; height: 34px; display: inline-flex;
             align-items: center; justify-content: center; flex-shrink: 0;
-            box-sizing: border-box; vertical-align: middle;
+            box-sizing: border-box; vertical-align: middle; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
-        .color-picker-wrapper {
-            background: linear-gradient(to bottom, #ffffff, #e2e8f0);
-            border: 1px solid #94a3b8; border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.12);
-        }
-        .toolbar button:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; transform: none; }
 
         .tool-group {
             display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px;
@@ -188,18 +190,13 @@
             width: 20px; height: 20px; border: none; cursor: pointer; background: none; padding: 0;
             border-radius: 4px;
         }
-      
+
         /* スマホ用クイック書式バー */
         .mobile-selection-bar {
             display: flex; align-items: center; gap: 6px; overflow-x: auto;
             padding: 6px 8px; margin-bottom: 4px; background: #fff;
             border: 1px solid #d9d9d9; border-radius: 6px; flex-shrink: 0;
             -webkit-overflow-scrolling: touch;
-        }
-        .mobile-selection-bar button, .mobile-color-btn {
-            height: 38px; min-width: 58px; padding: 0 9px; font-size: 14px; font-weight: 600;
-            display: inline-flex; align-items: center; justify-content: center; gap: 3px;
-            white-space: nowrap; flex-shrink: 0; touch-action: manipulation;
         }
         
         #selection-info {
@@ -209,26 +206,6 @@
             align-items: center; justify-content: center; height: 38px; flex-shrink: 0;
         }
 
-        .btn-quickbar-config {
-            background: linear-gradient(to bottom, #f1f5f9, #cbd5e1) !important;
-            color: #334155 !important;
-            border: 1px solid #94a3b8 !important;
-            border-radius: 6px !important;
-            font-weight: bold;
-            padding: 0 10px;
-            height: 38px !important;
-            min-width: 38px !important;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            cursor: pointer;
-            box-sizing: border-box;
-        }
-        .btn-quickbar-config:active {
-            background: linear-gradient(to bottom, #cbd5e1, #94a3b8) !important;
-        }
-        
         .mobile-toolbar-drawer {
             display: none; flex-direction: column; gap: 6px; background: #fff;
             padding: 8px; border: 1px solid #d9d9d9; border-radius: 6px; margin-bottom: 4px;
@@ -239,7 +216,6 @@
             display: flex; align-items: center; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch;
         }
 
-        .mobile-toolbar-drawer button,
         .mobile-toolbar-drawer .tool-group,
         .mobile-toolbar-drawer .color-picker-wrapper {
             height: 38px !important;
@@ -253,14 +229,6 @@
             border-radius: 6px !important;
         }
         .mobile-toolbar-drawer .color-picker-wrapper input[type="color"] { width: 22px; height: 22px; }
-
-        #btn-drawer-close {
-            border-radius: 6px !important; font-weight: bold; writing-mode: horizontal-tb !important;
-            background: linear-gradient(to bottom, #f1f5f9, #cbd5e1) !important; color: #334155 !important;
-            border: 1px solid #94a3b8 !important; box-shadow: 0 1px 3px rgba(0,0,0,0.15); white-space: nowrap;
-        }
-
-        #btn-clear-m { border-radius: 6px !important; font-weight: bold; writing-mode: horizontal-tb !important; white-space: nowrap; }
 
         #btn-open-drawer {
             background: linear-gradient(to bottom, #d8b4fe, #9333ea) !important; color: #ffffff !important;
@@ -301,7 +269,7 @@
         .col-header { width: 90px; min-width: 40px; touch-action: auto; }
         .cell-input {
             width: 100%; border: none; outline: none; background: transparent;
-            padding: 0 4px; box-sizing: border-box; font-family: inherit; font-size: inherit;
+            padding: 0 4px; box-sizing: border-box; font-family: inherit; font-size: 1.3rem;
             position: relative; z-index: 2;
         }
         td.selected { outline: 2px solid var(--excel-select-border); outline-offset: -2px; z-index: 5; position: relative; }
@@ -328,8 +296,6 @@
         .resize-row { position: absolute; left: 0; bottom: 0; width: 100%; height: 8px; cursor: row-resize; z-index: 10; touch-action: none; }
 
         .btn-success { background: var(--primary) !important; color: white !important; border-color: var(--primary) !important; border-radius: 6px !important; }
-        .btn-clear-cell { color: #d9534f; border-color: #d9534f !important; font-weight: bold; border-radius: 6px; }
-        .btn-del-rowcol { color: #d9534f; border-color: #d9534f !important; }
 
         .custom-modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -349,6 +315,31 @@
         .btn-modal-discard { background-color: #e2e8f0; color: #334155; }
         .btn-modal-discard:hover { background-color: #cbd5e1; }
         .btn-modal-cancel { background-color: transparent; color: #666; font-size: 0.85rem !important; }
+
+        /* 汎用ピッカー・リストモーダル */
+        .picker-modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 3000;
+        }
+        .picker-modal {
+            background: #fff; padding: 16px; border-radius: 8px; width: 260px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 8px;
+        }
+        .picker-modal-item {
+            padding: 10px; text-align: center; background: #f8fafc; border: 1px solid #cbd5e1;
+            border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.95rem;
+        }
+        .picker-modal-item:hover { background: #e2e8f0; }
+
+        /* 罫線選択モーダル用グリッド */
+        .border-grid-container {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px;
+        }
+        .border-grid-item {
+            padding: 12px 6px; text-align: center; background: #f8fafc; border: 1px solid #cbd5e1;
+            border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem;
+        }
+        .border-grid-item:hover { background: #e2e8f0; }
 
         .config-modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -384,29 +375,6 @@
         .btn-config-save:hover { background-color: var(--primary-hover); }
         .btn-config-cancel { background-color: #e2e8f0; color: #334155; }
         .btn-config-cancel:hover { background-color: #cbd5e1; }
-
-        /* 汎用ピッカーモーダル用スタイル */
-        .picker-modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 3000;
-        }
-        .picker-modal {
-            background: #fff; padding: 20px; border-radius: 10px; width: 260px;
-            text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        .picker-modal h4 { margin: 0 0 10px 0; font-size: 1rem; color: #1e293b; }
-        .picker-option-btn {
-            padding: 12px; font-size: 0.95rem; font-weight: bold; border-radius: 6px;
-            cursor: pointer; border: 1px solid #cbd5e1; background: linear-gradient(to bottom, #ffffff, #f1f5f9);
-            color: #334155; transition: background 0.1s;
-        }
-        .picker-option-btn:hover { background: #e2e8f0; }
-        .picker-option-btn:active { background: #cbd5e1; }
-        .picker-close-btn {
-            margin-top: 5px; padding: 8px; font-size: 0.85rem; border: none;
-            background: transparent; color: #64748b; cursor: pointer; font-weight: bold;
-        }
     </style>
 </head>
 <body>
@@ -419,7 +387,7 @@
                 <div class="home-actions-top">
                     <button id="btn-create-new" class="btn-create">＋ 表メモ</button>
                     <button id="btn-import-file" class="btn-import">📂 開く</button>
-                    <button id="btn-json-import" class="btn-json-import">📥 JSON読込</button>
+                    <button id="btn-import-json" class="btn-json-import">📥 JSON読込</button>
                     <input type="file" id="file-input" accept=".xlsx, .xls, .csv" style="display: none;">
                     <input type="file" id="json-file-input" accept=".json" style="display: none;">
                 </div>
@@ -436,8 +404,8 @@
                 <input type="text" id="memo-title" value="無題の表">
             </div>
             <div style="display: flex; align-items: center; gap: 6px;">
-                <button id="btn-save" class="btn-success pukuri-btn" style="padding: 6px 16px;">セーブ</button>
-                <button id="btn-open-config" class="btn-quickbar-config pukuri-btn" title="クイックバーの設定">⚙️</button>
+                <button id="btn-save" class="btn-success puck-btn">セーブ</button>
+                <button id="btn-open-config" class="puck-btn" title="クイックバーの設定">⚙️</button>
             </div>
         </div>
 
@@ -451,53 +419,52 @@
             <div class="mobile-drawer-row">
                 <div class="tool-group group-history" style="margin:0;">
                     <span class="tool-group-label">履歴</span>
-                    <button id="btn-undo-m" class="pukuri-btn" title="戻る" disabled style="height:34px; padding:0 8px;">↶</button>
-                    <button id="btn-redo-m" class="pukuri-btn" title="進む" disabled style="height:34px; padding:0 8px;">↷</button>
+                    <button id="btn-undo-m" class="puck-btn" title="戻る" disabled>↶</button>
+                    <button id="btn-redo-m" class="puck-btn" title="進む" disabled>↷</button>
                 </div>
 
                 <div class="tool-group group-clipboard" style="margin:0;">
                     <span class="tool-group-label">コピペ</span>
-                    <button id="btn-copy-m" class="pukuri-btn" title="コピー" style="height:34px; padding:0 8px;">コピー</button>
-                    <button id="btn-paste-m" class="pukuri-btn" title="貼付" style="height:34px; padding:0 8px;">貼付</button>
+                    <button id="btn-copy-m" class="puck-btn" title="コピー">コピー</button>
+                    <button id="btn-paste-m" class="puck-btn" title="貼付">貼付</button>
                 </div>
                 
                 <div class="tool-group group-text" style="margin:0;">
                     <span class="tool-group-label">文字</span>
-                    <button id="btn-bold-m" class="pukuri-btn" style="height:34px; padding:0 8px;"><b>B</b></button>
-                    <button id="btn-modal-fontsize-m" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;">サイズ</button>
+                    <button id="btn-bold-m" class="puck-btn"><b>B</b></button>
+                    <button id="btn-modal-font-size-m" class="puck-btn arrow">サイズ</button>
                     <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m" value="#ff0000"></div>
                     <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m" value="#ffff00"></div>
                 </div>
                 
                 <div class="tool-group group-align" style="margin:0;">
                     <span class="tool-group-label">配置</span>
-                    <button id="btn-modal-alignh-m" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;">左右</button>
-                    <button id="btn-modal-alignv-m" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;">上下</button>
+                    <button id="btn-modal-align-horiz-m" class="puck-btn arrow">左右</button>
+                    <button id="btn-modal-align-vert-m" class="puck-btn arrow">上下</button>
                 </div>
                 
                 <div class="tool-group group-size" style="margin:0;">
                     <span class="tool-group-label">行・列</span>
-                    <button id="btn-add-row-m" class="pukuri-btn" style="height:34px; padding:0 8px;">行＋</button>
-                    <button id="btn-delete-row-m" class="btn-del-rowcol pukuri-btn" style="height:34px; padding:0 8px;">行－</button>
-                    <button id="btn-add-col-m" class="pukuri-btn" style="height:34px; padding:0 8px;">列＋</button>
-                    <button id="btn-delete-col-m" class="btn-del-rowcol pukuri-btn" style="height:34px; padding:0 8px;">列－</button>
+                    <button id="btn-add-row-m" class="puck-btn">行＋</button>
+                    <button id="btn-delete-row-m" class="puck-btn btn-del-rowcol">行－</button>
+                    <button id="btn-add-col-m" class="puck-btn">列＋</button>
+                    <button id="btn-delete-col-m" class="puck-btn btn-del-rowcol">列－</button>
                 </div>
                 
                 <div class="tool-group group-format" style="margin:0;">
                     <span class="tool-group-label">数字</span>
-                    <button id="btn-format-none-m" class="pukuri-btn" style="height:34px; padding:0 8px;">標準</button>
-                    <button id="btn-format-comma-m" class="pukuri-btn" style="height:34px; padding:0 8px;"><b>,</b></button>
-                    <button id="btn-format-currency-m" class="pukuri-btn" style="height:34px; padding:0 8px;"><b>¥</b></button>
+                    <button id="btn-format-none-m" class="puck-btn">標準</button>
+                    <button id="btn-format-comma-m" class="puck-btn"><b>,</b></button>
+                    <button id="btn-format-currency-m" class="puck-btn"><b>¥</b></button>
                 </div>
                 
                 <div class="tool-group group-border" style="margin:0;">
                     <span class="tool-group-label">罫線</span>
-                    <button id="btn-modal-bordertype-m" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;">罫線</button>
-                    <button id="btn-modal-borderwidth-m" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;">細</button>
+                    <button id="btn-modal-border-m" class="puck-btn arrow">罫線</button>
                     <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m" value="#0000ff"></div>
                 </div>
                 
-                <button id="btn-clear-m" class="btn-clear-cell pukuri-btn" style="height:34px; padding:0 8px;">削除</button>
+                <button id="btn-clear-m" class="puck-btn btn-clear-cell">削除</button>
             </div>
         </div>
 
@@ -507,53 +474,52 @@
             
             <div class="tool-group group-history">
                 <span class="tool-group-label">履歴</span>
-                <button id="btn-undo" class="pukuri-btn" title="戻る (Ctrl+Z)" disabled style="height:34px; padding:0 8px;">↶ 戻る</button>
-                <button id="btn-redo" class="pukuri-btn" title="進む (Ctrl+Y)" disabled style="height:34px; padding:0 8px;">↷ 進む</button>
+                <button id="btn-undo" class="puck-btn" title="戻る (Ctrl+Z)" disabled>↶ 戻る</button>
+                <button id="btn-redo" class="puck-btn" title="進む (Ctrl+Y)" disabled>↷ 進む</button>
             </div>
 
             <div class="tool-group group-clipboard">
                 <span class="tool-group-label">コピペ</span>
-                <button id="btn-copy" class="pukuri-btn" title="コピー (Ctrl+C)" style="height:34px; padding:0 8px;">コピー</button>
-                <button id="btn-paste" class="pukuri-btn" title="貼付 (Ctrl+V)" style="height:34px; padding:0 8px;">貼付</button>
+                <button id="btn-copy" class="puck-btn" title="コピー (Ctrl+C)">コピー</button>
+                <button id="btn-paste" class="puck-btn" title="貼付 (Ctrl+V)">貼付</button>
             </div>
 
             <div class="tool-group group-text">
                 <span class="tool-group-label">文字</span>
-                <button id="btn-bold" class="pukuri-btn" title="太字" style="height:34px; padding:0 8px;"><b>B</b></button>
-                <button id="btn-modal-fontsize" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;" title="文字サイズ">サイズ</button>
+                <button id="btn-bold" class="puck-btn" title="太字"><b>B</b></button>
+                <button id="btn-modal-font-size" class="puck-btn arrow" title="文字サイズ">サイズ</button>
                 <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text" value="#ff0000"></div>
                 <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg" value="#ffff00"></div>
             </div>
 
             <div class="tool-group group-align">
                 <span class="tool-group-label">配置</span>
-                <button id="btn-modal-alignh" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;" title="左右位置">左右</button>
-                <button id="btn-modal-alignv" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;" title="上下位置">上下</button>
+                <button id="btn-modal-align-horiz" class="puck-btn arrow" title="左右位置">左右</button>
+                <button id="btn-modal-align-vert" class="puck-btn arrow" title="上下位置">上下</button>
             </div>
 
             <div class="tool-group group-size">
                 <span class="tool-group-label">行・列</span>
-                <button id="btn-add-row" class="pukuri-btn" title="選択位置に行を挿入" style="height:34px; padding:0 8px;">行＋</button>
-                <button id="btn-delete-row" class="btn-del-rowcol pukuri-btn" title="選択行を削除" style="height:34px; padding:0 8px;">行－</button>
-                <button id="btn-add-col" class="pukuri-btn" title="選択位置に列を挿入" style="height:34px; padding:0 8px;">列＋</button>
-                <button id="btn-delete-col" class="btn-del-rowcol pukuri-btn" title="選択列を削除" style="height:34px; padding:0 8px;">列－</button>
+                <button id="btn-add-row" class="puck-btn" title="選択位置に行を挿入">行＋</button>
+                <button id="btn-delete-row" class="puck-btn btn-del-rowcol" title="選択行を削除">行－</button>
+                <button id="btn-add-col" class="puck-btn" title="選択位置に列を挿入">列＋</button>
+                <button id="btn-delete-col" class="puck-btn btn-del-rowcol" title="選択列を削除">列－</button>
             </div>
 
             <div class="tool-group group-format">
                 <span class="tool-group-label">数字</span>
-                <button id="btn-format-none" class="pukuri-btn" title="標準" style="height:34px; padding:0 8px;">標準</button>
-                <button id="btn-format-comma" class="pukuri-btn" title="カンマ" style="height:34px; padding:0 8px;"><b>,</b></button>
-                <button id="btn-format-currency" class="pukuri-btn" title="通貨" style="height:34px; padding:0 8px;"><b>¥</b></button>
+                <button id="btn-format-none" class="puck-btn" title="標準">標準</button>
+                <button id="btn-format-comma" class="puck-btn" title="カンマ"><b>,</b></button>
+                <button id="btn-format-currency" class="puck-btn" title="通貨"><b>¥</b></button>
             </div>
 
             <div class="tool-group group-border">
                 <span class="tool-group-label">罫線</span>
-                <button id="btn-modal-bordertype" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;" title="罫線パターン">罫線</button>
-                <button id="btn-modal-borderwidth" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;" title="太さ">細</button>
+                <button id="btn-modal-border" class="puck-btn arrow" title="罫線パターン">罫線</button>
                 <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border" value="#0000ff"></div>
             </div>
 
-            <button id="btn-clear" class="btn-clear-cell pukuri-btn" title="セル削除" style="height:34px; padding:0 8px;">削除</button>
+            <button id="btn-clear" class="puck-btn btn-clear-cell" title="セル削除">削除</button>
         </div>
 
         <!-- 表エリア -->
@@ -565,13 +531,20 @@
         </div>
     </div>
 
+    <!-- 汎用選択モーダル -->
+    <div id="generic-picker-modal" class="picker-modal-overlay">
+        <div class="picker-modal" id="picker-modal-content">
+            <!-- 動的に中身が書き換わります -->
+        </div>
+    </div>
+
     <!-- セーブ確認モーダル -->
     <div id="save-confirm-modal" class="custom-modal-overlay">
         <div class="custom-modal">
             <p>セーブをしますか？</p>
             <div class="custom-modal-buttons">
-                <button id="modal-btn-save" class="btn-modal-save pukuri-btn">セーブをして戻る</button>
-                <button id="modal-btn-discard" class="btn-modal-discard pukuri-btn">セーブをせずに戻る</button>
+                <button id="modal-btn-save" class="btn-modal-save">セーブをして戻る</button>
+                <button id="modal-btn-discard" class="btn-modal-discard">セーブをせずに戻る</button>
                 <button id="modal-btn-cancel" class="btn-modal-cancel">キャンセル</button>
             </div>
         </div>
@@ -582,9 +555,9 @@
         <div class="custom-modal">
             <p>貼り付け形式を選択してください</p>
             <div class="custom-modal-buttons">
-                <button id="modal-btn-paste-all" class="btn-modal-save pukuri-btn">すべて（書式・数式込）</button>
-                <button id="modal-btn-paste-value" class="btn-modal-discard pukuri-btn">値のみ</button>
-                <button id="modal-btn-paste-transpose" class="btn-modal-discard pukuri-btn">行列入れ替え</button>
+                <button id="modal-btn-paste-all" class="btn-modal-save">すべて（書式・数式込）</button>
+                <button id="modal-btn-paste-value" class="btn-modal-discard">値のみ</button>
+                <button id="modal-btn-paste-transpose" class="btn-modal-discard">行列入れ替え</button>
                 <button id="modal-btn-paste-cancel" class="btn-modal-cancel">キャンセル</button>
             </div>
         </div>
@@ -597,18 +570,9 @@
             <p style="font-size: 0.8rem; color: #666; margin-top: 0; margin-bottom: 10px;">表示項目の選択と順番（▲▼）の変更ができます。</p>
             <div id="config-item-list" class="config-item-list"></div>
             <div class="config-modal-buttons">
-                <button id="modal-btn-config-save" class="btn-config-save pukuri-btn">保存</button>
-                <button id="modal-btn-config-cancel" class="btn-config-cancel pukuri-btn">キャンセル</button>
+                <button id="modal-btn-config-save" class="btn-config-save">保存</button>
+                <button id="modal-btn-config-cancel" class="btn-config-cancel">キャンセル</button>
             </div>
-        </div>
-    </div>
-
-    <!-- 汎用選択ピッカーモーダル（サイズ・配置・罫線用） -->
-    <div id="generic-picker-overlay" class="picker-modal-overlay">
-        <div class="picker-modal" id="generic-picker-content">
-            <h4 id="generic-picker-title">選択</h4>
-            <div id="generic-picker-buttons" style="display: flex; flex-direction: column; gap: 8px;"></div>
-            <button id="generic-picker-close" class="picker-close-btn">キャンセル</button>
         </div>
     </div>
 
@@ -634,43 +598,14 @@
     let redoStack = [];
     const MAX_HISTORY = 30;
 
-    /* モーダルピッカー処理用の状態変数 */
-    let currentBorderWidthVal = '1px';
-
-    function openPickerModal(title, options, onSelect) {
-        const overlay = document.getElementById('generic-picker-overlay');
-        const titleEl = document.getElementById('generic-picker-title');
-        const container = document.getElementById('generic-picker-buttons');
-        titleEl.textContent = title;
-        container.innerHTML = '';
-
-        options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'picker-option-btn';
-            btn.textContent = opt.label;
-            btn.addEventListener('click', () => {
-                onSelect(opt.value);
-                overlay.style.display = 'none';
-            });
-            container.appendChild(btn);
-        });
-        overlay.style.display = 'flex';
-    }
-
-    document.getElementById('generic-picker-close').addEventListener('click', () => {
-        document.getElementById('generic-picker-overlay').style.display = 'none';
-    });
-    document.getElementById('generic-picker-overlay').addEventListener('click', (e) => {
-        if (e.target === document.getElementById('generic-picker-overlay')) {
-            document.getElementById('generic-picker-overlay').style.display = 'none';
-        }
-    });
+    // 現在選択中の罫線太さ（細・中・太）管理用
+    let currentBorderWidth = '1px';
 
     const QUICKBAR_ITEMS_CONFIG = [
-        { id: 'qb-allformat', label: '全書式', render: () => { const b = document.createElement('button'); b.id = 'btn-open-drawer'; b.className = 'pukuri-btn'; b.style.height = '34px'; b.style.padding = '0 8px'; b.textContent = '全書式'; b.addEventListener('click', () => { drawer.classList.toggle('open'); }); return b; } },
+        { id: 'qb-allformat', label: '全書式', render: () => { const b = document.createElement('button'); b.id = 'btn-open-drawer'; b.className = 'puck-btn'; b.textContent = '全書式'; b.addEventListener('click', () => { drawer.classList.toggle('open'); }); return b; } },
         { id: 'qb-history', label: '履歴', render: () => { 
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-history'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">履歴</span><button id="btn-undo-m2" class="pukuri-btn" title="戻る" style="height:34px; padding:0 8px;">↶</button><button id="btn-redo-m2" class="pukuri-btn" title="進む" style="height:34px; padding:0 8px;">↷</button>';
+            wrap.innerHTML = '<span class="tool-group-label">履歴</span><button id="btn-undo-m2" class="puck-btn" title="戻る">↶</button><button id="btn-redo-m2" class="puck-btn" title="進む">↷</button>';
             setTimeout(() => {
                 const u = wrap.querySelector('#btn-undo-m2'); const r = wrap.querySelector('#btn-redo-m2');
                 if(u) u.addEventListener('click', performUndo);
@@ -681,7 +616,7 @@
         }},
         { id: 'qb-clipboard', label: 'コピー貼付', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-clipboard'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">コピペ</span><button id="btn-copy-m2" class="pukuri-btn" style="height:34px; padding:0 8px;">コピー</button><button id="btn-paste-m2" class="pukuri-btn" style="height:34px; padding:0 8px;">貼付</button>';
+            wrap.innerHTML = '<span class="tool-group-label">コピペ</span><button id="btn-copy-m2" class="puck-btn">コピー</button><button id="btn-paste-m2" class="puck-btn">貼付</button>';
             setTimeout(() => {
                 const cp = wrap.querySelector('#btn-copy-m2'); const ps = wrap.querySelector('#btn-paste-m2');
                 if(cp) cp.addEventListener('click', copySelectedCell);
@@ -691,10 +626,10 @@
         }},
         { id: 'qb-text', label: '文字', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-text'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">文字</span><button id="btn-bold-m2" class="pukuri-btn" style="height:34px; padding:0 8px;"><b>B</b></button><button id="btn-modal-fontsize-m2" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;">サイズ</button><div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m2" value="#ff0000"></div><div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m2" value="#ffff00"></div>';
+            wrap.innerHTML = '<span class="tool-group-label">文字</span><button id="btn-bold-m2" class="puck-btn"><b>B</b></button><button id="select-font-size-m2" class="puck-btn arrow">サイズ</button><div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m2" value="#ff0000"></div><div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m2" value="#ffff00"></div>';
             setTimeout(() => {
                 const b = wrap.querySelector('#btn-bold-m2'); 
-                const fsBtn = wrap.querySelector('#btn-modal-fontsize-m2');
+                const fs = wrap.querySelector('#select-font-size-m2');
                 const ct = wrap.querySelector('#color-text-m2'); 
                 const cb = wrap.querySelector('#color-bg-m2');
                 if(b) b.addEventListener('click', () => {
@@ -704,14 +639,8 @@
                     selectedCells.forEach(td => { const input = td.querySelector('input'); if (input) input.style.fontWeight = isBold ? 'normal' : 'bold'; });
                     b.classList.toggle('active', !isBold);
                 });
-                if(fsBtn) fsBtn.addEventListener('click', () => {
-                    openPickerModal('文字サイズ選択', [
-                        { label: '小', value: '1.1rem' },
-                        { label: '標準', value: '1.3rem' },
-                        { label: '中', value: '1.6rem' },
-                        { label: '大', value: '2.0rem' },
-                        { label: '超', value: '2.4rem' }
-                    ], (val) => {
+                if(fs) fs.addEventListener('click', () => {
+                    openFontSizeModal((val) => {
                         saveState();
                         selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.fontSize = val; });
                     });
@@ -723,26 +652,18 @@
         }},
         { id: 'qb-align', label: '配置', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-align'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">配置</span><button id="btn-modal-alignh-m2" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;">左右</button><button id="btn-modal-alignv-m2" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;">上下</button>';
+            wrap.innerHTML = '<span class="tool-group-label">配置</span><button id="select-align-horiz-m2" class="puck-btn arrow">左右</button><button id="select-align-vert-m2" class="puck-btn arrow">上下</button>';
             setTimeout(() => {
-                const hBtn = wrap.querySelector('#btn-modal-alignh-m2');
-                const vBtn = wrap.querySelector('#btn-modal-alignv-m2');
-                if(hBtn) hBtn.addEventListener('click', () => {
-                    openPickerModal('左右位置選択', [
-                        { label: '左寄せ', value: 'left' },
-                        { label: '中央寄せ', value: 'center' },
-                        { label: '右寄せ', value: 'right' }
-                    ], (val) => {
+                const sa = wrap.querySelector('#select-align-horiz-m2');
+                const sav = wrap.querySelector('#select-align-vert-m2');
+                if(sa) sa.addEventListener('click', () => {
+                    openAlignHorizModal((val) => {
                         saveState();
                         selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.textAlign = val; });
                     });
                 });
-                if(vBtn) vBtn.addEventListener('click', () => {
-                    openPickerModal('上下位置選択', [
-                        { label: '上', value: 'flex-start' },
-                        { label: '中', value: 'center' },
-                        { label: '下', value: 'flex-end' }
-                    ], (val) => {
+                if(sav) sav.addEventListener('click', () => {
+                    openAlignVertModal((val) => {
                         saveState();
                         selectedCells.forEach(td => { const inner = td.querySelector('.cell-inner'); if(inner) inner.style.justifyContent = val; });
                     });
@@ -752,7 +673,7 @@
         }},
         { id: 'qb-matrix', label: '行列', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-size'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">行・列</span><button id="btn-add-row-m2" class="pukuri-btn" style="height:34px; padding:0 8px;">行＋</button><button id="btn-delete-row-m2" class="btn-del-rowcol pukuri-btn" style="height:34px; padding:0 8px;">行－</button><button id="btn-add-col-m2" class="pukuri-btn" style="height:34px; padding:0 8px;">列＋</button><button id="btn-delete-col-m2" class="btn-del-rowcol pukuri-btn" style="height:34px; padding:0 8px;">列－</button>';
+            wrap.innerHTML = '<span class="tool-group-label">行・列</span><button id="btn-add-row-m2" class="puck-btn">行＋</button><button id="btn-delete-row-m2" class="puck-btn btn-del-rowcol">行－</button><button id="btn-add-col-m2" class="puck-btn">列＋</button><button id="btn-delete-col-m2" class="puck-btn btn-del-rowcol">列－</button>';
             setTimeout(() => {
                 const ar = wrap.querySelector('#btn-add-row-m2'); const dr = wrap.querySelector('#btn-delete-row-m2');
                 const ac = wrap.querySelector('#btn-add-col-m2'); const dc = wrap.querySelector('#btn-delete-col-m2');
@@ -765,7 +686,7 @@
         }},
         { id: 'qb-number', label: '数字', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-format'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">数字</span><button id="btn-format-none-m2" class="pukuri-btn" style="height:34px; padding:0 8px;">標準</button><button id="btn-format-comma-m2" class="pukuri-btn" style="height:34px; padding:0 8px;"><b>,</b></button><button id="btn-format-currency-m2" class="pukuri-btn" style="height:34px; padding:0 8px;"><b>¥</b></button>';
+            wrap.innerHTML = '<span class="tool-group-label">数字</span><button id="btn-format-none-m2" class="puck-btn">標準</button><button id="btn-format-comma-m2" class="puck-btn"><b>,</b></button><button id="btn-format-currency-m2" class="puck-btn"><b>¥</b></button>';
             setTimeout(() => {
                 const fn = wrap.querySelector('#btn-format-none-m2'); const fc = wrap.querySelector('#btn-format-comma-m2'); const fcurr = wrap.querySelector('#btn-format-currency-m2');
                 if(fn) fn.addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'none')); });
@@ -776,37 +697,12 @@
         }},
         { id: 'qb-border', label: '罫線', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-border'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">罫線</span><button id="btn-modal-bordertype-m2" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;">罫線</button><button id="btn-modal-borderwidth-m2" class="pukuri-btn has-dropdown" style="height:34px; padding:0 8px;">細</button><div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m2" value="#0000ff"></div>';
+            wrap.innerHTML = '<span class="tool-group-label">罫線</span><button id="btn-modal-border-m2" class="puck-btn arrow">罫線</button><div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m2" value="#0000ff"></div>';
             setTimeout(() => {
-                const typeBtn = wrap.querySelector('#btn-modal-bordertype-m2');
-                const widthBtn = wrap.querySelector('#btn-modal-borderwidth-m2');
+                const bt = wrap.querySelector('#btn-modal-border-m2');
                 const bc = wrap.querySelector('#color-border-m2');
-                if(typeBtn) {
-                    typeBtn.addEventListener('click', () => {
-                        openPickerModal('罫線パターン選択', [
-                            { label: '格子（すべて）', value: 'all' },
-                            { label: '外枠', value: 'outer' },
-                            { label: '上線', value: 'top' },
-                            { label: '下線', value: 'bottom' },
-                            { label: '左線', value: 'left' },
-                            { label: '右線', value: 'right' },
-                            { label: '罫線なし', value: 'none' }
-                        ], (val) => {
-                            applyBorderCustom(val, currentBorderWidthVal, bc ? bc.value : '#0000ff');
-                        });
-                    });
-                }
-                if(widthBtn) {
-                    widthBtn.addEventListener('click', () => {
-                        openPickerModal('罫線の太さ選択', [
-                            { label: '細 (1px)', value: '1px' },
-                            { label: '中 (2px)', value: '2px' },
-                            { label: '太 (3px)', value: '3px' }
-                        ], (val) => {
-                            currentBorderWidthVal = val;
-                            widthBtn.textContent = val === '1px' ? '細' : (val === '2px' ? '中' : '太');
-                        });
-                    });
+                if(bt) {
+                    bt.addEventListener('click', () => openBorderModal('color-border-m2'));
                 }
                 if(bc && colorBorderM) {
                     bc.addEventListener('input', (e) => { colorBorderM.value = e.target.value; });
@@ -815,13 +711,13 @@
             return wrap;
         }},
         { id: 'qb-delete', label: '削除', render: () => {
-            const b = document.createElement('button'); b.id = 'btn-clear-m2'; b.className = 'btn-clear-cell pukuri-btn'; b.style.height = '34px'; b.style.padding = '0 8px'; b.textContent = '削除';
+            const b = document.createElement('button'); b.id = 'btn-clear-m2'; b.className = 'puck-btn btn-clear-cell'; b.textContent = '削除';
             b.addEventListener('click', () => {
                 if (selectedCells.length === 0) return;
                 saveState();
                 selectedCells.forEach(td => {
                     const input = td.querySelector('input'); const inner = td.querySelector('.cell-inner');
-                    if (input) { input.value = ''; delete input.dataset.formula; delete input.dataset.format; input.style.fontWeight = 'normal'; input.style.fontSize = '0.9rem'; input.style.color = ''; input.style.textAlign = 'left'; }
+                    if (input) { input.value = ''; delete input.dataset.formula; delete input.dataset.format; input.style.fontWeight = 'normal'; input.style.fontSize = '1.3rem'; input.style.color = ''; input.style.textAlign = 'left'; }
                     if (inner) inner.style.justifyContent = 'center';
                     td.style.backgroundColor = ''; td.style.borderTop = defaultBorder; td.style.borderBottom = defaultBorder; td.style.borderLeft = defaultBorder; td.style.borderRight = defaultBorder;
                 });
@@ -990,6 +886,190 @@
         });
     }
 
+    // 汎用モーダル表示関数
+    const pickerModalOverlay = document.getElementById('generic-picker-modal');
+    const pickerModalContent = document.getElementById('picker-modal-content');
+
+    function closePickerModal() {
+        pickerModalOverlay.style.display = 'none';
+        pickerModalContent.innerHTML = '';
+    }
+
+    pickerModalOverlay.addEventListener('click', (e) => {
+        if (e.target === pickerModalOverlay) closePickerModal();
+    });
+
+    function openFontSizeModal(callback) {
+        pickerModalContent.innerHTML = '';
+        const sizes = [
+            { label: '小', value: '1.1rem' },
+            { label: '標準', value: '1.3rem' },
+            { label: '中', value: '1.6rem' },
+            { label: '大', value: '2.0rem' },
+            { label: '超', value: '2.4rem' }
+        ];
+        sizes.forEach(s => {
+            const item = document.createElement('div');
+            item.className = 'picker-modal-item';
+            item.textContent = s.label;
+            item.addEventListener('click', () => {
+                callback(s.value);
+                closePickerModal();
+            });
+            pickerModalContent.appendChild(item);
+        });
+        pickerModalOverlay.style.display = 'flex';
+    }
+
+    function openAlignHorizModal(callback) {
+        pickerModalContent.innerHTML = '';
+        const aligns = [
+            { label: '左', value: 'left' },
+            { label: '中', value: 'center' },
+            { label: '右', value: 'right' }
+        ];
+        aligns.forEach(a => {
+            const item = document.createElement('div');
+            item.className = 'picker-modal-item';
+            item.textContent = a.label;
+            item.addEventListener('click', () => {
+                callback(a.value);
+                closePickerModal();
+            });
+            pickerModalContent.appendChild(item);
+        });
+        pickerModalOverlay.style.display = 'flex';
+    }
+
+    function openAlignVertModal(callback) {
+        pickerModalContent.innerHTML = '';
+        const aligns = [
+            { label: '上', value: 'flex-start' },
+            { label: '中', value: 'center' },
+            { label: '下', value: 'flex-end' }
+        ];
+        aligns.forEach(a => {
+            const item = document.createElement('div');
+            item.className = 'picker-modal-item';
+            item.textContent = a.label;
+            item.addEventListener('click', () => {
+                callback(a.value);
+                closePickerModal();
+            });
+            pickerModalContent.appendChild(item);
+        });
+        pickerModalOverlay.style.display = 'flex';
+    }
+
+    function openBorderModal(colorId) {
+        pickerModalContent.innerHTML = '';
+        
+        // 太さ選択ボタン行（細・中・太）
+        const widthRow = document.createElement('div');
+        widthRow.style.display = 'flex';
+        widthRow.style.gap = '6px';
+        widthRow.style.marginBottom = '10px';
+        
+        const widths = [
+            { label: '細', val: '1px' },
+            { label: '中', val: '2px' },
+            { label: '太', val: '3px' }
+        ];
+        widths.forEach(w => {
+            const wBtn = document.createElement('button');
+            wBtn.className = 'puck-btn';
+            wBtn.style.flex = '1';
+            wBtn.textContent = w.label;
+            if (currentBorderWidth === w.val) wBtn.classList.add('active');
+            wBtn.addEventListener('click', () => {
+                currentBorderWidth = w.val;
+                widthRow.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                wBtn.classList.add('active');
+            });
+            widthRow.appendChild(wBtn);
+        });
+        pickerModalContent.appendChild(widthRow);
+
+        // 罫線パターン・グリッド（デフォルト：格子）
+        const grid = document.createElement('div');
+        grid.className = 'border-grid-container';
+        
+        const types = [
+            { label: '格子', val: 'all' },
+            { label: '外枠', val: 'outer' },
+            { label: '上', val: 'top' },
+            { label: '下', val: 'bottom' },
+            { label: '左', val: 'left' },
+            { label: 'right', val: 'right', display: '右' },
+            { label: '無', val: 'none' }
+        ];
+
+        types.forEach(t => {
+            const item = document.createElement('div');
+            item.className = 'border-grid-item';
+            item.textContent = t.display || t.label;
+            item.addEventListener('click', () => {
+                applyBorderCustomModal(t.val, currentBorderWidth, colorId);
+                closePickerModal();
+            });
+            grid.appendChild(item);
+        });
+        pickerModalContent.appendChild(grid);
+
+        pickerModalOverlay.style.display = 'flex';
+    }
+
+    function applyBorderCustomModal(type, widthVal, colorId) {
+        if (selectedCells.length === 0 || !type) return;
+        saveState();
+        
+        const colorVal = document.getElementById(colorId) ? document.getElementById(colorId).value : '#0000ff';
+        const customBorder = `${widthVal} solid ${colorVal}`;
+
+        if (type === 'all') {
+            selectedCells.forEach(td => {
+                td.style.borderTop = customBorder;
+                td.style.borderBottom = customBorder;
+                td.style.borderLeft = customBorder;
+                td.style.borderRight = customBorder;
+            });
+        } else if (type === 'outer') {
+            let minR = ROWS, maxR = -1, minC = COLS, maxC = -1;
+            selectedCells.forEach(td => {
+                const r = parseInt(td.dataset.row);
+                const c = parseInt(td.dataset.col);
+                if (r < minR) minR = r;
+                if (r > maxR) maxR = r;
+                if (c < minC) minC = c;
+                if (c > maxC) maxC = c;
+            });
+
+            selectedCells.forEach(td => {
+                const r = parseInt(td.dataset.row);
+                const c = parseInt(td.dataset.col);
+                if (r === minR) td.style.borderTop = customBorder;
+                if (r === maxR) td.style.borderBottom = customBorder;
+                if (c === minC) td.style.borderLeft = customBorder;
+                if (c === maxC) td.style.borderRight = customBorder;
+            });
+        } else if (type === 'top') {
+            selectedCells.forEach(td => { td.style.borderTop = customBorder; });
+        } else if (type === 'bottom') {
+            selectedCells.forEach(td => { td.style.borderBottom = customBorder; });
+        } else if (type === 'left') {
+            selectedCells.forEach(td => { td.style.borderLeft = customBorder; });
+        } else if (type === 'right') {
+            selectedCells.forEach(td => { td.style.borderRight = customBorder; });
+        } else if (type === 'none') {
+            selectedCells.forEach(td => {
+                td.style.borderTop = defaultBorder;
+                td.style.borderBottom = defaultBorder;
+                td.style.borderLeft = defaultBorder;
+                td.style.borderRight = defaultBorder;
+            });
+        }
+    }
+
     function getSheetState() {
         let sheetData = [];
         for (let r = 0; r < ROWS; r++) {
@@ -1077,7 +1157,7 @@
                     if (cellInfo.formula) input.dataset.formula = cellInfo.formula; else delete input.dataset.formula;
                     if (cellInfo.format) input.dataset.format = cellInfo.format; else delete input.dataset.format;
                     input.style.fontWeight = cellInfo.bold || 'normal';
-                    input.style.fontSize = cellInfo.fontSize || '0.9rem';
+                    input.style.fontSize = cellInfo.fontSize || '1.3rem';
                     input.style.color = cellInfo.color || '';
                     input.style.textAlign = cellInfo.align || 'left';
                     inner.style.justifyContent = cellInfo.vertAlign || 'center';
@@ -1280,13 +1360,14 @@
                         insertCellRefToFormula(r, c, false);
                         formulaRangeStart = null;
                     } else if (!activeFormulaInput) {
+                        const alreadySelected = selectedCells.length === 1 && selectedCells[0] === td;
                         isMouseDown = false;
                         startCellCoord = { r, c };
                         selectRange(r, c, r, c);
                         updateSelectionInfo(r, c);
-                        setTimeout(() => {
+                        if (alreadySelected) {
                             input.focus();
-                        }, 50);
+                        }
                     }
                 }
                 touchStartPos = null;
@@ -1430,6 +1511,7 @@
                 initCellHandle(handleBr, r, c);
 
                 const input = document.createElement('input'); input.type = 'text'; input.className = 'cell-input';
+                input.style.fontSize = '1.3rem'; // デフォルトを1.3remに変更
                 input.dataset.row = r; input.dataset.col = c;
 
                 setupCellEvents(input, td, inner, r, c);
@@ -1508,7 +1590,7 @@
         const state = getSheetState();
         let emptyRow = {};
         for (let c = 0; c < COLS; c++) {
-            emptyRow[c] = { val: "", formula: "", format: "", bold: "", fontSize: "", color: "", align: "", vertAlign: "", bg: "", borderTop: defaultBorder, borderBottom: defaultBorder, borderLeft: defaultBorder, borderRight: defaultBorder };
+            emptyRow[c] = { val: "", formula: "", format: "", bold: "", fontSize: "1.3rem", color: "", align: "", vertAlign: "", bg: "", borderTop: defaultBorder, borderBottom: defaultBorder, borderLeft: defaultBorder, borderRight: defaultBorder };
         }
         state.data.splice(targetR, 0, emptyRow);
         state.rows++;
@@ -1535,7 +1617,7 @@
             for (let c = state.cols - 1; c > targetC; c--) {
                 rowObj[c] = rowObj[c - 1] || {};
             }
-            rowObj[targetC] = { val: "", formula: "", format: "", bold: "", fontSize: "", color: "", align: "", vertAlign: "", bg: "", borderTop: defaultBorder, borderBottom: defaultBorder, borderLeft: defaultBorder, borderRight: defaultBorder };
+            rowObj[targetC] = { val: "", formula: "", format: "", bold: "", fontSize: "1.3rem", color: "", align: "", vertAlign: "", bg: "", borderTop: defaultBorder, borderBottom: defaultBorder, borderLeft: defaultBorder, borderRight: defaultBorder };
         });
         restoreSheetState(state);
     }
@@ -1799,7 +1881,7 @@
                             if (cellInfo.formula) input.dataset.formula = cellInfo.formula; else delete input.dataset.formula;
                             if (cellInfo.format) input.dataset.format = cellInfo.format; else delete input.dataset.format;
                             input.style.fontWeight = cellInfo.bold || 'normal';
-                            input.style.fontSize = cellInfo.fontSize || '0.9rem';
+                            input.style.fontSize = cellInfo.fontSize || '1.3rem';
                             input.style.color = cellInfo.color || '';
                             input.style.textAlign = cellInfo.align || 'left';
                             processCellFormula(input);
@@ -1895,19 +1977,12 @@
         selectedCells.forEach(td => { const input = td.querySelector('input'); if (input) input.style.fontWeight = isBold ? 'normal' : 'bold'; });
     });
 
-    /* 各種サイズ・配置・罫線ボタンのモーダル呼び出しハンドラー設定 */
-    const fontSizeOptions = [
-        { label: '小 (1.1rem)', value: '1.1rem' },
-        { label: '標準 (1.3rem)', value: '1.3rem' },
-        { label: '中 (1.6rem)', value: '1.6rem' },
-        { label: '大 (2.0rem)', value: '2.0rem' },
-        { label: '超 (2.4rem)', value: '2.4rem' }
-    ];
-    ['btn-modal-fontsize', 'btn-modal-fontsize-m'].forEach(id => {
-        const btn = document.getElementById(id);
-        if(btn) {
-            btn.addEventListener('click', () => {
-                openPickerModal('文字サイズ選択', fontSizeOptions, (val) => {
+    // モーダルイベントの設定 (サイズ、左右配置、上下配置、罫線)
+    ['btn-modal-font-size', 'btn-modal-font-size-m'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('click', () => {
+                openFontSizeModal((val) => {
                     saveState();
                     selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.fontSize = val; });
                 });
@@ -1915,16 +1990,11 @@
         }
     });
 
-    const alignHOptions = [
-        { label: '左寄せ', value: 'left' },
-        { label: '中央寄せ', value: 'center' },
-        { label: '右寄せ', value: 'right' }
-    ];
-    ['btn-modal-alignh', 'btn-modal-alignh-m'].forEach(id => {
-        const btn = document.getElementById(id);
-        if(btn) {
-            btn.addEventListener('click', () => {
-                openPickerModal('左右位置選択', alignHOptions, (val) => {
+    ['btn-modal-align-horiz', 'btn-modal-align-horiz-m'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('click', () => {
+                openAlignHorizModal((val) => {
                     saveState();
                     selectedCells.forEach(td => { const input = td.querySelector('input'); if(input) input.style.textAlign = val; });
                 });
@@ -1932,16 +2002,11 @@
         }
     });
 
-    const alignVOptions = [
-        { label: '上', value: 'flex-start' },
-        { label: '中', value: 'center' },
-        { label: '下', value: 'flex-end' }
-    ];
-    ['btn-modal-alignv', 'btn-modal-alignv-m'].forEach(id => {
-        const btn = document.getElementById(id);
-        if(btn) {
-            btn.addEventListener('click', () => {
-                openPickerModal('上下位置選択', alignVOptions, (val) => {
+    ['btn-modal-align-vert', 'btn-modal-align-vert-m'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('click', () => {
+                openAlignVertModal((val) => {
                     saveState();
                     selectedCells.forEach(td => { const inner = td.querySelector('.cell-inner'); if(inner) inner.style.justifyContent = val; });
                 });
@@ -1949,40 +2014,12 @@
         }
     });
 
-    const borderTypeOptions = [
-        { label: '格子（すべて）', value: 'all' },
-        { label: '外枠', value: 'outer' },
-        { label: '上線', value: 'top' },
-        { label: '下線', value: 'bottom' },
-        { label: '左線', value: 'left' },
-        { label: '右線', value: 'right' },
-        { label: '罫線なし', value: 'none' }
-    ];
-    ['btn-modal-bordertype', 'btn-modal-bordertype-m'].forEach(id => {
-        const btn = document.getElementById(id);
-        if(btn) {
-            btn.addEventListener('click', () => {
-                openPickerModal('罫線パターン選択', borderTypeOptions, (val) => {
-                    const colorId = id.includes('-m') ? 'color-border-m' : 'color-border';
-                    applyBorderCustom(val, currentBorderWidthVal, colorId);
-                });
-            });
-        }
-    });
-
-    const borderWidthOptions = [
-        { label: '細 (1px)', value: '1px' },
-        { label: '中 (2px)', value: '2px' },
-        { label: '太 (3px)', value: '3px' }
-    ];
-    ['btn-modal-borderwidth', 'btn-modal-borderwidth-m'].forEach(id => {
-        const btn = document.getElementById(id);
-        if(btn) {
-            btn.addEventListener('click', () => {
-                openPickerModal('罫線の太さ選択', borderWidthOptions, (val) => {
-                    currentBorderWidthVal = val;
-                    btn.textContent = val === '1px' ? '細' : (val === '2px' ? '中' : '太');
-                });
+    ['btn-modal-border', 'btn-modal-border-m'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('click', () => {
+                const colorId = id.includes('-m') ? 'color-border-m' : 'color-border';
+                openBorderModal(colorId);
             });
         }
     });
@@ -2020,7 +2057,7 @@
         saveState();
         selectedCells.forEach(td => {
             const input = td.querySelector('input'); const inner = td.querySelector('.cell-inner');
-            if (input) { input.value = ''; delete input.dataset.formula; delete input.dataset.format; input.style.fontWeight = 'normal'; input.style.fontSize = '0.9rem'; input.style.color = ''; input.style.textAlign = 'left'; }
+            if (input) { input.value = ''; delete input.dataset.formula; delete input.dataset.format; input.style.fontWeight = 'normal'; input.style.fontSize = '1.3rem'; input.style.color = ''; input.style.textAlign = 'left'; }
             if (inner) inner.style.justifyContent = 'center';
             td.style.backgroundColor = ''; td.style.borderTop = defaultBorder; td.style.borderBottom = defaultBorder; td.style.borderLeft = defaultBorder; td.style.borderRight = defaultBorder;
         });
@@ -2034,70 +2071,12 @@
             saveState();
             selectedCells.forEach(td => {
                 const input = td.querySelector('input'); const inner = td.querySelector('.cell-inner');
-                if (input) { input.value = ''; delete input.dataset.formula; delete input.dataset.format; input.style.fontWeight = 'normal'; input.style.fontSize = '0.9rem'; input.style.color = ''; input.style.textAlign = 'left'; }
+                if (input) { input.value = ''; delete input.dataset.formula; delete input.dataset.format; input.style.fontWeight = 'normal'; input.style.fontSize = '1.3rem'; input.style.color = ''; input.style.textAlign = 'left'; }
                 if (inner) inner.style.justifyContent = 'center';
                 td.style.backgroundColor = ''; td.style.borderTop = defaultBorder; td.style.borderBottom = defaultBorder; td.style.borderLeft = defaultBorder; td.style.borderRight = defaultBorder;
             });
             recalculateAllFormulas();
         });
-    }
-
-    function applyBorderCustom(type, widthVal, colorIdOrVal) {
-        if (selectedCells.length === 0 || !type) return;
-        saveState();
-        
-        let colorVal = '#e6e6e6';
-        if (colorIdOrVal && colorIdOrVal.startsWith('#')) {
-            colorVal = colorIdOrVal;
-        } else {
-            const colorEl = document.getElementById(colorIdOrVal);
-            if (colorEl) colorVal = colorEl.value;
-        }
-
-        const customBorder = `${widthVal} solid ${colorVal}`;
-
-        if (type === 'all') {
-            selectedCells.forEach(td => {
-                td.style.borderTop = customBorder;
-                td.style.borderBottom = customBorder;
-                td.style.borderLeft = customBorder;
-                td.style.borderRight = customBorder;
-            });
-        } else if (type === 'outer') {
-            let minR = ROWS, maxR = -1, minC = COLS, maxC = -1;
-            selectedCells.forEach(td => {
-                const r = parseInt(td.dataset.row);
-                const c = parseInt(td.dataset.col);
-                if (r < minR) minR = r;
-                if (r > maxR) maxR = r;
-                if (c < minC) minC = c;
-                if (c > maxC) maxC = c;
-            });
-
-            selectedCells.forEach(td => {
-                const r = parseInt(td.dataset.row);
-                const c = parseInt(td.dataset.col);
-                if (r === minR) td.style.borderTop = customBorder;
-                if (r === maxR) td.style.borderBottom = customBorder;
-                if (c === minC) td.style.borderLeft = customBorder;
-                if (c === maxC) td.style.borderRight = customBorder;
-            });
-        } else if (type === 'top') {
-            selectedCells.forEach(td => { td.style.borderTop = customBorder; });
-        } else if (type === 'bottom') {
-            selectedCells.forEach(td => { td.style.borderBottom = customBorder; });
-        } else if (type === 'left') {
-            selectedCells.forEach(td => { td.style.borderLeft = customBorder; });
-        } else if (type === 'right') {
-            selectedCells.forEach(td => { td.style.borderRight = customBorder; });
-        } else if (type === 'none') {
-            selectedCells.forEach(td => {
-                td.style.borderTop = defaultBorder;
-                td.style.borderBottom = defaultBorder;
-                td.style.borderLeft = defaultBorder;
-                td.style.borderRight = defaultBorder;
-            });
-        }
     }
 
     function updateToolbarState(input) {
@@ -2277,122 +2256,85 @@
             }
             csvContent += rowArr.join(",") + "\r\n";
         });
-        const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${title}.csv`;
-        a.click();
+        const a = document.createElement('a'); a.href = url; a.download = `${title}.csv`; a.click();
         URL.revokeObjectURL(url);
     }
 
     function exportJSON(title, memoObj) {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(memoObj, null, 2));
-        const a = document.createElement('a');
-        a.href = dataStr;
-        a.download = `${title}.json`;
-        a.click();
+        const a = document.createElement('a'); a.href = dataStr; a.download = `${title}.json`; a.click();
     }
 
     function loadMemoToEditor(id) {
-        currentId = id;
-        const savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
+        let savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
         const memo = savedMemos[id];
         if (!memo) return;
+        currentId = id; activeFormulaInput = null;
         document.getElementById('memo-title').value = memo.title || "無題の表";
-        restoreSheetState({ 
-            cols: memo.cols || 15, 
-            rows: memo.rows || 40, 
-            data: memo.data, 
-            colWidths: memo.colWidths || {}, 
-            rowHeights: memo.rowHeights || {} 
-        });
+        restoreSheetState(memo);
         showPage('page-editor');
     }
 
-    document.getElementById('btn-import-file').addEventListener('click', () => {
-        document.getElementById('file-input').click();
-    });
-
+    document.getElementById('btn-import-file').addEventListener('click', () => { document.getElementById('file-input').click(); });
     document.getElementById('file-input').addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(evt) {
+        reader.onload = (evt) => {
             try {
                 const data = new Uint8Array(evt.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
-                const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                const jsonSheet = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
                 
-                currentId = null;
-                document.getElementById('memo-title').value = file.name.replace(/\.[^/.]+$/, "");
+                currentId = 'memo_' + Date.now();
+                let titleVal = file.name.replace(/\.[^/.]+$/, "");
+                document.getElementById('memo-title').value = titleVal;
+                
                 initSheet();
-                
-                let maxR = Math.min(json.length, ROWS);
-                let maxC = COLS;
-                json.forEach(row => { if (row.length > maxC) maxC = Math.min(row.length, 26 * 26); });
-                if (maxC > COLS || maxR > ROWS) {
-                    COLS = Math.max(COLS, maxC);
-                    ROWS = Math.max(ROWS, maxR);
-                    buildSheetStructure();
-                }
-
-                json.forEach((row, r) => {
-                    if (r >= ROWS) return;
-                    row.forEach((val, c) => {
-                        if (c >= COLS) return;
-                        const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
-                        if (input) {
-                            input.value = val !== undefined && val !== null ? val : "";
-                            processCellFormula(input);
-                        }
-                    });
+                let state = getSheetState();
+                jsonSheet.forEach((rowArr, r) => {
+                    if (r < ROWS) {
+                        rowArr.forEach((val, c) => {
+                            if (c < COLS) {
+                                state.data[r][c].val = val !== undefined ? String(val) : "";
+                            }
+                        });
+                    }
                 });
-                recalculateAllFormulas();
+                restoreSheetState(state);
                 showPage('page-editor');
-                alert("ファイルを開きました！");
-            } catch (err) {
-                alert("ファイルの読み込みに失敗しました。");
-            }
+            } catch (err) { alert("ファイルの読み込みに失敗しました。"); }
         };
         reader.readAsArrayBuffer(file);
+        e.target.value = "";
     });
 
-    document.getElementById('btn-import-json').addEventListener('click', () => {
-        document.getElementById('json-file-input').click();
-    });
-
+    document.getElementById('btn-import-json').addEventListener('click', () => { document.getElementById('json-file-input').click(); });
     document.getElementById('json-file-input').addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(evt) {
+        reader.onload = (evt) => {
             try {
                 const memoObj = JSON.parse(evt.target.result);
-                if (!memoObj.data) throw new Error("無効なJSON");
                 currentId = 'memo_' + Date.now();
+                let savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
+                savedMemos[currentId] = memoObj;
+                localStorage.setItem('hyo_memos', JSON.stringify(savedMemos));
                 document.getElementById('memo-title').value = memoObj.title || "無題の表";
-                initSheet();
-                restoreSheetState({
-                    cols: memoObj.cols || 15,
-                    rows: memoObj.rows || 40,
-                    data: memoObj.data,
-                    colWidths: memoObj.colWidths || {},
-                    rowHeights: memoObj.rowHeights || {}
-                });
+                restoreSheetState(memoObj);
                 showPage('page-editor');
-                alert("JSONを読み込みました！");
-            } catch(err) {
-                alert("JSONファイルの読み込みに失敗しました。");
-            }
+            } catch (err) { alert("JSONファイルの読み込みに失敗しました。"); }
         };
         reader.readAsText(file);
+        e.target.value = "";
     });
 
-    window.addEventListener('DOMContentLoaded', () => {
-        initSheet();
+    window.addEventListener('load', () => {
         renderMemoList();
         renderMobileQuickbar();
     });
