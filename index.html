@@ -113,7 +113,7 @@
         }
         #btn-save:active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); transform: translateY(1px); }
 
-        /* ぷっくりボタン共通スタイル（全ボタン・セレクト代替用） */
+        /* ぷっくりボタン共通スタイル */
         .puck-btn {
             background: linear-gradient(to bottom, #f8fafc, #cbd5e1);
             color: #334155;
@@ -263,7 +263,13 @@
             height: 30px; font-size: 0.9rem; position: relative; background-color: #ffffff;
         }
         td.data-cell { border: 1px solid var(--excel-border); display: table-cell; }
+        
+        /* スマホ時の修正：字・背景・線のボックス(cell-inner)の垂直中央寄せ */
         .cell-inner { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 2; }
+        @media (max-width: 699px) {
+            .cell-inner { justify-content: center !important; }
+        }
+
         th { background-color: var(--excel-header); text-align: center; font-weight: normal; color: #555; border: 1px solid var(--excel-border); }
         .row-header { width: 45px; min-width: 35px; touch-action: auto; cursor: pointer; }
         .col-header { width: 90px; min-width: 40px; touch-action: auto; }
@@ -460,7 +466,8 @@
                 
                 <div class="tool-group group-border" style="margin:0;">
                     <span class="tool-group-label">罫線</span>
-                    <button id="btn-modal-border-m" class="puck-btn arrow">罫線</button>
+                    <button id="btn-modal-border-type-m" class="puck-btn arrow">種類</button>
+                    <button id="btn-modal-border-width-m" class="puck-btn arrow">太さ</button>
                     <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m" value="#0000ff"></div>
                 </div>
                 
@@ -515,7 +522,8 @@
 
             <div class="tool-group group-border">
                 <span class="tool-group-label">罫線</span>
-                <button id="btn-modal-border" class="puck-btn arrow" title="罫線パターン">罫線</button>
+                <button id="btn-modal-border-type" class="puck-btn arrow" title="罫線種類">種類</button>
+                <button id="btn-modal-border-width" class="puck-btn arrow" title="罫線太さ">太さ</button>
                 <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border" value="#0000ff"></div>
             </div>
 
@@ -598,8 +606,9 @@
     let redoStack = [];
     const MAX_HISTORY = 30;
 
-    // 現在選択中の罫線太さ（細・中・太）管理用
-    let currentBorderWidth = '1px';
+    // 現在選択中の罫線種類と太さの管理用
+    let currentBorderType = 'all'; // デフォルト: 格子
+    let currentBorderWidth = '1px'; // デフォルト: 細
 
     const QUICKBAR_ITEMS_CONFIG = [
         { id: 'qb-allformat', label: '全書式', render: () => { const b = document.createElement('button'); b.id = 'btn-open-drawer'; b.className = 'puck-btn'; b.textContent = '全書式'; b.addEventListener('click', () => { drawer.classList.toggle('open'); }); return b; } },
@@ -697,16 +706,14 @@
         }},
         { id: 'qb-border', label: '罫線', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-border'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">罫線</span><button id="btn-modal-border-m2" class="puck-btn arrow">罫線</button><div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m2" value="#0000ff"></div>';
+            wrap.innerHTML = '<span class="tool-group-label">罫線</span><button id="btn-modal-border-type-m2" class="puck-btn arrow">種類</button><button id="btn-modal-border-width-m2" class="puck-btn arrow">太さ</button><div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m2" value="#0000ff"></div>';
             setTimeout(() => {
-                const bt = wrap.querySelector('#btn-modal-border-m2');
+                const bType = wrap.querySelector('#btn-modal-border-type-m2');
+                const bWidth = wrap.querySelector('#btn-modal-border-width-m2');
                 const bc = wrap.querySelector('#color-border-m2');
-                if(bt) {
-                    bt.addEventListener('click', () => openBorderModal('color-border-m2'));
-                }
-                if(bc && colorBorderM) {
-                    bc.addEventListener('input', (e) => { colorBorderM.value = e.target.value; });
-                }
+                if(bType) bType.addEventListener('click', () => openBorderTypeModal('color-border-m2'));
+                if(bWidth) bWidth.addEventListener('click', () => openBorderWidthModal());
+                if(bc && colorBorderM) bc.addEventListener('input', (e) => { colorBorderM.value = e.target.value; });
             }, 50);
             return wrap;
         }},
@@ -961,36 +968,9 @@
         pickerModalOverlay.style.display = 'flex';
     }
 
-    function openBorderModal(colorId) {
+    // 罫線「種類」モーダル（格子・外枠・上・下・左・右・無）
+    function openBorderTypeModal(colorId) {
         pickerModalContent.innerHTML = '';
-        
-        // 太さ選択ボタン行（細・中・太）
-        const widthRow = document.createElement('div');
-        widthRow.style.display = 'flex';
-        widthRow.style.gap = '6px';
-        widthRow.style.marginBottom = '10px';
-        
-        const widths = [
-            { label: '細', val: '1px' },
-            { label: '中', val: '2px' },
-            { label: '太', val: '3px' }
-        ];
-        widths.forEach(w => {
-            const wBtn = document.createElement('button');
-            wBtn.className = 'puck-btn';
-            wBtn.style.flex = '1';
-            wBtn.textContent = w.label;
-            if (currentBorderWidth === w.val) wBtn.classList.add('active');
-            wBtn.addEventListener('click', () => {
-                currentBorderWidth = w.val;
-                widthRow.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-                wBtn.classList.add('active');
-            });
-            widthRow.appendChild(wBtn);
-        });
-        pickerModalContent.appendChild(widthRow);
-
-        // 罫線パターン・グリッド（デフォルト：格子）
         const grid = document.createElement('div');
         grid.className = 'border-grid-container';
         
@@ -1006,25 +986,49 @@
 
         types.forEach(t => {
             const item = document.createElement('div');
-            item.className = 'border-grid-item';
+            item.className = 'picker-modal-item';
             item.textContent = t.display || t.label;
+            if (currentBorderType === t.val) item.style.backgroundColor = '#e2e8f0';
             item.addEventListener('click', () => {
-                applyBorderCustomModal(t.val, currentBorderWidth, colorId);
+                currentBorderType = t.val;
                 closePickerModal();
             });
             grid.appendChild(item);
         });
         pickerModalContent.appendChild(grid);
-
         pickerModalOverlay.style.display = 'flex';
     }
 
-    function applyBorderCustomModal(type, widthVal, colorId) {
-        if (selectedCells.length === 0 || !type) return;
+    // 罫線「太さ」モーダル（細・中・太）
+    function openBorderWidthModal() {
+        pickerModalContent.innerHTML = '';
+        const widths = [
+            { label: '細', val: '1px' },
+            { label: '中', val: '2px' },
+            { label: '太', val: '3px' }
+        ];
+        widths.forEach(w => {
+            const item = document.createElement('div');
+            item.className = 'picker-modal-item';
+            item.textContent = w.label;
+            if (currentBorderWidth === w.val) item.style.backgroundColor = '#e2e8f0';
+            item.addEventListener('click', () => {
+                currentBorderWidth = w.val;
+                closePickerModal();
+            });
+            pickerModalContent.appendChild(item);
+        });
+        pickerModalOverlay.style.display = 'flex';
+    }
+
+    // 線BOX（カラーピッカー wrapper や線BOXクリック時など）または直接適用を実行する処理
+    function applySelectedBorder(colorId) {
+        if (selectedCells.length === 0) return;
         saveState();
         
         const colorVal = document.getElementById(colorId) ? document.getElementById(colorId).value : '#0000ff';
-        const customBorder = `${widthVal} solid ${colorVal}`;
+        const customBorder = `${currentBorderWidth} solid ${colorVal}`;
+        const type = currentBorderType;
 
         if (type === 'all') {
             selectedCells.forEach(td => {
@@ -1511,7 +1515,7 @@
                 initCellHandle(handleBr, r, c);
 
                 const input = document.createElement('input'); input.type = 'text'; input.className = 'cell-input';
-                input.style.fontSize = '1.3rem'; // デフォルトを1.3remに変更
+                input.style.fontSize = '1.3rem';
                 input.dataset.row = r; input.dataset.col = c;
 
                 setupCellEvents(input, td, inner, r, c);
@@ -1977,7 +1981,7 @@
         selectedCells.forEach(td => { const input = td.querySelector('input'); if (input) input.style.fontWeight = isBold ? 'normal' : 'bold'; });
     });
 
-    // モーダルイベントの設定 (サイズ、左右配置、上下配置、罫線)
+    // モーダルイベントの設定 (サイズ、左右配置、上下配置、種類、太さ)
     ['btn-modal-font-size', 'btn-modal-font-size-m'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -2014,12 +2018,23 @@
         }
     });
 
-    ['btn-modal-border', 'btn-modal-border-m'].forEach(id => {
+    // 罫線「種類」ボタン
+    ['btn-modal-border-type', 'btn-modal-border-type-m'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.addEventListener('click', () => {
                 const colorId = id.includes('-m') ? 'color-border-m' : 'color-border';
-                openBorderModal(colorId);
+                openBorderTypeModal(colorId);
+            });
+        }
+    });
+
+    // 罫線「太さ」ボタン
+    ['btn-modal-border-width', 'btn-modal-border-width-m'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('click', () => {
+                openBorderWidthModal();
             });
         }
     });
@@ -2051,6 +2066,19 @@
     if(colorBg) { colorBg.addEventListener('click', () => applyBgColor(colorBg.value)); colorBg.addEventListener('input', (e) => applyBgColor(e.target.value)); }
     if(colorTextM) { colorTextM.addEventListener('click', () => applyTextColor(colorTextM.value)); colorTextM.addEventListener('input', (e) => applyTextColor(e.target.value)); }
     if(colorBgM) { colorBgM.addEventListener('click', () => applyBgColor(colorBgM.value)); colorBgM.addEventListener('input', (e) => applyBgColor(e.target.value)); }
+
+    // 線BOX（カラーピッカー wrapper）をクリック・操作したときに即座に罫線を引く処理
+    if(colorBorder) {
+        colorBorder.addEventListener('click', () => applySelectedBorder('color-border'));
+        colorBorder.addEventListener('input', (e) => applySelectedBorder('color-border'));
+    }
+    if(colorBorderM) {
+        colorBorderM.addEventListener('click', () => applySelectedBorder('color-border-m'));
+        colorBorderM.addEventListener('input', (e) => {
+            colorBorderM.value = e.target.value;
+            applySelectedBorder('color-border-m');
+        });
+    }
 
     document.getElementById('btn-clear').addEventListener('click', () => {
         if (selectedCells.length === 0) return;
@@ -2185,150 +2213,233 @@
             const optCsv = document.createElement('option'); optCsv.value = "csv"; optCsv.textContent = "CSV"; exportSelect.appendChild(optCsv);
             const optJson = document.createElement('option'); optJson.value = "json"; optJson.textContent = "JSON"; exportSelect.appendChild(optJson);
 
-            exportSelect.addEventListener('change', () => {
-                const val = exportSelect.value;
-                if (val === 'line') sendToLine(memo.title, memo.data, memo.cols || COLS);
-                else if (val === 'excel') exportExcel(memo.title, memo.data, memo.cols || COLS);
-                else if (val === 'csv') exportCSV(memo.title, memo.data, memo.cols || COLS);
-                else if (val === 'json') exportJSON(memo.title, memo);
-                exportSelect.value = "";
+            exportSelect.addEventListener('change', (e) => {
+                const val = e.target.value;
+                e.target.value = "";
+                if (val === 'line') exportToLine(id);
+                else if (val === 'excel') exportToExcel(id);
+                else if (val === 'csv') exportToCsv(id);
+                else if (val === 'json') exportToJson(id);
             });
 
-            const btnDel = document.createElement('button'); btnDel.textContent = '削除'; btnDel.className = 'btn-del';
-            btnDel.addEventListener('click', () => {
-                if (confirm(`「${memo.title}」を削除してもよろしいですか？`)) {
-                    delete savedMemos[id]; localStorage.setItem('hyo_memos', JSON.stringify(savedMemos)); renderMemoList();
+            const delBtn = document.createElement('button');
+            delBtn.textContent = '削除'; delBtn.className = 'btn-del';
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm(`「${memo.title || "無題の表"}」を削除してもよろしいですか？`)) {
+                    delete savedMemos[id];
+                    localStorage.setItem('hyo_memos', JSON.stringify(savedMemos));
+                    renderMemoList();
                 }
             });
 
-            actionsDiv.appendChild(exportSelect); actionsDiv.appendChild(btnDel);
-            item.appendChild(infoDiv); item.appendChild(actionsDiv); listContainer.appendChild(item);
+            actionsDiv.appendChild(exportSelect);
+            actionsDiv.appendChild(delBtn);
+            item.appendChild(infoDiv);
+            item.appendChild(actionsDiv);
+            listContainer.appendChild(item);
         });
     }
 
-    function sendToLine(title, sheetData, totalCols) {
-        let text = `【${title}】\n`;
-        sheetData.forEach(rowObj => {
-            let rowValues = [];
-            for (let c = 0; c < totalCols; c++) {
-                let cell = rowObj[c];
-                let val = cell ? (cell.formula ? evaluateFormula(cell.formula) : cell.val) : "";
-                if (val !== "") rowValues.push(val);
+    function loadMemoToEditor(id) {
+        let savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
+        if (!savedMemos[id]) return;
+        currentId = id;
+        activeFormulaInput = null;
+        const memo = savedMemos[id];
+        document.getElementById('memo-title').value = memo.title || "無題の表";
+        
+        COLS = memo.cols || 15;
+        ROWS = memo.rows || 40;
+        buildSheetStructure();
+
+        if (memo.colWidths) {
+            Object.keys(memo.colWidths).forEach(cStr => {
+                const c = parseInt(cStr);
+                const th = document.querySelector(`th.col-header[data-col="${c}"]`);
+                if (th && memo.colWidths[c]) th.style.width = memo.colWidths[c];
+            });
+        }
+        if (memo.rowHeights) {
+            Object.keys(memo.rowHeights).forEach(rStr => {
+                const r = parseInt(rStr);
+                const trElements = document.querySelectorAll('#sheet-body tr');
+                if (trElements[r] && memo.rowHeights[r]) {
+                    const h = memo.rowHeights[r];
+                    trElements[r].style.height = h;
+                    trElements[r].querySelectorAll('td, th').forEach(el => el.style.height = h);
+                }
+            });
+        }
+
+        if (memo.data) {
+            memo.data.forEach((rowObj, r) => {
+                if (r >= ROWS) return;
+                Object.keys(rowObj).forEach(cStr => {
+                    const c = parseInt(cStr);
+                    if (c >= COLS) return;
+                    const cellInfo = rowObj[c];
+                    const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+                    const td = input ? input.closest('td') : null;
+                    const inner = td ? td.querySelector('.cell-inner') : null;
+                    if (input && td && inner) {
+                        input.value = cellInfo.val || "";
+                        if (cellInfo.formula) input.dataset.formula = cellInfo.formula; else delete input.dataset.formula;
+                        if (cellInfo.format) input.dataset.format = cellInfo.format; else delete input.dataset.format;
+                        input.style.fontWeight = cellInfo.bold || 'normal';
+                        input.style.fontSize = cellInfo.fontSize || '1.3rem';
+                        input.style.color = cellInfo.color || '';
+                        input.style.textAlign = cellInfo.align || 'left';
+                        inner.style.justifyContent = cellInfo.vertAlign || 'center';
+                        td.style.backgroundColor = cellInfo.bg || '';
+                        td.style.borderTop = cellInfo.borderTop || defaultBorder;
+                        td.style.borderBottom = cellInfo.borderBottom || defaultBorder;
+                        td.style.borderLeft = cellInfo.borderLeft || defaultBorder;
+                        td.style.borderRight = cellInfo.borderRight || defaultBorder;
+                    }
+                });
+            });
+        }
+        recalculateAllFormulas();
+        undoStack = [];
+        redoStack = [];
+        updateUndoRedoButtons();
+        showPage('page-editor');
+    }
+
+    function exportToLine(id) {
+        let savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
+        const memo = savedMemos[id];
+        if (!memo || !memo.data) return;
+        let text = `【${memo.title}】\n`;
+        memo.data.forEach(rowObj => {
+            let rowVals = [];
+            for (let c = 0; c < memo.cols; c++) {
+                if (rowObj[c] && rowObj[c].val !== "") rowVals.push(rowObj[c].val);
             }
-            if (rowValues.length > 0) text += rowValues.join("\t") + "\n";
+            if (rowVals.length > 0) text += rowVals.join('\t') + '\n';
         });
         if (navigator.share) {
-            navigator.share({ title: title, text: text }).catch(() => {});
+            navigator.share({ title: memo.title, text: text }).catch(() => {});
         } else {
-            const encoded = encodeURIComponent(text);
-            window.open(`https://social-plugins.line.me/lineit/share?text=${encoded}`, '_blank');
+            navigator.clipboard.writeText(text).then(() => alert("LINE用テキストをコピーしました")).catch(() => {});
         }
     }
 
-    function exportExcel(title, sheetData, totalCols) {
+    function exportToExcel(id) {
+        let savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
+        const memo = savedMemos[id];
+        if (!memo || !memo.data) return;
         let aoa = [];
-        sheetData.forEach(rowObj => {
+        memo.data.forEach(rowObj => {
             let rowArr = [];
-            for (let c = 0; c < totalCols; c++) {
-                let cell = rowObj[c];
-                let val = cell ? (cell.formula ? evaluateFormula(cell.formula) : cell.val) : "";
-                rowArr.push(val);
+            for (let c = 0; c < memo.cols; c++) {
+                rowArr.push(rowObj[c] ? (rowObj[c].formula ? rowObj[c].formula : rowObj[c].val) : "");
             }
             aoa.push(rowArr);
         });
         const ws = XLSX.utils.aoa_to_sheet(aoa);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-        XLSX.writeFile(wb, `${title}.xlsx`);
+        XLSX.writeFile(wb, `${memo.title || '表メモ'}.xlsx`);
     }
 
-    function exportCSV(title, sheetData, totalCols) {
+    function exportToCsv(id) {
+        let savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
+        const memo = savedMemos[id];
+        if (!memo || !memo.data) return;
         let csvContent = "";
-        sheetData.forEach(rowObj => {
+        memo.data.forEach(rowObj => {
             let rowArr = [];
-            for (let c = 0; c < totalCols; c++) {
-                let cell = rowObj[c];
-                let val = cell ? (cell.formula ? evaluateFormula(cell.formula) : cell.val) : "";
-                if (typeof val === 'string' && (val.includes(',') || val.includes('"') || val.includes('\n'))) {
-                    val = `"${val.replace(/"/g, '""')}"`;
-                }
-                rowArr.push(val);
+            for (let c = 0; c < memo.cols; c++) {
+                let v = rowObj[c] ? (rowObj[c].formula ? rowObj[c].formula : rowObj[c].val) : "";
+                rowArr.push('"' + String(v).replace(/"/g, '""') + '"');
             }
-            csvContent += rowArr.join(",") + "\r\n";
+            csvContent += rowArr.join(',') + '\r\n';
         });
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = `${title}.csv`; a.click();
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${memo.title || '表メモ'}.csv`;
+        a.click();
         URL.revokeObjectURL(url);
     }
 
-    function exportJSON(title, memoObj) {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(memoObj, null, 2));
-        const a = document.createElement('a'); a.href = dataStr; a.download = `${title}.json`; a.click();
-    }
-
-    function loadMemoToEditor(id) {
+    function exportToJson(id) {
         let savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
         const memo = savedMemos[id];
         if (!memo) return;
-        currentId = id; activeFormulaInput = null;
-        document.getElementById('memo-title').value = memo.title || "無題の表";
-        restoreSheetState(memo);
-        showPage('page-editor');
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(memo, null, 2));
+        const a = document.createElement('a');
+        a.href = dataStr;
+        a.download = `${memo.title || '表メモ'}.json`;
+        a.click();
     }
 
-    document.getElementById('btn-import-file').addEventListener('click', () => { document.getElementById('file-input').click(); });
+    document.getElementById('btn-import-file').addEventListener('click', () => {
+        document.getElementById('file-input').click();
+    });
+
     document.getElementById('file-input').addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = (evt) => {
+        reader.onload = function(e) {
             try {
-                const data = new Uint8Array(evt.target.result);
+                const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
-                const jsonSheet = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
                 
-                currentId = 'memo_' + Date.now();
-                let titleVal = file.name.replace(/\.[^/.]+$/, "");
-                document.getElementById('memo-title').value = titleVal;
+                COLS = Math.max(15, ...json.map(r => r.length));
+                ROWS = Math.max(40, json.length);
+                buildSheetStructure();
                 
-                initSheet();
-                let state = getSheetState();
-                jsonSheet.forEach((rowArr, r) => {
-                    if (r < ROWS) {
-                        rowArr.forEach((val, c) => {
-                            if (c < COLS) {
-                                state.data[r][c].val = val !== undefined ? String(val) : "";
+                json.forEach((rowArr, r) => {
+                    rowArr.forEach((val, c) => {
+                        if (c < COLS && r < ROWS) {
+                            const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+                            if (input) {
+                                input.value = val !== undefined && val !== null ? val : "";
+                                processCellFormula(input);
                             }
-                        });
-                    }
+                        }
+                    });
                 });
-                restoreSheetState(state);
+                document.getElementById('memo-title').value = file.name.replace(/\.[^/.]+$/, "");
+                currentId = null;
                 showPage('page-editor');
-            } catch (err) { alert("ファイルの読み込みに失敗しました。"); }
+            } catch (err) {
+                alert("ファイルの読み込みに失敗しました。");
+            }
         };
         reader.readAsArrayBuffer(file);
         e.target.value = "";
     });
 
-    document.getElementById('btn-import-json').addEventListener('click', () => { document.getElementById('json-file-input').click(); });
+    document.getElementById('btn-import-json').addEventListener('click', () => {
+        document.getElementById('json-file-input').click();
+    });
+
     document.getElementById('json-file-input').addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = (evt) => {
+        reader.onload = function(e) {
             try {
-                const memoObj = JSON.parse(evt.target.result);
-                currentId = 'memo_' + Date.now();
+                const memo = JSON.parse(e.target.result);
+                const newId = 'memo_' + Date.now();
                 let savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
-                savedMemos[currentId] = memoObj;
+                savedMemos[newId] = memo;
                 localStorage.setItem('hyo_memos', JSON.stringify(savedMemos));
-                document.getElementById('memo-title').value = memoObj.title || "無題の表";
-                restoreSheetState(memoObj);
-                showPage('page-editor');
-            } catch (err) { alert("JSONファイルの読み込みに失敗しました。"); }
+                renderMemoList();
+                loadMemoToEditor(newId);
+                alert("JSONファイルをインポートしました。");
+            } catch (err) {
+                alert("JSONファイルの形式が正しくありません。");
+            }
         };
         reader.readAsText(file);
         e.target.value = "";
