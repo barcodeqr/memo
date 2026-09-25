@@ -151,6 +151,22 @@
             border-radius: 4px;
         }
 
+/* iPhone等のSafariで文字色や枠線が青くなるのを防ぐ */
+.toolbar select, .mobile-toolbar-drawer select,
+.toolbar button, .mobile-toolbar-drawer button,
+.mobile-selection-bar button, .memo-actions select, .memo-actions button {
+    color: #333333; /* 黒系の文字色に固定 */
+    -webkit-appearance: none; /* iOSのデフォルトスタイルを解除 */
+    appearance: none;
+    background-color: #ffffff;
+}
+
+/* 選択時の文字色や、特定のプルダウン項目の文字色を強制的に黒にする */
+select option {
+    color: #333333;
+    background: #ffffff;
+}
+        
         /* スマホ用クイック書式バー */
         .mobile-selection-bar {
             display: flex; align-items: center; gap: 6px; overflow-x: auto;
