@@ -1210,7 +1210,9 @@
                         selectRange(r, c, r, c);
                         updateSelectionInfo(r, c);
                         if (alreadySelected) {
-                            input.focus();
+                            setTimeout(() => {
+                        input.focus();
+                    }, 50);
                         }
                     }
                 }
