@@ -151,17 +151,30 @@
             border-radius: 4px;
         }
 
-/* iPhone等のSafariで文字色や枠線が青くなるのを防ぐ */
+/* iPhone等のSafariで文字色や枠線が青くなるのを防ぎつつ、必要な枠線を維持する */
 .toolbar select, .mobile-toolbar-drawer select,
 .toolbar button, .mobile-toolbar-drawer button,
-.mobile-selection-bar button, .memo-actions select, .memo-actions button {
-    color: #333333; /* 黒系の文字色に固定 */
-    -webkit-appearance: none; /* iOSのデフォルトスタイルを解除 */
-    appearance: none;
-    background-color: #ffffff;
+.mobile-selection-bar button, .memo-actions select, .memo-actions button,
+.mobile-toolbar-drawer .tool-group, .color-picker-wrapper {
+    color: #333333 !important; /* 黒系の文字色に固定 */
+    -webkit-appearance: none !important; /* iOSのデフォルトスタイルを完全に解除 */
+    appearance: none !important;
+    background-color: #ffffff !important;
 }
 
-/* 選択時の文字色や、特定のプルダウン項目の文字色を強制的に黒にする */
+/* スマホ書式バーやドロワー内のボタン・プルダウンの黒い枠線を確実に復活させる */
+.mobile-selection-bar button, 
+.mobile-color-btn, 
+.mobile-toolbar-drawer button,
+.mobile-toolbar-drawer select,
+.mobile-toolbar-drawer .tool-group,
+.color-picker-wrapper,
+.memo-actions select,
+.memo-actions button {
+    border: 1px solid #ccc !important;
+}
+
+/* 選択時の文字色や、プルダウン項目の文字色を強制的に黒にする */
 select option {
     color: #333333;
     background: #ffffff;
