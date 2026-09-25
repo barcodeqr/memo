@@ -151,42 +151,41 @@
             border-radius: 4px;
         }
 
-/* 1. プルダウン（セレクトボックス）とカラーピッカー専用にiOSのスタイルをリセット */
-.toolbar select, 
-.mobile-toolbar-drawer select, 
-.memo-actions select,
-.color-picker-wrapper,
-.mobile-toolbar-drawer .tool-group {
-    color: #333333 !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    background-color: #ffffff !important;
-    border: 1px solid #ccc !important;
-}
+        /* 1. プルダウン（セレクトボックス）とカラーピッカー専用にiOSのスタイルをリセット */
+        .toolbar select, 
+        .mobile-toolbar-drawer select, 
+        .memo-actions select,
+        .color-picker-wrapper,
+        .mobile-toolbar-drawer .tool-group {
+            color: #333333 !important;
+            -webkit-appearance: none !important;
+            appearance: none !important;
+            background-color: #ffffff !important;
+            border: 1px solid #ccc !important;
+        }
 
-/* 2. プルダウンのドロップダウン選択肢の文字・背景色 */
-select option {
-    color: #333333;
-    background: #ffffff;
-}
+        /* 2. プルダウンのドロップダウン選択肢の文字・背景色 */
+        select option {
+            color: #333333;
+            background: #ffffff;
+        }
 
-/* 3. 各種ボタンの基本枠線を明確にしつつ、個別の背景色（削除系の赤やグラデーションなど）を保護する */
-.toolbar button, 
-.mobile-toolbar-drawer button,
-.mobile-selection-bar button, 
-.memo-actions button {
-    border: 1px solid #ccc !important;
-    color: #333333;
-}
+        /* 3. 各種ボタンの基本枠線を明確にしつつ、個別の背景色を保護する */
+        .toolbar button, 
+        .mobile-toolbar-drawer button,
+        .mobile-selection-bar button, 
+        .memo-actions button {
+            border: 1px solid #ccc !important;
+            color: #333333;
+        }
 
-/* 削除ボタン（赤系）の文字色・枠線を維持 */
-.btn-del, .btn-clear-cell, .btn-del-rowcol {
-    color: #d9534f !important;
-    border-color: #d9534f !important;
-}
-.btn-del:hover, .btn-clear-cell:hover, .btn-del-rowcol:hover {
-    background: #fdf2f2 !important;
-}
+        .btn-del, .btn-clear-cell, .btn-del-rowcol {
+            color: #d9534f !important;
+            border-color: #d9534f !important;
+        }
+        .btn-del:hover, .btn-clear-cell:hover, .btn-del-rowcol:hover {
+            background: #fdf2f2 !important;
+        }
         
         /* スマホ用クイック書式バー */
         .mobile-selection-bar {
@@ -1234,30 +1233,28 @@ select option {
         };
 
         const handleTouchEnd = (e) => {
-    if (e.type === 'touchend' && touchStartPos) {
-        if (!touchMoved) {
-            if (activeFormulaInput && activeFormulaInput !== input) {
-                lastInsertedRefLen = 0;
-                insertCellRefToFormula(r, c, false);
-                formulaRangeStart = null;
-            } else if (!activeFormulaInput) {
-                // alreadySelected の判定は不要なので削除、またはそのまま使わず常にフォーカスをあてる
+            if (e.type === 'touchend' && touchStartPos) {
+                if (!touchMoved) {
+                    if (activeFormulaInput && activeFormulaInput !== input) {
+                        lastInsertedRefLen = 0;
+                        insertCellRefToFormula(r, c, false);
+                        formulaRangeStart = null;
+                    } else if (!activeFormulaInput) {
+                        isMouseDown = false;
+                        startCellCoord = { r, c };
+                        selectRange(r, c, r, c);
+                        updateSelectionInfo(r, c);
+                        
+                        setTimeout(() => {
+                            input.focus();
+                        }, 50);
+                    }
+                }
+                touchStartPos = null;
+                touchMoved = false;
                 isMouseDown = false;
-                startCellCoord = { r, c };
-                selectRange(r, c, r, c);
-                updateSelectionInfo(r, c);
-                
-                // タップしてセルを選択したときは常にフォーカスをあてる
-                setTimeout(() => {
-                    input.focus();
-                }, 50);
             }
-        }
-        touchStartPos = null;
-        touchMoved = false;
-        isMouseDown = false;
-    }
-};
+        };
 
         td.addEventListener('mousedown', handleCellInteraction);
         td.addEventListener('touchstart', handleCellInteraction, { passive: false });
@@ -2035,8 +2032,12 @@ select option {
     }
 
     document.getElementById('btn-create-new').addEventListener('click', () => {
-        currentId = null; activeFormulaInput = null; document.getElementById('memo-title').value = "無題の表";
-        initSheet(); showPage('page-editor');
+        currentId = null; 
+        activeFormulaInput = null; 
+        document.getElementById('memo-title').value = "無題の表";
+        initSheet();
+        showPage('page-editor');
+        renderMobileQuickbar();
     });
 
     document.getElementById('btn-go-home').addEventListener('click', () => {
@@ -2045,14 +2046,12 @@ select option {
 
     document.getElementById('modal-btn-save').addEventListener('click', () => {
         document.getElementById('save-confirm-modal').style.display = 'none';
-        document.getElementById('btn-save').click();
-        activeFormulaInput = null;
+        saveCurrentMemo();
         showPage('page-home');
     });
 
     document.getElementById('modal-btn-discard').addEventListener('click', () => {
         document.getElementById('save-confirm-modal').style.display = 'none';
-        activeFormulaInput = null;
         showPage('page-home');
     });
 
@@ -2061,167 +2060,142 @@ select option {
     });
 
     document.getElementById('btn-save').addEventListener('click', () => {
-        let titleVal = document.getElementById('memo-title').value.trim() || "無題の表";
-        let savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
-        if (!currentId) currentId = 'memo_' + Date.now();
-
-        let count = 1; let finalTitle = titleVal; let isDuplicate = true;
-        while (isDuplicate) {
-            isDuplicate = false;
-            for (let id in savedMemos) {
-                if (id !== currentId && savedMemos[id].title === finalTitle) {
-                    count++; finalTitle = `${titleVal.replace(/（\d+）$/, '')}（${count}）`; isDuplicate = true; break;
-                }
-            }
-        }
-        titleVal = finalTitle; document.getElementById('memo-title').value = titleVal;
-
-        let sheetData = getSheetState();
-        savedMemos[currentId] = { 
-            title: titleVal, 
-            data: sheetData.data, 
-            cols: sheetData.cols, 
-            rows: sheetData.rows, 
-            colWidths: sheetData.colWidths, 
-            rowHeights: sheetData.rowHeights, 
-            updatedAt: Date.now() 
-        };
-        localStorage.setItem('hyo_memos', JSON.stringify(savedMemos));
-        renderMemoList(); alert(`「${titleVal}」をセーブしました！`);
+        saveCurrentMemo();
+        alert("セーブしました");
     });
+
+    function getSavedMemos() {
+        try {
+            const list = localStorage.getItem('hyo_memo_list');
+            return list ? JSON.parse(list) : [];
+        } catch(e) { return []; }
+    }
+
+    function saveCurrentMemo() {
+        const title = document.getElementById('memo-title').value || "無題の表";
+        const state = getSheetState();
+        let memos = getSavedMemos();
+        
+        const now = new Date().toISOString();
+        if (currentId) {
+            const idx = memos.findIndex(m => m.id === currentId);
+            if (idx >= 0) {
+                memos[idx].title = title;
+                memos[idx].updatedAt = now;
+                memos[idx].state = state;
+            } else {
+                currentId = 'memo_' + Date.now();
+                memos.unshift({ id: currentId, title: title, updatedAt: now, state: state });
+            }
+        } else {
+            currentId = 'memo_' + Date.now();
+            memos.unshift({ id: currentId, title: title, updatedAt: now, state: state });
+        }
+        localStorage.setItem('hyo_memo_list', JSON.stringify(memos));
+    }
 
     function renderMemoList() {
         const listContainer = document.getElementById('memo-list');
-        const savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
-        const keys = Object.keys(savedMemos);
+        const memos = getSavedMemos();
+        if (memos.length === 0) {
+            listContainer.innerHTML = '<p style="color: #888; text-align: center; margin: 10px 0;">保存された表メモはありません。</p>';
+            return;
+        }
         listContainer.innerHTML = '';
-        if (keys.length === 0) { listContainer.innerHTML = '<p style="color: #888; text-align: center; margin: 10px 0;">保存された表メモはありません。</p>'; return; }
-        
-        keys.sort((a, b) => (savedMemos[b].updatedAt || 0) - (savedMemos[a].updatedAt || 0));
-        keys.forEach(id => {
-            const memo = savedMemos[id];
-            const item = document.createElement('div'); item.className = 'memo-item';
-            const dateObj = new Date(memo.updatedAt || Date.now());
-            const dateStr = `${dateObj.getFullYear()}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${String(dateObj.getDate()).padStart(2, '0')} ${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
-            
-            const infoDiv = document.createElement('div'); infoDiv.className = 'memo-info';
-            infoDiv.addEventListener('click', () => loadMemoToEditor(id));
-            infoDiv.innerHTML = `<span class="memo-title-text">${memo.title || "無題の表"}</span><span class="memo-date-text">保存日時: ${dateStr}</span>`;
-            
-            const actionsDiv = document.createElement('div'); actionsDiv.className = 'memo-actions';
-            
-            const exportSelect = document.createElement('select');
-            const defaultOpt = document.createElement('option');
-            defaultOpt.value = ""; defaultOpt.textContent = "出力"; defaultOpt.disabled = true; defaultOpt.selected = true;
-            exportSelect.appendChild(defaultOpt);
+        memos.forEach(m => {
+            const item = document.createElement('div');
+            item.className = 'memo-item';
 
-            const optLine = document.createElement('option'); optLine.value = "line"; optLine.textContent = "LINE"; exportSelect.appendChild(optLine);
-            const optExcel = document.createElement('option'); optExcel.value = "excel"; optExcel.textContent = "Excel"; exportSelect.appendChild(optExcel);
-            const optCsv = document.createElement('option'); optCsv.value = "csv"; optCsv.textContent = "CSV"; exportSelect.appendChild(optCsv);
-            const optJson = document.createElement('option'); optJson.value = "json"; optJson.textContent = "JSON"; exportSelect.appendChild(optJson);
+            const info = document.createElement('div');
+            info.className = 'memo-info';
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'memo-title-text';
+            titleSpan.textContent = m.title;
+            const dateSpan = document.createElement('span');
+            dateSpan.className = 'memo-date-text';
+            dateSpan.textContent = new Date(m.updatedAt).toLocaleString();
 
-            exportSelect.addEventListener('change', () => {
-                const val = exportSelect.value;
-                if (val === 'line') sendToLine(memo.title, memo.data, memo.cols || COLS);
-                else if (val === 'excel') exportExcel(memo.title, memo.data, memo.cols || COLS);
-                else if (val === 'csv') exportCSV(memo.title, memo.data, memo.cols || COLS);
-                else if (val === 'json') exportJSON(memo.title, memo);
-                exportSelect.value = "";
+            info.appendChild(titleSpan);
+            info.appendChild(dateSpan);
+            info.addEventListener('click', () => {
+                currentId = m.id;
+                document.getElementById('memo-title').value = m.title;
+                restoreSheetState(m.state);
+                showPage('page-editor');
+                renderMobileQuickbar();
             });
 
-            const btnDel = document.createElement('button'); btnDel.textContent = '削除'; btnDel.className = 'btn-del';
-            btnDel.addEventListener('click', () => {
-                if (confirm(`「${memo.title}」を削除してもよろしいですか？`)) {
-                    delete savedMemos[id]; localStorage.setItem('hyo_memos', JSON.stringify(savedMemos)); renderMemoList();
+            const actions = document.createElement('div');
+            actions.className = 'memo-actions';
+
+            const exportXlsxBtn = document.createElement('button');
+            exportXlsxBtn.textContent = 'Excel';
+            exportXlsxBtn.title = 'Excel形式で出力';
+            exportXlsxBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                exportToExcel(m);
+            });
+
+            const exportJsonBtn = document.createElement('button');
+            exportJsonBtn.textContent = 'JSON';
+            exportJsonBtn.title = 'JSON形式で出力';
+            exportJsonBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                exportToJson(m);
+            });
+
+            const delBtn = document.createElement('button');
+            delBtn.textContent = '削除';
+            delBtn.className = 'btn-del';
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm(`「${m.title}」を削除しますか？`)) {
+                    deleteMemo(m.id);
                 }
             });
 
-            actionsDiv.appendChild(exportSelect); actionsDiv.appendChild(btnDel);
-            item.appendChild(infoDiv); item.appendChild(actionsDiv); listContainer.appendChild(item);
+            actions.appendChild(exportXlsxBtn);
+            actions.appendChild(exportJsonBtn);
+            actions.appendChild(delBtn);
+
+            item.appendChild(info);
+            item.appendChild(actions);
+            listContainer.appendChild(item);
         });
     }
 
-    function sendToLine(title, sheetData, totalCols) {
-        let text = `【${title}】\n`;
-        sheetData.forEach(rowObj => {
-            let rowValues = [];
-            for (let c = 0; c < totalCols; c++) {
-                let cell = rowObj[c];
-                let val = cell ? (cell.formula ? evaluateFormula(cell.formula) : cell.val) : "";
-                if (val !== "") rowValues.push(val);
-            }
-            if (rowValues.length > 0) text += rowValues.join("\t") + "\n";
-        });
-        if (navigator.share) {
-            navigator.share({ title: title, text: text }).catch(() => {});
-        } else {
-            const encoded = encodeURIComponent(text);
-            window.open(`https://social-plugins.line.me/lineit/share?text=${encoded}`, '_blank');
-        }
+    function deleteMemo(id) {
+        let memos = getSavedMemos();
+        memos = memos.filter(m => m.id !== id);
+        localStorage.setItem('hyo_memo_list', JSON.stringify(memos));
+        renderMemoList();
     }
 
-    function exportExcel(title, sheetData, totalCols) {
+    function exportToExcel(memoObj) {
+        const state = memoObj.state;
         let aoa = [];
-        sheetData.forEach(rowObj => {
+        for (let r = 0; r < state.rows; r++) {
             let rowArr = [];
-            for (let c = 0; c < totalCols; c++) {
-                let cell = rowObj[c];
-                let val = cell ? (cell.formula ? evaluateFormula(cell.formula) : cell.val) : "";
-                rowArr.push(val);
+            for (let c = 0; c < state.cols; c++) {
+                const cellInfo = state.data[r] && state.data[r][c] ? state.data[r][c] : {};
+                rowArr.push(cellInfo.val || '');
             }
             aoa.push(rowArr);
-        });
+        }
         const ws = XLSX.utils.aoa_to_sheet(aoa);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-        XLSX.writeFile(wb, `${title}.xlsx`);
+        XLSX.writeFile(wb, (memoObj.title || '表メモ') + '.xlsx');
     }
 
-    function exportCSV(title, sheetData, totalCols) {
-        let csvContent = "";
-        sheetData.forEach(rowObj => {
-            let rowArr = [];
-            for (let c = 0; c < totalCols; c++) {
-                let cell = rowObj[c];
-                let val = cell ? (cell.formula ? evaluateFormula(cell.formula) : cell.val) : "";
-                if (typeof val === 'string' && (val.includes(',') || val.includes('"') || val.includes('\n'))) {
-                    val = `"${val.replace(/"/g, '""')}"`;
-                }
-                rowArr.push(val);
-            }
-            csvContent += rowArr.join(",") + "\r\n";
-        });
-        const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${title}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-
-    function exportJSON(title, memoObj) {
+    function exportToJson(memoObj) {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(memoObj, null, 2));
-        const a = document.createElement('a');
-        a.href = dataStr;
-        a.download = `${title}.json`;
-        a.click();
-    }
-
-    function loadMemoToEditor(id) {
-        currentId = id;
-        const savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
-        const memo = savedMemos[id];
-        if (!memo) return;
-        document.getElementById('memo-title').value = memo.title || "無題の表";
-        restoreSheetState({ 
-            cols: memo.cols || 15, 
-            rows: memo.rows || 40, 
-            data: memo.data, 
-            colWidths: memo.colWidths || {}, 
-            rowHeights: memo.rowHeights || {} 
-        });
-        showPage('page-editor');
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", (memoObj.title || '表メモ') + '.json');
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
     }
 
     document.getElementById('btn-import-file').addEventListener('click', () => {
@@ -2232,44 +2206,34 @@ select option {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(evt) {
+        reader.onload = (evt) => {
             try {
                 const data = new Uint8Array(evt.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
-                const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                
-                currentId = null;
-                document.getElementById('memo-title').value = file.name.replace(/\.[^/.]+$/, "");
-                initSheet();
-                
-                let maxR = Math.min(json.length, ROWS);
-                let maxC = COLS;
-                json.forEach(row => { if (row.length > maxC) maxC = Math.min(row.length, 26 * 26); });
-                if (maxC > COLS || maxR > ROWS) {
-                    COLS = Math.max(COLS, maxC);
-                    ROWS = Math.max(ROWS, maxR);
-                    buildSheetStructure();
-                }
+                const aoa = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-                json.forEach((row, r) => {
+                currentId = 'memo_' + Date.now();
+                document.getElementById('memo-title').value = file.name.replace(/\.[^/.]+$/, "");
+                
+                initSheet();
+                aoa.forEach((rowArr, r) => {
                     if (r >= ROWS) return;
-                    row.forEach((val, c) => {
+                    rowArr.forEach((val, c) => {
                         if (c >= COLS) return;
                         const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
-                        if (input) {
-                            input.value = val !== undefined && val !== null ? val : "";
-                            processCellFormula(input);
-                        }
+                        if (input) input.value = val !== undefined && val !== null ? val : '';
                     });
                 });
-                recalculateAllFormulas();
                 showPage('page-editor');
-                alert("ファイルを開きました！");
+                renderMobileQuickbar();
+                saveCurrentMemo();
+                renderMemoList();
             } catch (err) {
                 alert("ファイルの読み込みに失敗しました。");
             }
+            e.target.value = "";
         };
         reader.readAsArrayBuffer(file);
     });
@@ -2282,34 +2246,30 @@ select option {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(evt) {
+        reader.onload = (evt) => {
             try {
                 const memoObj = JSON.parse(evt.target.result);
-                if (!memoObj.data) throw new Error("無効なJSON");
-                currentId = 'memo_' + Date.now();
-                document.getElementById('memo-title').value = memoObj.title || "無題の表";
-                restoreSheetState({ 
-                    cols: memoObj.cols || 15, 
-                    rows: memoObj.rows || 40, 
-                    data: memoObj.data, 
-                    colWidths: memoObj.colWidths || {},
-                    rowHeights: memoObj.rowHeights || {}
-                });
-                showPage('page-editor');
-                renderMemoList();
-                alert("JSONを読み込みました！");
+                if (memoObj && memoObj.state) {
+                    currentId = memoObj.id || ('memo_' + Date.now());
+                    document.getElementById('memo-title').value = memoObj.title || 'インポートした表';
+                    restoreSheetState(memoObj.state);
+                    showPage('page-editor');
+                    renderMobileQuickbar();
+                    saveCurrentMemo();
+                    renderMemoList();
+                } else {
+                    alert("無効なJSONフォーマットです。");
+                }
             } catch (err) {
-                alert("JSONファイルの読み込みに失敗しました。");
+                alert("JSONのパースに失敗しました。");
             }
+            e.target.value = "";
         };
         reader.readAsText(file);
     });
 
-    window.addEventListener('DOMContentLoaded', () => {
-        initSheet();
-        renderMemoList();
-        renderMobileQuickbar();
-    });
+    // 初期化実行
+    renderMemoList();
 </script>
 </body>
 </html>
