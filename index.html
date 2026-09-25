@@ -151,33 +151,41 @@
             border-radius: 4px;
         }
 
-/* iPhone等のSafariで文字色や枠線が青くなるのを防ぎつつ、必要な枠線を維持する */
-.toolbar select, .mobile-toolbar-drawer select,
-.toolbar button, .mobile-toolbar-drawer button,
-.mobile-selection-bar button, .memo-actions select, .memo-actions button,
-.mobile-toolbar-drawer .tool-group, .color-picker-wrapper {
-    color: #333333 !important; /* 黒系の文字色に固定 */
-    -webkit-appearance: none !important; /* iOSのデフォルトスタイルを完全に解除 */
+/* 1. プルダウン（セレクトボックス）とカラーピッカー専用にiOSのスタイルをリセット */
+.toolbar select, 
+.mobile-toolbar-drawer select, 
+.memo-actions select,
+.color-picker-wrapper,
+.mobile-toolbar-drawer .tool-group {
+    color: #333333 !important;
+    -webkit-appearance: none !important;
     appearance: none !important;
     background-color: #ffffff !important;
-}
-
-/* スマホ書式バーやドロワー内のボタン・プルダウンの黒い枠線を確実に復活させる */
-.mobile-selection-bar button, 
-.mobile-color-btn, 
-.mobile-toolbar-drawer button,
-.mobile-toolbar-drawer select,
-.mobile-toolbar-drawer .tool-group,
-.color-picker-wrapper,
-.memo-actions select,
-.memo-actions button {
     border: 1px solid #ccc !important;
 }
 
-/* 選択時の文字色や、プルダウン項目の文字色を強制的に黒にする */
+/* 2. プルダウンのドロップダウン選択肢の文字・背景色 */
 select option {
     color: #333333;
     background: #ffffff;
+}
+
+/* 3. 各種ボタンの基本枠線を明確にしつつ、個別の背景色（削除系の赤やグラデーションなど）を保護する */
+.toolbar button, 
+.mobile-toolbar-drawer button,
+.mobile-selection-bar button, 
+.memo-actions button {
+    border: 1px solid #ccc !important;
+    color: #333333;
+}
+
+/* 削除ボタン（赤系）の文字色・枠線を維持 */
+.btn-del, .btn-clear-cell, .btn-del-rowcol {
+    color: #d9534f !important;
+    border-color: #d9534f !important;
+}
+.btn-del:hover, .btn-clear-cell:hover, .btn-del-rowcol:hover {
+    background: #fdf2f2 !important;
 }
         
         /* スマホ用クイック書式バー */
