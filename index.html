@@ -1418,14 +1418,12 @@
                         insertCellRefToFormula(r, c, false);
                         formulaRangeStart = null;
                     } else if (!activeFormulaInput) {
-                        const alreadySelected = selectedCells.length === 1 && selectedCells[0] === td;
                         isMouseDown = false;
                         startCellCoord = { r, c };
                         selectRange(r, c, r, c);
                         updateSelectionInfo(r, c);
-                        if (alreadySelected) {
-                            input.focus();
-                        }
+                        // 1クリック（タップ）ですぐにカーソルを移動してフォーカスを合わせる
+                        input.focus();
                     }
                 }
                 touchStartPos = null;
