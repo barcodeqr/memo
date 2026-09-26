@@ -261,6 +261,9 @@
             flex-grow: 1; width: 100%; overflow: auto; border: 1px solid var(--excel-border);
             background: #fff; position: relative; user-select: none; -webkit-user-select: none;
             -webkit-overflow-scrolling: touch; border-radius: 6px;
+            /* iOSでのスワイプ時に書式部分から表が離れてしまう現象を防ぐ設定 */
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
         }
         .spreadsheet-container::-webkit-scrollbar { width: 18px; height: 18px; }
         .spreadsheet-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 9px; }
