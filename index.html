@@ -282,8 +282,15 @@
         .cell-inner { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 2; box-sizing: border-box; }
 
         th { background-color: var(--excel-header); text-align: center; font-weight: normal; color: #555; border: 1px solid var(--excel-border); }
-        .row-header { width: 45px; min-width: 35px; touch-action: auto; cursor: pointer; }
-        .col-header { width: 90px; min-width: 40px; touch-action: auto; }
+        
+        /* 列ヘッダーを上部に固定 */
+        .col-header { width: 90px; min-width: 40px; touch-action: auto; position: sticky; top: 0; z-index: 10; background-color: var(--excel-header); }
+        
+        /* 行ヘッダーを左側に固定 */
+        .row-header { width: 45px; min-width: 35px; touch-action: auto; cursor: pointer; position: sticky; left: 0; z-index: 9; background-color: var(--excel-header); }
+        
+        /* Aと1の間（左上のコーナー）を最優先で固定 */
+        #select-all-corner { position: sticky; top: 0; left: 0; z-index: 20; background-color: var(--excel-header); }
         .cell-input {
             width: 100%; border: none; outline: none; background: transparent;
             padding: 0 4px; box-sizing: border-box; font-family: inherit; font-size: 1.3rem;
