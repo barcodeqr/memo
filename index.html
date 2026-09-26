@@ -1303,6 +1303,12 @@
             if (selectedCells.length === 0 || !selectedCells.includes(td)) selectRange(r, c, r, c);
             updateToolbarState(input);
             updateSelectionInfo(r, c);
+
+            // iPhoneでのカーソルとアクティブセルのズレを同期するため、フォーカス時にカーソル位置を末尾に合わせる
+            setTimeout(() => {
+                const len = input.value.length;
+                input.setSelectionRange(len, len);
+            }, 0);
         });
 
         input.addEventListener('input', () => {
