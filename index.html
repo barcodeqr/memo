@@ -163,30 +163,41 @@
             border: 1px solid var(--excel-border); border-radius: 6px; align-items: center;
             flex-shrink: 0;
         }
-        .toolbar .color-picker-wrapper {
-            font-size: 0.85rem; padding: 0 8px; cursor: pointer; border: 1px solid #94a3b8;
-            background: linear-gradient(to bottom, #f8fafc, #cbd5e1); border-radius: 6px; height: 34px; display: inline-flex;
-            align-items: center; justify-content: center; flex-shrink: 0;
-            box-sizing: border-box; vertical-align: middle; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-        }
 
         .tool-group {
             display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px;
             border-radius: 6px; border: 1px solid #cbd5e1; flex-shrink: 0; height: 38px;
         }
-        .tool-group-label { font-size: 0.75rem; font-weight: bold; margin-right: 2px; }
-        
-        .group-history { background: #f8fafc; border-color: #cbd5e1; }
-        .group-clipboard { background: #f8fafc; border-color: #cbd5e1; }
-        .group-size { background: #f8fafc; border-color: #cbd5e1; }
-        .group-text { background: #f8fafc; border-color: #cbd5e1; }
-        .group-color { background: #f8fafc; border-color: #cbd5e1; }
-        .group-format { background: #f8fafc; border-color: #cbd5e1; }
-        .group-align { background: #f8fafc; border-color: #cbd5e1; }
-        .group-border { background: #f8fafc; border-color: #cbd5e1; }
-
-        .color-picker-wrapper { gap: 3px; height: 34px; padding: 0 6px; border-radius: 6px; }
+        .color-picker-wrapper {
+            background: linear-gradient(to bottom, #f8fafc, #cbd5e1);
+            color: #334155;
+            border: 1px solid #94a3b8;
+            padding: 0 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            transition: background 0.2s, box-shadow 0.2s;
+            flex-shrink: 0;
+            white-space: nowrap;
+            text-decoration: none;
+            vertical-align: middle;
+        }
+        .color-picker-wrapper:hover { background: linear-gradient(to bottom, #e2e8f0, #94a3b8); }
+        .color-picker-wrapper:active { 
+            background: linear-gradient(to bottom, #cbd5e1, #94a3b8); 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); 
+            transform: translateY(1px); 
+        }
         .color-picker-wrapper input[type="color"] {
+
             width: 20px; height: 20px; border: none; cursor: pointer; background: none; padding: 0;
             border-radius: 4px;
         }
@@ -218,17 +229,18 @@
 
         .mobile-toolbar-drawer .tool-group,
         .mobile-toolbar-drawer .color-picker-wrapper {
-            height: 38px !important;
+            height: 34px !important;
             box-sizing: border-box;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             vertical-align: middle;
-            font-size: 13px;
-            padding: 0 8px;
+            font-size: 0.85px !important; /* または 0.85rem */
+            font-size: 0.85rem !important;
+            padding: 0 6px;
             border-radius: 6px !important;
         }
-        .mobile-toolbar-drawer .color-picker-wrapper input[type="color"] { width: 22px; height: 22px; }
+        .mobile-toolbar-drawer .color-picker-wrapper input[type="color"] { width: 20px; height: 20px; }
 
         #btn-open-drawer {
             background: linear-gradient(to bottom, #d8b4fe, #9333ea) !important; color: #ffffff !important;
@@ -243,7 +255,6 @@
         }
         @media (max-width: 699px) {
             .toolbar { display: none; }
-            td.data-cell { min-width: 40px; }
         }
 
         .spreadsheet-container {
@@ -648,9 +659,11 @@
             }, 50);
             return wrap;
         }},
+
         { id: 'qb-text', label: '文字', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-text'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">文字</span><button id="btn-bold-m2" class="puck-btn"><b>B</b></button><button id="select-font-size-m2" class="puck-btn arrow">サイズ</button><div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m2" value="#ff0000"></div><div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m2" value="#ffff00"></div>';
+            wrap.innerHTML = '<span class="tool-group-label">文字</span><button id="btn-bold-m2" class="puck-btn"><b>B</b></button><button id="select-font-size-m2" class="puck-btn arrow">サイズ</button><div class="color-picker-wrapper puck-btn"><label>字</label><input type="color" id="color-text-m2" value="#ff0000"></div><div class="color-picker-wrapper puck-btn"><label>背景</label><input type="color" id="color-bg-m2" value="#ffff00"></div>';
+
             setTimeout(() => {
                 const b = wrap.querySelector('#btn-bold-m2'); 
                 const fs = wrap.querySelector('#select-font-size-m2');
@@ -719,9 +732,11 @@
             }, 50);
             return wrap;
         }},
+
         { id: 'qb-border', label: '罫線', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-border'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">罫線</span><button id="btn-modal-border-type-m2" class="puck-btn arrow">格子 </button><button id="btn-modal-border-width-m2" class="puck-btn arrow">1px </button><div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m2" value="#0000ff"></div>';
+            wrap.innerHTML = '<span class="tool-group-label">罫線</span><button id="btn-modal-border-type-m2" class="puck-btn arrow">格子 </button><button id="btn-modal-border-width-m2" class="puck-btn arrow">1px </button><div class="color-picker-wrapper puck-btn"><label>線</label><input type="color" id="color-border-m2" value="#0000ff"></div>';
+
             setTimeout(() => {
                 const bType = wrap.querySelector('#btn-modal-border-type-m2');
                 const bWidth = wrap.querySelector('#btn-modal-border-width-m2');
@@ -1028,27 +1043,15 @@
     // 罫線「太さ」モーダル
     function openBorderWidthModal() {
         pickerModalContent.innerHTML = '';
+        const wGrid = document.createElement('div');
+        wGrid.className = 'border-grid-container';
+        
         const widths = [
             { label: '細', val: '1px' },
             { label: '中', val: '2px' },
             { label: '太', val: '3px' }
         ];
-        widths.forEach(w => {
-            const item = document.createElement('div');
-            item.className = 'picker-modal-item';
-            item.textContent = w.label;
-            if (currentBorderWidth === w.val) item.style.backgroundColor = '#e2e8f0';
-            item.addEventListener('click', () => {
-                currentBorderWidth = w.val;
-                updateBorderLabels();
-                closePickerModal();
-            });
-            grid.appendChild(item); // 修正：正しく追加するよう修正
-        });
-        // 修正: 正しくwidths要素をループして追加
-        pickerModalContent.innerHTML = '';
-        const wGrid = document.createElement('div');
-        wGrid.className = 'border-grid-container';
+
         widths.forEach(w => {
             const item = document.createElement('div');
             item.className = 'picker-modal-item';
@@ -1061,6 +1064,7 @@
             });
             wGrid.appendChild(item);
         });
+        
         pickerModalContent.appendChild(wGrid);
         pickerModalOverlay.style.display = 'flex';
     }
