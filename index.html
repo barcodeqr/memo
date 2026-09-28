@@ -478,112 +478,98 @@
         <!-- スマホ用 書式一覧ドロワー -->
         <div class="mobile-toolbar-drawer" id="mobile-toolbar-drawer">
             <div class="mobile-drawer-row">
-                <div class="tool-group group-history" style="margin:0;">
-                    <span class="tool-group-label">履歴</span>
-                    <button id="btn-undo-m" class="puck-btn" title="戻る" disabled>↶</button>
-                    <button id="btn-redo-m" class="puck-btn" title="進む" disabled>↷</button>
-                </div>
+    <div class="tool-group group-history" style="margin:0;">
+        <button id="btn-undo-m" class="puck-btn" title="戻る" disabled>↶</button>
+        <button id="btn-redo-m" class="puck-btn" title="進む" disabled>↷</button>
+    </div>
 
-                <div class="tool-group group-clipboard" style="margin:0;">
-                    <span class="tool-group-label">コピペ</span>
-                    <button id="btn-copy-m" class="puck-btn" title="コピー">コピー</button>
-                    <button id="btn-paste-m" class="puck-btn" title="貼付">貼付</button>
-                </div>
-                
-                <div class="tool-group group-text" style="margin:0;">
-                    <span class="tool-group-label">文字</span>
-                    <button id="btn-bold-m" class="puck-btn"><b>B</b></button>
-                    <button id="btn-modal-font-size-m" class="puck-btn arrow">サイズ</button>
-                    <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m" value="#ff0000"></div>
-                    <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m" value="#ffff00"></div>
-                </div>
-                
-                <div class="tool-group group-align" style="margin:0;">
-                    <span class="tool-group-label">配置</span>
-                    <button id="btn-modal-align-horiz-m" class="puck-btn arrow">左右</button>
-                    <button id="btn-modal-align-vert-m" class="puck-btn arrow">上下</button>
-                </div>
-                
-                <div class="tool-group group-size" style="margin:0;">
-                    <span class="tool-group-label">行・列</span>
-                    <button id="btn-add-row-m" class="puck-btn">行＋</button>
-                    <button id="btn-delete-row-m" class="puck-btn btn-del-rowcol">行－</button>
-                    <button id="btn-add-col-m" class="puck-btn">列＋</button>
-                    <button id="btn-delete-col-m" class="puck-btn btn-del-rowcol">列－</button>
-                </div>
-                
-                <div class="tool-group group-format" style="margin:0;">
-                    <span class="tool-group-label">数字</span>
-                    <button id="btn-format-none-m" class="puck-btn">標準</button>
-                    <button id="btn-format-comma-m" class="puck-btn"><b>,</b></button>
-                    <button id="btn-format-currency-m" class="puck-btn"><b>¥</b></button>
-                </div>
-                
-                <div class="tool-group group-border" style="margin:0;">
-                    <span class="tool-group-label">罫線</span>
-                    <button id="btn-modal-border-type-m" class="puck-btn arrow" id="label-border-type-m">格子</button>
-                    <button id="btn-modal-border-width-m" class="puck-btn arrow" id="label-border-width-m">1px</button>
-                    <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m" value="#0000ff"></div>
-                </div>
-                
-                <button id="btn-clear-m" class="puck-btn btn-clear-cell">削除</button>
-            </div>
+    <div class="tool-group group-clipboard" style="margin:0;">
+        <button id="btn-copy-m" class="puck-btn" title="コピー">コピー</button>
+        <button id="btn-paste-m" class="puck-btn" title="貼付">貼付</button>
+    </div>
+    
+    <div class="tool-group group-text" style="margin:0;">
+        <button id="btn-bold-m" class="puck-btn"><b>B</b></button>
+        <button id="btn-modal-font-size-m" class="puck-btn arrow">サイズ</button>
+        <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m" value="#ff0000"></div>
+        <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m" value="#ffff00"></div>
+    </div>
+    
+    <div class="tool-group group-align" style="margin:0;">
+        <button id="btn-modal-align-horiz-m" class="puck-btn arrow">左右</button>
+        <button id="btn-modal-align-vert-m" class="puck-btn arrow">上下</button>
+    </div>
+    
+    <div class="tool-group group-size" style="margin:0;">
+        <button id="btn-add-row-m" class="puck-btn">行＋</button>
+        <button id="btn-delete-row-m" class="puck-btn btn-del-rowcol">行－</button>
+        <button id="btn-add-col-m" class="puck-btn">列＋</button>
+        <button id="btn-delete-col-m" class="puck-btn btn-del-rowcol">列－</button>
+    </div>
+    
+    <div class="tool-group group-format" style="margin:0;">
+        <button id="btn-format-none-m" class="puck-btn">標準</button>
+        <button id="btn-format-comma-m" class="puck-btn"><b>,</b></button>
+        <button id="btn-format-currency-m" class="puck-btn"><b>¥</b></button>
+    </div>
+    
+    <div class="tool-group group-border" style="margin:0;">
+        <button id="btn-modal-border-type-m" class="puck-btn arrow" id="label-border-type-m">格子</button>
+        <button id="btn-modal-border-width-m" class="puck-btn arrow" id="label-border-width-m">1px</button>
+        <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m" value="#0000ff"></div>
+    </div>
+    
+    <button id="btn-clear-m" class="puck-btn btn-clear-cell">削除</button>
+</div>
         </div>
 
         <!-- PC用ツールバー -->
         <div class="toolbar">
-            <span id="selection-info-pc" style="font-size: 14px; font-weight: bold; color: #1e293b; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 8px; height: 34px; display: inline-flex; align-items: center; justify-content: center; min-width: 55px; flex-shrink: 0;">A1</span>
-            
-            <div class="tool-group group-history">
-                <span class="tool-group-label">履歴</span>
-                <button id="btn-undo" class="puck-btn" title="戻る (Ctrl+Z)" disabled>↶ 戻る</button>
-                <button id="btn-redo" class="puck-btn" title="進む (Ctrl+Y)" disabled>↷ 進む</button>
-            </div>
+    <span id="selection-info-pc" style="font-size: 14px; font-weight: bold; color: #1e293b; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 8px; height: 34px; display: inline-flex; align-items: center; justify-content: center; min-width: 55px; flex-shrink: 0;">A1</span>
+    
+    <div class="tool-group group-history">
+        <button id="btn-undo" class="puck-btn" title="戻る (Ctrl+Z)" disabled>↶ 戻る</button>
+        <button id="btn-redo" class="puck-btn" title="進む (Ctrl+Y)" disabled>↷ 進む</button>
+    </div>
 
-            <div class="tool-group group-clipboard">
-                <span class="tool-group-label">コピペ</span>
-                <button id="btn-copy" class="puck-btn" title="コピー (Ctrl+C)">コピー</button>
-                <button id="btn-paste" class="puck-btn" title="貼付 (Ctrl+V)">貼付</button>
-            </div>
+    <div class="tool-group group-clipboard">
+        <button id="btn-copy" class="puck-btn" title="コピー (Ctrl+C)">コピー</button>
+        <button id="btn-paste" class="puck-btn" title="貼付 (Ctrl+V)">貼付</button>
+    </div>
 
-            <div class="tool-group group-text">
-                <span class="tool-group-label">文字</span>
-                <button id="btn-bold" class="puck-btn" title="太字"><b>B</b></button>
-                <button id="btn-modal-font-size" class="puck-btn arrow" title="文字サイズ">サイズ</button>
-                <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text" value="#ff0000"></div>
-                <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg" value="#ffff00"></div>
-            </div>
+    <div class="tool-group group-text">
+        <button id="btn-bold" class="puck-btn" title="太字"><b>B</b></button>
+        <button id="btn-modal-font-size" class="puck-btn arrow" title="文字サイズ">サイズ</button>
+        <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text" value="#ff0000"></div>
+        <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg" value="#ffff00"></div>
+    </div>
 
-            <div class="tool-group group-align">
-                <span class="tool-group-label">配置</span>
-                <button id="btn-modal-align-horiz" class="puck-btn arrow" title="左右位置">左右</button>
-                <button id="btn-modal-align-vert" class="puck-btn arrow" title="上下位置">上下</button>
-            </div>
+    <div class="tool-group group-align">
+        <button id="btn-modal-align-horiz" class="puck-btn arrow" title="左右位置">左右</button>
+        <button id="btn-modal-align-vert" class="puck-btn arrow" title="上下位置">上下</button>
+    </div>
 
-            <div class="tool-group group-size">
-                <span class="tool-group-label">行・列</span>
-                <button id="btn-add-row" class="puck-btn" title="選択位置に行を挿入">行＋</button>
-                <button id="btn-delete-row" class="puck-btn btn-del-rowcol" title="選択行を削除">行－</button>
-                <button id="btn-add-col" class="puck-btn" title="選択位置に列を挿入">列＋</button>
-                <button id="btn-delete-col" class="puck-btn btn-del-rowcol" title="選択列を削除">列－</button>
-            </div>
+    <div class="tool-group group-size">
+        <button id="btn-add-row" class="puck-btn" title="選択位置に行を挿入">行＋</button>
+        <button id="btn-delete-row" class="puck-btn btn-del-rowcol" title="選択行を削除">行－</button>
+        <button id="btn-add-col" class="puck-btn" title="選択位置に列を挿入">列＋</button>
+        <button id="btn-delete-col" class="puck-btn btn-del-rowcol" title="選択列を削除">列－</button>
+    </div>
 
-            <div class="tool-group group-format">
-                <span class="tool-group-label">数字</span>
-                <button id="btn-format-none" class="puck-btn" title="標準">標準</button>
-                <button id="btn-format-comma" class="puck-btn" title="カンマ"><b>,</b></button>
-                <button id="btn-format-currency" class="puck-btn" title="通貨"><b>¥</b></button>
-            </div>
+    <div class="tool-group group-format">
+        <button id="btn-format-none" class="puck-btn" title="標準">標準</button>
+        <button id="btn-format-comma" class="puck-btn" title="カンマ"><b>,</b></button>
+        <button id="btn-format-currency" class="puck-btn" title="通貨"><b>¥</b></button>
+    </div>
 
-            <div class="tool-group group-border">
-                <span class="tool-group-label">罫線</span>
-                <button id="btn-modal-border-type" class="puck-btn arrow" id="label-border-type" title="罫線種類">格子</button>
-                <button id="btn-modal-border-width" class="puck-btn arrow" id="label-border-width" title="罫線太さ">1px</button>
-                <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border" value="#0000ff"></div>
-            </div>
+    <div class="tool-group group-border">
+        <button id="btn-modal-border-type" class="puck-btn arrow" id="label-border-type" title="罫線種類">格子</button>
+        <button id="btn-modal-border-width" class="puck-btn arrow" id="label-border-width" title="罫線太さ">1px</button>
+        <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border" value="#0000ff"></div>
+    </div>
 
-            <button id="btn-clear" class="puck-btn btn-clear-cell" title="セル削除">削除</button>
-        </div>
+    <button id="btn-clear" class="puck-btn btn-clear-cell" title="セル削除">削除</button>
+</div>
 
         <!-- 表エリア -->
         <div class="spreadsheet-container" id="scroll-container">
@@ -1017,7 +1003,7 @@
         { id: 'qb-allformat', label: '全書式', render: () => { const b = document.createElement('button'); b.id = 'btn-open-drawer'; b.className = 'puck-btn'; b.textContent = '全書式'; b.addEventListener('click', () => { drawer.classList.toggle('open'); }); return b; } },
         { id: 'qb-history', label: '履歴', render: () => { 
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-history'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">履歴</span><button id="btn-undo-m2" class="puck-btn" title="戻る">↶</button><button id="btn-redo-m2" class="puck-btn" title="進む">↷</button>';
+            wrap.innerHTML = '<button id="btn-undo-m2" class="puck-btn" title="戻る">↶</button><button id="btn-redo-m2" class="puck-btn" title="進む">↷</button>';
             setTimeout(() => {
                 const u = wrap.querySelector('#btn-undo-m2'); const r = wrap.querySelector('#btn-redo-m2');
                 if(u) u.addEventListener('click', performUndo);
@@ -1028,7 +1014,7 @@
         }},
         { id: 'qb-clipboard', label: 'コピー貼付', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-clipboard'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">コピペ</span><button id="btn-copy-m2" class="puck-btn">コピー</button><button id="btn-paste-m2" class="puck-btn">貼付</button>';
+            wrap.innerHTML = '<button id="btn-copy-m2" class="puck-btn">コピー</button><button id="btn-paste-m2" class="puck-btn">貼付</button>';
             setTimeout(() => {
                 const cp = wrap.querySelector('#btn-copy-m2'); const ps = wrap.querySelector('#btn-paste-m2');
                 if(cp) cp.addEventListener('click', copySelectedCell);
@@ -1039,7 +1025,7 @@
 
         { id: 'qb-text', label: '文字', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-text'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">文字</span><button id="btn-bold-m2" class="puck-btn"><b>B</b></button><button id="select-font-size-m2" class="puck-btn arrow">サイズ</button><div class="color-picker-wrapper puck-btn"><label>字</label><input type="color" id="color-text-m2" value="#ff0000"></div><div class="color-picker-wrapper puck-btn"><label>背景</label><input type="color" id="color-bg-m2" value="#ffff00"></div>';
+            wrap.innerHTML = '<button id="btn-bold-m2" class="puck-btn"><b>B</b></button><button id="select-font-size-m2" class="puck-btn arrow">サイズ</button><div class="color-picker-wrapper puck-btn"><label>字</label><input type="color" id="color-text-m2" value="#ff0000"></div><div class="color-picker-wrapper puck-btn"><label>背景</label><input type="color" id="color-bg-m2" value="#ffff00"></div>';
 
             setTimeout(() => {
                 const b = wrap.querySelector('#btn-bold-m2'); 
@@ -1066,7 +1052,7 @@
         }},
         { id: 'qb-align', label: '配置', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-align'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">配置</span><button id="select-align-horiz-m2" class="puck-btn arrow">左右</button><button id="select-align-vert-m2" class="puck-btn arrow">上下</button>';
+            wrap.innerHTML = '<button id="select-align-horiz-m2" class="puck-btn arrow">左右</button><button id="select-align-vert-m2" class="puck-btn arrow">上下</button>';
             setTimeout(() => {
                 const sa = wrap.querySelector('#select-align-horiz-m2');
                 const sav = wrap.querySelector('#select-align-vert-m2');
@@ -1087,7 +1073,7 @@
         }},
         { id: 'qb-matrix', label: '行列', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-size'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">行・列</span><button id="btn-add-row-m2" class="puck-btn">行＋</button><button id="btn-delete-row-m2" class="puck-btn btn-del-rowcol">行－</button><button id="btn-add-col-m2" class="puck-btn">列＋</button><button id="btn-delete-col-m2" class="puck-btn btn-del-rowcol">列－</button>';
+            wrap.innerHTML = '<button id="btn-add-row-m2" class="puck-btn">行＋</button><button id="btn-delete-row-m2" class="puck-btn btn-del-rowcol">行－</button><button id="btn-add-col-m2" class="puck-btn">列＋</button><button id="btn-delete-col-m2" class="puck-btn btn-del-rowcol">列－</button>';
             setTimeout(() => {
                 const ar = wrap.querySelector('#btn-add-row-m2'); const dr = wrap.querySelector('#btn-delete-row-m2');
                 const ac = wrap.querySelector('#btn-add-col-m2'); const dc = wrap.querySelector('#btn-delete-col-m2');
@@ -1100,7 +1086,7 @@
         }},
         { id: 'qb-number', label: '数字', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-format'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">数字</span><button id="btn-format-none-m2" class="puck-btn">標準</button><button id="btn-format-comma-m2" class="puck-btn"><b>,</b></button><button id="btn-format-currency-m2" class="puck-btn"><b>¥</b></button>';
+            wrap.innerHTML = '<button id="btn-format-none-m2" class="puck-btn">標準</button><button id="btn-format-comma-m2" class="puck-btn"><b>,</b></button><button id="btn-format-currency-m2" class="puck-btn"><b>¥</b></button>';
             setTimeout(() => {
                 const fn = wrap.querySelector('#btn-format-none-m2'); const fc = wrap.querySelector('#btn-format-comma-m2'); const fcurr = wrap.querySelector('#btn-format-currency-m2');
                 if(fn) fn.addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'none')); });
@@ -1112,8 +1098,7 @@
 
         { id: 'qb-border', label: '罫線', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-border'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">罫線</span><button id="btn-modal-border-type-m2" class="puck-btn arrow">格子 </button><button id="btn-modal-border-width-m2" class="puck-btn arrow">1px </button><div class="color-picker-wrapper puck-btn"><label>線</label><input type="color" id="color-border-m2" value="#0000ff"></div>';
-
+            wrap.innerHTML = '<button id="btn-modal-border-type-m2" class="puck-btn arrow">格子 </button><button id="btn-modal-border-width-m2" class="puck-btn arrow">1px </button><div class="color-picker-wrapper puck-btn"><label>線</label><input type="color" id="color-border-m2" value="#0000ff"></div>';
             setTimeout(() => {
                 const bType = wrap.querySelector('#btn-modal-border-type-m2');
                 const bWidth = wrap.querySelector('#btn-modal-border-width-m2');
