@@ -260,10 +260,10 @@
         .spreadsheet-container {
             flex-grow: 1; width: 100%; overflow: auto; border: 1px solid var(--excel-border);
             background: #fff; position: relative; user-select: none; -webkit-user-select: none;
-            -webkit-overflow-scrolling: touch; border-radius: 6px;
+            border-radius: 6px;
             /* iOSでのスワイプ時に書式部分から表が離れてしまう現象を防ぐ設定 */
-            overscroll-behavior: contain;
-            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: auto;
         }
         .spreadsheet-container::-webkit-scrollbar { width: 18px; height: 18px; }
         .spreadsheet-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 9px; }
@@ -282,8 +282,15 @@
         .cell-inner { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 2; box-sizing: border-box; }
 
         th { background-color: var(--excel-header); text-align: center; font-weight: normal; color: #555; border: 1px solid var(--excel-border); }
-        .row-header { width: 45px; min-width: 35px; touch-action: auto; cursor: pointer; }
-        .col-header { width: 90px; min-width: 40px; touch-action: auto; }
+        
+        /* 列ヘッダーを上部に固定 */
+        .col-header { width: 90px; min-width: 40px; touch-action: auto; position: sticky; top: 0; z-index: 10; background-color: var(--excel-header); }
+        
+        /* 行ヘッダーを左側に固定 */
+        .row-header { width: 45px; min-width: 35px; touch-action: auto; cursor: pointer; position: sticky; left: 0; z-index: 9; background-color: var(--excel-header); }
+        
+        /* Aと1の間（左上のコーナー）を最優先で固定 */
+        #select-all-corner { position: sticky; top: 0; left: 0; z-index: 20; background-color: var(--excel-header); }
         .cell-input {
             width: 100%; border: none; outline: none; background: transparent;
             padding: 0 4px; box-sizing: border-box; font-family: inherit; font-size: 1.3rem;
@@ -392,6 +399,35 @@
         .btn-config-save:hover { background-color: var(--primary-hover); }
         .btn-config-cancel { background-color: #e2e8f0; color: #334155; }
         .btn-config-cancel:hover { background-color: #cbd5e1; }
+
+        /* ===== バックアップ機能 ===== */
+        .btn-backup {
+            width: 100%; margin-top: 8px; padding: 10px 8px; font-size: 0.9rem; font-weight: bold;
+            border-radius: 6px; cursor: pointer; border: 1px solid #cbd5e1; background: #f1f5f9; color: #334155;
+        }
+        .btn-backup:hover { background: #e2e8f0; }
+        .backup-banner {
+            background: #fff8e1; border: 1px solid #f0d98a; border-radius: 6px;
+            padding: 10px 12px; font-size: 0.85rem; color: #5c4a00;
+        }
+        .backup-banner-buttons { display: flex; gap: 8px; margin-top: 8px; }
+        .backup-banner-buttons button {
+            flex: 1; padding: 8px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: bold;
+        }
+        #bk-banner-open { background: var(--primary); color: #fff; }
+        #bk-banner-later { background: #e2e8f0; color: #334155; }
+        .custom-modal.backup-modal { max-height: 85vh; overflow-y: auto; }
+        .backup-modal h3 { margin: 0 0 8px 0; font-size: 1.1rem; color: var(--primary); text-align: center; }
+        .custom-modal p.bk-note { font-size: 0.8rem; color: #666; font-weight: 400; margin: 0 0 12px 0; }
+        .bk-section { margin: 16px 0 8px 0; }
+        .bk-title { font-size: 0.85rem; font-weight: bold; color: #334155; margin-bottom: 6px; }
+        .bk-gen-list { display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto; }
+        .bk-gen-row {
+            display: flex; justify-content: space-between; align-items: center; gap: 8px;
+            background: #fafafa; border: 1px solid var(--excel-border); border-radius: 6px; padding: 6px 10px; font-size: 0.8rem;
+        }
+        .bk-gen-row button { padding: 4px 10px; border-radius: 4px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer; font-size: 0.8rem; }
+        .bk-empty { font-size: 0.8rem; color: #888; text-align: center; padding: 6px 0; }
     </style>
 </head>
 <body>
@@ -407,6 +443,14 @@
                     <button id="btn-import-json" class="btn-json-import">📥 JSON読込</button>
                     <input type="file" id="file-input" accept=".xlsx, .xls, .csv" style="display: none;">
                     <input type="file" id="json-file-input" accept=".json" style="display: none;">
+                </div>
+                <button id="btn-open-backup" class="btn-backup">💾 バックアップ・復元</button>
+            </div>
+            <div id="backup-banner" class="backup-banner" style="display: none;">
+                <div id="bk-banner-text"></div>
+                <div class="backup-banner-buttons">
+                    <button id="bk-banner-open">バックアップする</button>
+                    <button id="bk-banner-later">今日は表示しない</button>
                 </div>
             </div>
             <div id="memo-list" class="memo-list"><p style="color: #888; text-align: center; margin: 10px 0;">保存された表メモはありません。</p></div>
@@ -569,6 +613,28 @@
         </div>
     </div>
 
+    <!-- バックアップ・復元モーダル -->
+    <div id="backup-modal" class="custom-modal-overlay">
+        <div class="custom-modal backup-modal">
+            <h3>バックアップ・復元</h3>
+            <p id="bk-summary" class="bk-note"></p>
+            <div class="custom-modal-buttons">
+                <button id="bk-btn-download" class="btn-modal-save">📥 全メモをファイルに保存</button>
+                <button id="bk-btn-share" class="btn-modal-discard" style="display: none;">📤 共有して送る（ドライブ・LINEなど）</button>
+                <button id="bk-btn-restore" class="btn-modal-discard">📂 バックアップファイルから復元</button>
+            </div>
+            <input type="file" id="bk-file-input" accept=".json,application/json" style="display: none;">
+            <div class="bk-section">
+                <div class="bk-title">自動バックアップ（この端末内・直近10世代）</div>
+                <div id="bk-gen-list" class="bk-gen-list"></div>
+            </div>
+            <p id="bk-persist" class="bk-note"></p>
+            <div class="custom-modal-buttons">
+                <button id="bk-btn-close" class="btn-modal-cancel">閉じる</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 貼り付け選択モーダル -->
     <div id="paste-choice-modal" class="custom-modal-overlay">
         <div class="custom-modal">
@@ -596,6 +662,314 @@
     </div>
 
 <script>
+    // ===== 保存の強化（安全な保存・自動バックアップ・全メモのバックアップと復元）=====
+    const MEMO_KEY = 'hyo_memos';
+    const BK_LAST_KEY = 'hyo_last_backup';
+    const BK_SNOOZE_KEY = 'hyo_backup_snooze';
+    const BK_INTERVAL_DAYS = 7;
+    const IDB_NAME = 'hyo_memo_backup';
+    const IDB_STORE = 'snapshots';
+    const IDB_MAX_GEN = 10;
+    const IDB_MERGE_MS = 10 * 60 * 1000;
+    let lastSaveOk = null;
+    let idbQueue = Promise.resolve();
+
+    function lsGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+    function lsSet(key, val) { try { localStorage.setItem(key, val); return true; } catch (e) { return false; } }
+
+    function fmtDate(ts) {
+        const d = new Date(ts);
+        const p = n => String(n).padStart(2, '0');
+        return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+    }
+
+    // 壊れたデータがあっても例外を出さずに読み込む
+    function loadMemos() {
+        const raw = lsGet(MEMO_KEY);
+        if (!raw) return {};
+        try {
+            const obj = JSON.parse(raw);
+            return (obj && typeof obj === 'object' && !Array.isArray(obj)) ? obj : {};
+        } catch (e) {
+            lsSet('hyo_memos_corrupt', raw);
+            return {};
+        }
+    }
+
+    // 保存して読み戻し確認。成否を返す。自動バックアップ(IndexedDB)にも必ず控えを残す
+    function saveMemos(obj) {
+        const json = JSON.stringify(obj);
+        let ok = false;
+        try {
+            localStorage.setItem(MEMO_KEY, json);
+            ok = (localStorage.getItem(MEMO_KEY) === json);
+        } catch (e) { ok = false; }
+        idbSnapshot(json, Object.keys(obj).length, false);
+        requestPersist();
+        return ok;
+    }
+
+    // ---- IndexedDB：直近10世代の自動バックアップ ----
+    function idbOpen() {
+        return new Promise((resolve, reject) => {
+            if (!window.indexedDB) { reject(new Error('IndexedDB unsupported')); return; }
+            const req = indexedDB.open(IDB_NAME, 1);
+            req.onupgradeneeded = () => { req.result.createObjectStore(IDB_STORE, { keyPath: 'ts' }); };
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+    }
+
+    // pin=true は削除・復元の直前など「消さずに残したい世代」
+    function idbSnapshot(json, count, pin) {
+        if (!count) return;
+        idbQueue = idbQueue.then(async () => {
+            const db = await idbOpen();
+            try {
+                await new Promise((resolve, reject) => {
+                    const tx = db.transaction(IDB_STORE, 'readwrite');
+                    const st = tx.objectStore(IDB_STORE);
+                    const req = st.getAll();
+                    req.onsuccess = () => {
+                        const list = req.result.sort((a, b) => b.ts - a.ts);
+                        const latest = list[0];
+                        const now = Date.now();
+                        if (latest && latest.json === json) {
+                            if (pin && !latest.pin) st.put(Object.assign({}, latest, { pin: true }));
+                            return;
+                        }
+                        let rest = list;
+                        // 10分以内の連続セーブは最新の世代を更新（世代が短時間で埋まらないように）
+                        if (latest && !latest.pin && !pin && (now - latest.ts) < IDB_MERGE_MS) {
+                            st.delete(latest.ts);
+                            rest = list.slice(1);
+                        }
+                        let ts = now;
+                        if (latest && ts <= latest.ts) ts = latest.ts + 1;
+                        st.put({ ts, count, json, pin: !!pin });
+                        rest.slice(IDB_MAX_GEN - 1).forEach(x => st.delete(x.ts));
+                    };
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = tx.onabort = () => reject(tx.error);
+                });
+            } finally { db.close(); }
+        }).catch(() => {});
+    }
+
+    async function idbList() {
+        try {
+            await idbQueue;
+            const db = await idbOpen();
+            const list = await new Promise((resolve, reject) => {
+                const req = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).getAll();
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+            db.close();
+            return list.sort((a, b) => b.ts - a.ts);
+        } catch (e) { return []; }
+    }
+
+    // ---- ブラウザによる自動削除からの保護 ----
+    async function requestPersist() {
+        try {
+            if (navigator.storage && navigator.storage.persist) {
+                if (!(await navigator.storage.persisted())) await navigator.storage.persist();
+            }
+        } catch (e) {}
+    }
+    async function persistStatus() {
+        try { if (navigator.storage && navigator.storage.persisted) return await navigator.storage.persisted(); } catch (e) {}
+        return null;
+    }
+
+    // ---- 起動時：保存データが消えていたら自動バックアップから戻す ----
+    async function recoverIfNeeded() {
+        const raw = lsGet(MEMO_KEY);
+        let broken = (raw === null);
+        if (!broken) {
+            try { JSON.parse(raw); } catch (e) { broken = true; lsSet('hyo_memos_corrupt', raw); }
+        }
+        if (!broken) return;
+        const list = await idbList();
+        const latest = list.find(x => x.count > 0);
+        if (!latest) return;
+        if (!lsSet(MEMO_KEY, latest.json)) return;
+        renderMemoList();
+        alert(`保存データが見つからなかったため、自動バックアップ（${fmtDate(latest.ts)}）から${latest.count}件のメモを復元しました。`);
+    }
+
+    // ---- 全メモのバックアップ（ファイル）----
+    function buildBackupPayload() {
+        const memos = loadMemos();
+        return { app: 'hyo-memo', type: 'all-memos', version: 1, exportedAt: new Date().toISOString(), count: Object.keys(memos).length, memos };
+    }
+    function backupFileName() {
+        const d = new Date();
+        const p = n => String(n).padStart(2, '0');
+        return `表メモ全バックアップ_${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}.json`;
+    }
+    function markBackupDone() {
+        lsSet(BK_LAST_KEY, String(Date.now()));
+        try { localStorage.removeItem(BK_SNOOZE_KEY); } catch (e) {}
+        refreshBackupBanner();
+        refreshBackupModal();
+    }
+    function downloadBackup() {
+        const payload = buildBackupPayload();
+        if (payload.count === 0) { alert('保存されたメモがないため、バックアップするものがありません。'); return; }
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = backupFileName();
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+        markBackupDone();
+    }
+    function makeShareFile(text) {
+        if (!(navigator.canShare && window.File)) return null;
+        const name = backupFileName();
+        for (const type of ['application/json', 'text/plain']) {
+            try {
+                const f = new File([text], name, { type });
+                if (navigator.canShare({ files: [f] })) return f;
+            } catch (e) {}
+        }
+        return null;
+    }
+    function canShareBackupFile() { return !!(navigator.share && makeShareFile('{}')); }
+    async function shareBackup() {
+        const payload = buildBackupPayload();
+        if (payload.count === 0) { alert('保存されたメモがないため、バックアップするものがありません。'); return; }
+        const file = makeShareFile(JSON.stringify(payload, null, 2));
+        if (!file) { alert('この端末では共有できません。「ファイルに保存」をお使いください。'); return; }
+        try {
+            await navigator.share({ files: [file], title: '表メモ全バックアップ' });
+            markBackupDone();
+        } catch (e) {
+            if (!e || e.name !== 'AbortError') alert('共有できませんでした。「ファイルに保存」をお使いください。');
+        }
+    }
+
+    // ---- 全メモの復元（追加方式：既存のメモは上書きしない）----
+    function restoreFromBackupText(text) {
+        let obj;
+        try { obj = JSON.parse(text); } catch (e) { alert('JSONファイルとして読み込めませんでした。'); return; }
+        if (!obj || obj.type !== 'all-memos' || !obj.memos || typeof obj.memos !== 'object') {
+            alert('全メモバックアップのファイルではありません。\n1件だけのJSONは、ホームの「📥 JSON読込」から開いてください。');
+            return;
+        }
+        const cur = loadMemos();
+        const curCount = Object.keys(cur).length;
+        if (curCount > 0) idbSnapshot(JSON.stringify(cur), curCount, true);
+        const sig = m => JSON.stringify([m.title, m.cols, m.rows, m.data, m.colWidths, m.rowHeights]);
+        const sigs = new Set();
+        Object.values(cur).forEach(x => { sigs.add(sig(x)); if (x._bkSig) sigs.add(x._bkSig); });
+        const titles = new Set(Object.values(cur).map(m => m.title));
+        let added = 0, skipped = 0, invalid = 0, seq = 0;
+        Object.keys(obj.memos).forEach(id => {
+            const m = obj.memos[id];
+            if (!m || typeof m !== 'object' || !m.data) { invalid++; return; }
+            const s = sig(m);
+            if (sigs.has(s)) { skipped++; return; }
+            let newId = id;
+            while (cur[newId]) newId = 'memo_' + Date.now() + '_' + (seq++);
+            let title = m.title || '無題の表';
+            if (titles.has(title)) {
+                const base = title + '（復元）';
+                title = base;
+                let n = 1;
+                while (titles.has(title)) { n++; title = `${base}（${n}）`; }
+            }
+            titles.add(title);
+            sigs.add(s);
+            // 元のタイトルでの内容を控えておき、同じバックアップを再度読み込んでも増えないようにする
+            cur[newId] = Object.assign({}, m, { title, _bkSig: s });
+            added++;
+        });
+        if (added > 0 && !saveMemos(cur)) {
+            alert('⚠ ブラウザへの保存に失敗しました（保存容量がいっぱいの可能性があります）。');
+            return;
+        }
+        renderMemoList();
+        let msg = `復元しました：${added}件を追加`;
+        if (skipped) msg += `、${skipped}件は同じ内容のためスキップ`;
+        if (invalid) msg += `、${invalid}件は読み込めませんでした`;
+        alert(msg + '。');
+    }
+
+    async function restoreGeneration(ts) {
+        const list = await idbList();
+        const g = list.find(x => x.ts === ts);
+        if (!g) return;
+        if (!confirm(`${fmtDate(g.ts)} の自動バックアップ（${g.count}件）に戻します。\n今の内容も自動バックアップに残ります。よろしいですか？`)) return;
+        const cur = loadMemos();
+        const curCount = Object.keys(cur).length;
+        if (curCount > 0) idbSnapshot(JSON.stringify(cur), curCount, true);
+        if (!lsSet(MEMO_KEY, g.json)) { alert('復元に失敗しました。'); return; }
+        renderMemoList();
+        refreshBackupModal();
+        alert('復元しました。');
+    }
+
+    // ---- 画面まわり ----
+    function refreshBackupBanner() {
+        const el = document.getElementById('backup-banner');
+        if (!el) return;
+        const n = Object.keys(loadMemos()).length;
+        const last = Number(lsGet(BK_LAST_KEY) || 0);
+        const snooze = Number(lsGet(BK_SNOOZE_KEY) || 0);
+        const days = last ? Math.floor((Date.now() - last) / 86400000) : null;
+        const due = n > 0 && (!last || days >= BK_INTERVAL_DAYS);
+        const snoozed = snooze && (Date.now() - snooze) < 86400000;
+        if (!due || snoozed) { el.style.display = 'none'; return; }
+        document.getElementById('bk-banner-text').textContent = last
+            ? `前回のバックアップから${days}日たちました。ファイルに残しておくと、端末のデータが消えても戻せます。`
+            : 'まだバックアップをしていません。ファイルに残しておくと、端末のデータが消えても戻せます。';
+        el.style.display = 'block';
+    }
+
+    async function refreshBackupModal() {
+        const modal = document.getElementById('backup-modal');
+        if (!modal || modal.style.display !== 'flex') return;
+        const n = Object.keys(loadMemos()).length;
+        const last = Number(lsGet(BK_LAST_KEY) || 0);
+        document.getElementById('bk-summary').textContent =
+            `保存中のメモ：${n}件　最後のバックアップ：${last ? fmtDate(last) : 'まだありません'}`;
+        const persisted = await persistStatus();
+        document.getElementById('bk-persist').textContent =
+            persisted === true ? 'ブラウザによる自動削除からの保護：有効'
+            : persisted === false ? 'ブラウザによる自動削除からの保護：未許可です。ホーム画面に追加して使うと許可されやすくなります。大事なメモはファイルにも残してください。'
+            : 'このブラウザでは自動削除からの保護を設定できません。大事なメモはファイルにも残してください。';
+        const box = document.getElementById('bk-gen-list');
+        const list = await idbList();
+        box.innerHTML = '';
+        if (list.length === 0) {
+            box.innerHTML = '<div class="bk-empty">まだありません（メモをセーブすると作られます）</div>';
+            return;
+        }
+        list.forEach(g => {
+            const row = document.createElement('div');
+            row.className = 'bk-gen-row';
+            const label = document.createElement('span');
+            label.textContent = `${fmtDate(g.ts)}　${g.count}件${g.pin ? '（削除・復元の直前）' : ''}`;
+            const btn = document.createElement('button');
+            btn.textContent = '復元';
+            btn.addEventListener('click', () => restoreGeneration(g.ts));
+            row.appendChild(label);
+            row.appendChild(btn);
+            box.appendChild(row);
+        });
+    }
+
+    function openBackupModal() {
+        document.getElementById('backup-modal').style.display = 'flex';
+        refreshBackupModal();
+    }
+    function closeBackupModal() {
+        document.getElementById('backup-modal').style.display = 'none';
+    }
+
     let COLS = 15; 
     let ROWS = 40;  
     let selectedCells = []; 
@@ -2192,7 +2566,12 @@
 
     document.getElementById('modal-btn-save').addEventListener('click', () => {
         document.getElementById('save-confirm-modal').style.display = 'none';
+        lastSaveOk = null;
         document.getElementById('btn-save').click();
+        if (lastSaveOk !== true) {
+            if (lastSaveOk === null) alert('セーブに失敗しました。編集画面に残ります。もう一度「セーブ」を押してください。');
+            return;
+        }
         activeFormulaInput = null;
         showPage('page-home');
     });
@@ -2209,7 +2588,7 @@
 
     document.getElementById('btn-save').addEventListener('click', () => {
         let titleVal = document.getElementById('memo-title').value.trim() || "無題の表";
-        let savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
+        let savedMemos = loadMemos();
         if (!currentId) currentId = 'memo_' + Date.now();
 
         let count = 1; let finalTitle = titleVal; let isDuplicate = true;
@@ -2233,16 +2612,22 @@
             rowHeights: sheetData.rowHeights, 
             updatedAt: Date.now() 
         };
-        localStorage.setItem('hyo_memos', JSON.stringify(savedMemos));
-        renderMemoList(); alert(`👤「${titleVal}」をセーブしました！`.replace('👤', ''));
+        const okSave = saveMemos(savedMemos);
+        lastSaveOk = okSave;
+        renderMemoList();
+        if (okSave) {
+            alert(`「${titleVal}」をセーブしました！`);
+        } else {
+            alert('⚠ ブラウザへの保存に失敗しました（保存容量がいっぱいの可能性があります）。\n自動バックアップには控えを残しています。ホームの「💾 バックアップ・復元」からファイルに書き出してください。');
+        }
     });
 
     function renderMemoList() {
         const listContainer = document.getElementById('memo-list');
-        const savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
+        const savedMemos = loadMemos();
         const keys = Object.keys(savedMemos);
         listContainer.innerHTML = '';
-        if (keys.length === 0) { listContainer.innerHTML = '<p style="color: #888; text-align: center; margin: 10px 0;">保存された表メモはありません。</p>'; return; }
+        if (keys.length === 0) { listContainer.innerHTML = '<p style="color: #888; text-align: center; margin: 10px 0;">保存された表メモはありません。</p>'; refreshBackupBanner(); return; }
         
         keys.sort((a, b) => (savedMemos[b].updatedAt || 0) - (savedMemos[a].updatedAt || 0));
         keys.forEach(id => {
@@ -2288,8 +2673,9 @@
             delBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (confirm(`「${memo.title}」を削除しますか？`)) {
+                    idbSnapshot(JSON.stringify(savedMemos), Object.keys(savedMemos).length, true);
                     delete savedMemos[id];
-                    localStorage.setItem('hyo_memos', JSON.stringify(savedMemos));
+                    if (!saveMemos(savedMemos)) alert('削除の保存に失敗しました。');
                     renderMemoList();
                 }
             });
@@ -2301,10 +2687,11 @@
             itemDiv.appendChild(actionsDiv);
             listContainer.appendChild(itemDiv);
         });
+        refreshBackupBanner();
     }
 
     function exportMemo(id, mode) {
-        const savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
+        const savedMemos = loadMemos();
         const memo = savedMemos[id];
         if (!memo) return;
 
@@ -2415,6 +2802,32 @@
     // 初期化
     renderMobileQuickbar();
     renderMemoList();
+
+    // バックアップ・復元まわりの初期化
+    document.getElementById('btn-open-backup').addEventListener('click', openBackupModal);
+    document.getElementById('bk-banner-open').addEventListener('click', openBackupModal);
+    document.getElementById('bk-banner-later').addEventListener('click', () => {
+        lsSet(BK_SNOOZE_KEY, String(Date.now()));
+        refreshBackupBanner();
+    });
+    document.getElementById('bk-btn-close').addEventListener('click', closeBackupModal);
+    document.getElementById('bk-btn-download').addEventListener('click', downloadBackup);
+    document.getElementById('bk-btn-share').addEventListener('click', shareBackup);
+    if (canShareBackupFile()) document.getElementById('bk-btn-share').style.display = 'block';
+    document.getElementById('bk-btn-restore').addEventListener('click', () => {
+        document.getElementById('bk-file-input').click();
+    });
+    document.getElementById('bk-file-input').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => { restoreFromBackupText(String(reader.result)); refreshBackupModal(); };
+        reader.onerror = () => alert('ファイルを読み込めませんでした。');
+        reader.readAsText(file);
+        e.target.value = '';
+    });
+    recoverIfNeeded();
+    requestPersist();
 </script>
 </body>
-    </html>
+</html>
