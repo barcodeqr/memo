@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- PWA用設定 -->
+    <!-- PWA逕ｨ險ｭ螳� -->
     <link rel="manifest" href="./manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="表メモ帳">
+    <meta name="apple-mobile-web-app-title" content="陦ｨ繝｡繝｢蟶ｳ">
     <meta name="theme-color" content="#107c41">
     <link rel="apple-touch-icon" href="./icon.png">
     <link rel="icon" type="image/png" href="./icon.png">
     
-    <title>表メモ帳</title>
+    <title>陦ｨ繝｡繝｢蟶ｳ</title>
     <!-- SheetJS for Excel (.xlsx) export & import -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -40,7 +40,7 @@
         .page { display: none; flex-direction: column; flex-grow: 1; height: 100%; overflow: hidden; }
         .page.active { display: flex; }
 
-        /* ホーム画面 */
+        /* 繝帙�繝�逕ｻ髱｢ */
         .home-container {
             max-width: 650px; margin: 30px auto; width: 100%; background: #fff;
             padding: 24px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
@@ -86,7 +86,7 @@
         .btn-del { color: #d9534f; border-color: #d9534f !important; }
         .btn-del:hover { background: #fdf2f2 !important; }
 
-        /* エディタ画面トップバー */
+        /* 繧ｨ繝�ぅ繧ｿ逕ｻ髱｢繝医ャ繝励ヰ繝ｼ */
         .editor-top-bar {
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
             background: #fff; padding: 4px 8px; border: 1px solid var(--excel-border); border-radius: 6px;
@@ -113,7 +113,7 @@
         }
         #btn-save:active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); transform: translateY(1px); }
 
-        /* ぷっくりボタン共通スタイル */
+        /* 縺ｷ縺｣縺上ｊ繝懊ち繝ｳ蜈ｱ騾壹せ繧ｿ繧､繝ｫ */
         .puck-btn {
             background: linear-gradient(to bottom, #f8fafc, #cbd5e1);
             color: #334155;
@@ -143,7 +143,7 @@
             transform: translateY(1px); 
         }
         .puck-btn.arrow::after {
-            content: '▼';
+            content: '笆ｼ';
             font-size: 0.65rem;
             margin-left: 2px;
         }
@@ -156,7 +156,7 @@
             background: linear-gradient(to bottom, #f5c6cb, #e0a899);
         }
 
-        /* ツールバー */
+        /* 繝��繝ｫ繝舌� */
         .toolbar {
             display: flex; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
             gap: 8px; margin-bottom: 4px; background: #fff; padding: 6px 8px;
@@ -202,7 +202,7 @@
             border-radius: 4px;
         }
 
-        /* スマホ用クイック書式バー */
+        /* 繧ｹ繝槭�逕ｨ繧ｯ繧､繝�け譖ｸ蠑上ヰ繝ｼ */
         .mobile-selection-bar {
             display: flex; align-items: center; gap: 6px; overflow-x: auto;
             padding: 6px 8px; margin-bottom: 4px; background: #fff;
@@ -235,7 +235,7 @@
             align-items: center;
             justify-content: center;
             vertical-align: middle;
-            font-size: 0.85px !important; /* または 0.85rem */
+            font-size: 0.85px !important; /* 縺ｾ縺溘� 0.85rem */
             font-size: 0.85rem !important;
             padding: 0 6px;
             border-radius: 6px !important;
@@ -260,10 +260,10 @@
         .spreadsheet-container {
             flex-grow: 1; width: 100%; overflow: auto; border: 1px solid var(--excel-border);
             background: #fff; position: relative; user-select: none; -webkit-user-select: none;
-            border-radius: 6px;
-            /* iOSでのスワイプ時に書式部分から表が離れてしまう現象を防ぐ設定 */
-            overscroll-behavior: none;
-            -webkit-overflow-scrolling: auto;
+            -webkit-overflow-scrolling: touch; border-radius: 6px;
+            /* iOS縺ｧ縺ｮ繧ｹ繝ｯ繧､繝玲凾縺ｫ譖ｸ蠑城Κ蛻�°繧芽｡ｨ縺碁屬繧後※縺励∪縺�樟雎｡繧帝亟縺占ｨｭ螳� */
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
         }
         .spreadsheet-container::-webkit-scrollbar { width: 18px; height: 18px; }
         .spreadsheet-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 9px; }
@@ -278,18 +278,18 @@
         }
         td.data-cell { border: 1px solid var(--excel-border); display: table-cell; }
         
-        /* スマホ時の修正：字・背景・線のボックス(cell-inner)の高さを100%確保し、垂直中央寄せをPC版と統一 */
+        /* 繧ｹ繝槭�譎ゅ�菫ｮ豁｣�壼ｭ励�閭梧勹繝ｻ邱壹�繝懊ャ繧ｯ繧ｹ(cell-inner)縺ｮ鬮倥＆繧�100%遒ｺ菫昴＠縲∝桙逶ｴ荳ｭ螟ｮ蟇�○繧単C迚医→邨ｱ荳 */
         .cell-inner { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 2; box-sizing: border-box; }
 
         th { background-color: var(--excel-header); text-align: center; font-weight: normal; color: #555; border: 1px solid var(--excel-border); }
         
-        /* 列ヘッダーを上部に固定 */
+        /* 蛻励�繝�ム繝ｼ繧剃ｸ企Κ縺ｫ蝗ｺ螳� */
         .col-header { width: 90px; min-width: 40px; touch-action: auto; position: sticky; top: 0; z-index: 10; background-color: var(--excel-header); }
         
-        /* 行ヘッダーを左側に固定 */
+        /* 陦後�繝�ム繝ｼ繧貞ｷｦ蛛ｴ縺ｫ蝗ｺ螳� */
         .row-header { width: 45px; min-width: 35px; touch-action: auto; cursor: pointer; position: sticky; left: 0; z-index: 9; background-color: var(--excel-header); }
         
-        /* Aと1の間（左上のコーナー）を最優先で固定 */
+        /* A縺ｨ1縺ｮ髢難ｼ亥ｷｦ荳翫�繧ｳ繝ｼ繝翫��峨ｒ譛蜆ｪ蜈医〒蝗ｺ螳� */
         #select-all-corner { position: sticky; top: 0; left: 0; z-index: 20; background-color: var(--excel-header); }
         .cell-input {
             width: 100%; border: none; outline: none; background: transparent;
@@ -340,7 +340,7 @@
         .btn-modal-discard:hover { background-color: #cbd5e1; }
         .btn-modal-cancel { background-color: transparent; color: #666; font-size: 0.85rem !important; }
 
-        /* 汎用ピッカー・リストモーダル */
+        /* 豎守畑繝斐ャ繧ｫ繝ｼ繝ｻ繝ｪ繧ｹ繝医Δ繝ｼ繝繝ｫ */
         .picker-modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 3000;
@@ -355,7 +355,7 @@
         }
         .picker-modal-item:hover { background: #e2e8f0; }
 
-        /* 罫線選択モーダル用グリッド */
+        /* 鄂ｫ邱夐∈謚槭Δ繝ｼ繝繝ｫ逕ｨ繧ｰ繝ｪ繝�ラ */
         .border-grid-container {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px;
         }
@@ -403,201 +403,201 @@
 </head>
 <body>
 
-    <!-- ページ1：ホーム画面 -->
+    <!-- 繝壹�繧ｸ1�壹�繝ｼ繝�逕ｻ髱｢ -->
     <div id="page-home" class="page active">
         <div class="home-container">
             <div class="home-header">
-                <h1>表メモ帳</h1>
+                <h1>陦ｨ繝｡繝｢蟶ｳ</h1>
                 <div class="home-actions-top">
-                    <button id="btn-create-new" class="btn-create">＋ 表メモ</button>
-                    <button id="btn-import-file" class="btn-import">📂 開く</button>
-                    <button id="btn-import-json" class="btn-json-import">📥 JSON読込</button>
+                    <button id="btn-create-new" class="btn-create">�� 陦ｨ繝｡繝｢</button>
+                    <button id="btn-import-file" class="btn-import">唐 髢九￥</button>
+                    <button id="btn-import-json" class="btn-json-import">踏 JSON隱ｭ霎ｼ</button>
                     <input type="file" id="file-input" accept=".xlsx, .xls, .csv" style="display: none;">
                     <input type="file" id="json-file-input" accept=".json" style="display: none;">
                 </div>
             </div>
-            <div id="memo-list" class="memo-list"><p style="color: #888; text-align: center; margin: 10px 0;">保存された表メモはありません。</p></div>
+            <div id="memo-list" class="memo-list"><p style="color: #888; text-align: center; margin: 10px 0;">菫晏ｭ倥＆繧後◆陦ｨ繝｡繝｢縺ｯ縺ゅｊ縺ｾ縺帙ｓ縲�</p></div>
         </div>
     </div>
 
-    <!-- ページ2：表エディタ画面 -->
+    <!-- 繝壹�繧ｸ2�夊｡ｨ繧ｨ繝�ぅ繧ｿ逕ｻ髱｢ -->
     <div id="page-editor" class="page">
         <div class="editor-top-bar">
             <div class="editor-top-left">
-                <button id="btn-go-home" class="btn-back">戻る</button>
-                <input type="text" id="memo-title" value="無題の表">
+                <button id="btn-go-home" class="btn-back">謌ｻ繧�</button>
+                <input type="text" id="memo-title" value="辟｡鬘後�陦ｨ">
             </div>
             <div style="display: flex; align-items: center; gap: 6px;">
-                <button id="btn-save" class="btn-success puck-btn">セーブ</button>
-                <button id="btn-open-config" class="puck-btn" title="クイックバーの設定">⚙️</button>
+                <button id="btn-save" class="btn-success puck-btn">繧ｻ繝ｼ繝�</button>
+                <button id="btn-open-config" class="puck-btn" title="繧ｯ繧､繝�け繝舌�縺ｮ險ｭ螳�">笞呻ｸ�</button>
             </div>
         </div>
 
-        <!-- スマホ用クイック書式バー -->
+        <!-- 繧ｹ繝槭�逕ｨ繧ｯ繧､繝�け譖ｸ蠑上ヰ繝ｼ -->
         <div class="mobile-selection-bar" id="mobile-selection-bar">
             <span id="selection-info">A1</span>
         </div>
 
-        <!-- スマホ用 書式一覧ドロワー -->
+        <!-- 繧ｹ繝槭�逕ｨ 譖ｸ蠑丈ｸ隕ｧ繝峨Ο繝ｯ繝ｼ -->
         <div class="mobile-toolbar-drawer" id="mobile-toolbar-drawer">
             <div class="mobile-drawer-row">
                 <div class="tool-group group-history" style="margin:0;">
-                    <span class="tool-group-label">履歴</span>
-                    <button id="btn-undo-m" class="puck-btn" title="戻る" disabled>↶</button>
-                    <button id="btn-redo-m" class="puck-btn" title="進む" disabled>↷</button>
+                    <span class="tool-group-label">螻･豁ｴ</span>
+                    <button id="btn-undo-m" class="puck-btn" title="謌ｻ繧�" disabled>竊ｶ</button>
+                    <button id="btn-redo-m" class="puck-btn" title="騾ｲ繧" disabled>竊ｷ</button>
                 </div>
 
                 <div class="tool-group group-clipboard" style="margin:0;">
-                    <span class="tool-group-label">コピペ</span>
-                    <button id="btn-copy-m" class="puck-btn" title="コピー">コピー</button>
-                    <button id="btn-paste-m" class="puck-btn" title="貼付">貼付</button>
+                    <span class="tool-group-label">繧ｳ繝斐�</span>
+                    <button id="btn-copy-m" class="puck-btn" title="繧ｳ繝斐�">繧ｳ繝斐�</button>
+                    <button id="btn-paste-m" class="puck-btn" title="雋ｼ莉�">雋ｼ莉�</button>
                 </div>
                 
                 <div class="tool-group group-text" style="margin:0;">
-                    <span class="tool-group-label">文字</span>
+                    <span class="tool-group-label">譁�ｭ�</span>
                     <button id="btn-bold-m" class="puck-btn"><b>B</b></button>
-                    <button id="btn-modal-font-size-m" class="puck-btn arrow">サイズ</button>
-                    <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text-m" value="#ff0000"></div>
-                    <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg-m" value="#ffff00"></div>
+                    <button id="btn-modal-font-size-m" class="puck-btn arrow">繧ｵ繧､繧ｺ</button>
+                    <div class="color-picker-wrapper"><label>蟄�</label><input type="color" id="color-text-m" value="#ff0000"></div>
+                    <div class="color-picker-wrapper"><label>閭梧勹</label><input type="color" id="color-bg-m" value="#ffff00"></div>
                 </div>
                 
                 <div class="tool-group group-align" style="margin:0;">
-                    <span class="tool-group-label">配置</span>
-                    <button id="btn-modal-align-horiz-m" class="puck-btn arrow">左右</button>
-                    <button id="btn-modal-align-vert-m" class="puck-btn arrow">上下</button>
+                    <span class="tool-group-label">驟咲ｽｮ</span>
+                    <button id="btn-modal-align-horiz-m" class="puck-btn arrow">蟾ｦ蜿ｳ</button>
+                    <button id="btn-modal-align-vert-m" class="puck-btn arrow">荳贋ｸ�</button>
                 </div>
                 
                 <div class="tool-group group-size" style="margin:0;">
-                    <span class="tool-group-label">行・列</span>
-                    <button id="btn-add-row-m" class="puck-btn">行＋</button>
-                    <button id="btn-delete-row-m" class="puck-btn btn-del-rowcol">行－</button>
-                    <button id="btn-add-col-m" class="puck-btn">列＋</button>
-                    <button id="btn-delete-col-m" class="puck-btn btn-del-rowcol">列－</button>
+                    <span class="tool-group-label">陦後�蛻�</span>
+                    <button id="btn-add-row-m" class="puck-btn">陦鯉ｼ�</button>
+                    <button id="btn-delete-row-m" class="puck-btn btn-del-rowcol">陦鯉ｼ�</button>
+                    <button id="btn-add-col-m" class="puck-btn">蛻暦ｼ�</button>
+                    <button id="btn-delete-col-m" class="puck-btn btn-del-rowcol">蛻暦ｼ�</button>
                 </div>
                 
                 <div class="tool-group group-format" style="margin:0;">
-                    <span class="tool-group-label">数字</span>
-                    <button id="btn-format-none-m" class="puck-btn">標準</button>
+                    <span class="tool-group-label">謨ｰ蟄�</span>
+                    <button id="btn-format-none-m" class="puck-btn">讓呎ｺ�</button>
                     <button id="btn-format-comma-m" class="puck-btn"><b>,</b></button>
-                    <button id="btn-format-currency-m" class="puck-btn"><b>¥</b></button>
+                    <button id="btn-format-currency-m" class="puck-btn"><b>ﾂ･</b></button>
                 </div>
                 
                 <div class="tool-group group-border" style="margin:0;">
-                    <span class="tool-group-label">罫線</span>
-                    <button id="btn-modal-border-type-m" class="puck-btn arrow" id="label-border-type-m">格子</button>
+                    <span class="tool-group-label">鄂ｫ邱�</span>
+                    <button id="btn-modal-border-type-m" class="puck-btn arrow" id="label-border-type-m">譬ｼ蟄�</button>
                     <button id="btn-modal-border-width-m" class="puck-btn arrow" id="label-border-width-m">1px</button>
-                    <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border-m" value="#0000ff"></div>
+                    <div class="color-picker-wrapper"><label>邱�</label><input type="color" id="color-border-m" value="#0000ff"></div>
                 </div>
                 
-                <button id="btn-clear-m" class="puck-btn btn-clear-cell">削除</button>
+                <button id="btn-clear-m" class="puck-btn btn-clear-cell">蜑企勁</button>
             </div>
         </div>
 
-        <!-- PC用ツールバー -->
+        <!-- PC逕ｨ繝��繝ｫ繝舌� -->
         <div class="toolbar">
             <span id="selection-info-pc" style="font-size: 14px; font-weight: bold; color: #1e293b; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 8px; height: 34px; display: inline-flex; align-items: center; justify-content: center; min-width: 55px; flex-shrink: 0;">A1</span>
             
             <div class="tool-group group-history">
-                <span class="tool-group-label">履歴</span>
-                <button id="btn-undo" class="puck-btn" title="戻る (Ctrl+Z)" disabled>↶ 戻る</button>
-                <button id="btn-redo" class="puck-btn" title="進む (Ctrl+Y)" disabled>↷ 進む</button>
+                <span class="tool-group-label">螻･豁ｴ</span>
+                <button id="btn-undo" class="puck-btn" title="謌ｻ繧� (Ctrl+Z)" disabled>竊ｶ 謌ｻ繧�</button>
+                <button id="btn-redo" class="puck-btn" title="騾ｲ繧 (Ctrl+Y)" disabled>竊ｷ 騾ｲ繧</button>
             </div>
 
             <div class="tool-group group-clipboard">
-                <span class="tool-group-label">コピペ</span>
-                <button id="btn-copy" class="puck-btn" title="コピー (Ctrl+C)">コピー</button>
-                <button id="btn-paste" class="puck-btn" title="貼付 (Ctrl+V)">貼付</button>
+                <span class="tool-group-label">繧ｳ繝斐�</span>
+                <button id="btn-copy" class="puck-btn" title="繧ｳ繝斐� (Ctrl+C)">繧ｳ繝斐�</button>
+                <button id="btn-paste" class="puck-btn" title="雋ｼ莉� (Ctrl+V)">雋ｼ莉�</button>
             </div>
 
             <div class="tool-group group-text">
-                <span class="tool-group-label">文字</span>
-                <button id="btn-bold" class="puck-btn" title="太字"><b>B</b></button>
-                <button id="btn-modal-font-size" class="puck-btn arrow" title="文字サイズ">サイズ</button>
-                <div class="color-picker-wrapper"><label>字</label><input type="color" id="color-text" value="#ff0000"></div>
-                <div class="color-picker-wrapper"><label>背景</label><input type="color" id="color-bg" value="#ffff00"></div>
+                <span class="tool-group-label">譁�ｭ�</span>
+                <button id="btn-bold" class="puck-btn" title="螟ｪ蟄�"><b>B</b></button>
+                <button id="btn-modal-font-size" class="puck-btn arrow" title="譁�ｭ励し繧､繧ｺ">繧ｵ繧､繧ｺ</button>
+                <div class="color-picker-wrapper"><label>蟄�</label><input type="color" id="color-text" value="#ff0000"></div>
+                <div class="color-picker-wrapper"><label>閭梧勹</label><input type="color" id="color-bg" value="#ffff00"></div>
             </div>
 
             <div class="tool-group group-align">
-                <span class="tool-group-label">配置</span>
-                <button id="btn-modal-align-horiz" class="puck-btn arrow" title="左右位置">左右</button>
-                <button id="btn-modal-align-vert" class="puck-btn arrow" title="上下位置">上下</button>
+                <span class="tool-group-label">驟咲ｽｮ</span>
+                <button id="btn-modal-align-horiz" class="puck-btn arrow" title="蟾ｦ蜿ｳ菴咲ｽｮ">蟾ｦ蜿ｳ</button>
+                <button id="btn-modal-align-vert" class="puck-btn arrow" title="荳贋ｸ倶ｽ咲ｽｮ">荳贋ｸ�</button>
             </div>
 
             <div class="tool-group group-size">
-                <span class="tool-group-label">行・列</span>
-                <button id="btn-add-row" class="puck-btn" title="選択位置に行を挿入">行＋</button>
-                <button id="btn-delete-row" class="puck-btn btn-del-rowcol" title="選択行を削除">行－</button>
-                <button id="btn-add-col" class="puck-btn" title="選択位置に列を挿入">列＋</button>
-                <button id="btn-delete-col" class="puck-btn btn-del-rowcol" title="選択列を削除">列－</button>
+                <span class="tool-group-label">陦後�蛻�</span>
+                <button id="btn-add-row" class="puck-btn" title="驕ｸ謚樔ｽ咲ｽｮ縺ｫ陦後ｒ謖ｿ蜈･">陦鯉ｼ�</button>
+                <button id="btn-delete-row" class="puck-btn btn-del-rowcol" title="驕ｸ謚櫁｡後ｒ蜑企勁">陦鯉ｼ�</button>
+                <button id="btn-add-col" class="puck-btn" title="驕ｸ謚樔ｽ咲ｽｮ縺ｫ蛻励ｒ謖ｿ蜈･">蛻暦ｼ�</button>
+                <button id="btn-delete-col" class="puck-btn btn-del-rowcol" title="驕ｸ謚槫�繧貞炎髯､">蛻暦ｼ�</button>
             </div>
 
             <div class="tool-group group-format">
-                <span class="tool-group-label">数字</span>
-                <button id="btn-format-none" class="puck-btn" title="標準">標準</button>
-                <button id="btn-format-comma" class="puck-btn" title="カンマ"><b>,</b></button>
-                <button id="btn-format-currency" class="puck-btn" title="通貨"><b>¥</b></button>
+                <span class="tool-group-label">謨ｰ蟄�</span>
+                <button id="btn-format-none" class="puck-btn" title="讓呎ｺ�">讓呎ｺ�</button>
+                <button id="btn-format-comma" class="puck-btn" title="繧ｫ繝ｳ繝�"><b>,</b></button>
+                <button id="btn-format-currency" class="puck-btn" title="騾夊ｲｨ"><b>ﾂ･</b></button>
             </div>
 
             <div class="tool-group group-border">
-                <span class="tool-group-label">罫線</span>
-                <button id="btn-modal-border-type" class="puck-btn arrow" id="label-border-type" title="罫線種類">格子</button>
-                <button id="btn-modal-border-width" class="puck-btn arrow" id="label-border-width" title="罫線太さ">1px</button>
-                <div class="color-picker-wrapper"><label>線</label><input type="color" id="color-border" value="#0000ff"></div>
+                <span class="tool-group-label">鄂ｫ邱�</span>
+                <button id="btn-modal-border-type" class="puck-btn arrow" id="label-border-type" title="鄂ｫ邱夂ｨｮ鬘�">譬ｼ蟄�</button>
+                <button id="btn-modal-border-width" class="puck-btn arrow" id="label-border-width" title="鄂ｫ邱壼､ｪ縺�">1px</button>
+                <div class="color-picker-wrapper"><label>邱�</label><input type="color" id="color-border" value="#0000ff"></div>
             </div>
 
-            <button id="btn-clear" class="puck-btn btn-clear-cell" title="セル削除">削除</button>
+            <button id="btn-clear" class="puck-btn btn-clear-cell" title="繧ｻ繝ｫ蜑企勁">蜑企勁</button>
         </div>
 
-        <!-- 表エリア -->
+        <!-- 陦ｨ繧ｨ繝ｪ繧｢ -->
         <div class="spreadsheet-container" id="scroll-container">
             <table id="spreadsheet">
-                <thead><tr id="col-header-row"><th class="row-header" id="select-all-corner" title="表全体を選択" style="cursor: pointer;"></th></tr></thead>
+                <thead><tr id="col-header-row"><th class="row-header" id="select-all-corner" title="陦ｨ蜈ｨ菴薙ｒ驕ｸ謚�" style="cursor: pointer;"></th></tr></thead>
                 <tbody id="sheet-body"></tbody>
             </table>
         </div>
     </div>
 
-    <!-- 汎用選択モーダル -->
+    <!-- 豎守畑驕ｸ謚槭Δ繝ｼ繝繝ｫ -->
     <div id="generic-picker-modal" class="picker-modal-overlay">
         <div class="picker-modal" id="picker-modal-content">
-            <!-- 動的に中身が書き換わります -->
+            <!-- 蜍慕噪縺ｫ荳ｭ霄ｫ縺梧嶌縺肴鋤繧上ｊ縺ｾ縺� -->
         </div>
     </div>
 
-    <!-- セーブ確認モーダル -->
+    <!-- 繧ｻ繝ｼ繝也｢ｺ隱阪Δ繝ｼ繝繝ｫ -->
     <div id="save-confirm-modal" class="custom-modal-overlay">
         <div class="custom-modal">
-            <p>セーブをしますか？</p>
+            <p>繧ｻ繝ｼ繝悶ｒ縺励∪縺吶°��</p>
             <div class="custom-modal-buttons">
-                <button id="modal-btn-save" class="btn-modal-save">セーブをして戻る</button>
-                <button id="modal-btn-discard" class="btn-modal-discard">セーブをせずに戻る</button>
-                <button id="modal-btn-cancel" class="btn-modal-cancel">キャンセル</button>
+                <button id="modal-btn-save" class="btn-modal-save">繧ｻ繝ｼ繝悶ｒ縺励※謌ｻ繧�</button>
+                <button id="modal-btn-discard" class="btn-modal-discard">繧ｻ繝ｼ繝悶ｒ縺帙★縺ｫ謌ｻ繧�</button>
+                <button id="modal-btn-cancel" class="btn-modal-cancel">繧ｭ繝｣繝ｳ繧ｻ繝ｫ</button>
             </div>
         </div>
     </div>
 
-    <!-- 貼り付け選択モーダル -->
+    <!-- 雋ｼ繧贋ｻ倥￠驕ｸ謚槭Δ繝ｼ繝繝ｫ -->
     <div id="paste-choice-modal" class="custom-modal-overlay">
         <div class="custom-modal">
-            <p>貼り付け形式を選択してください</p>
+            <p>雋ｼ繧贋ｻ倥￠蠖｢蠑上ｒ驕ｸ謚槭＠縺ｦ縺上□縺輔＞</p>
             <div class="custom-modal-buttons">
-                <button id="modal-btn-paste-all" class="btn-modal-save">すべて（書式・数式込）</button>
-                <button id="modal-btn-paste-value" class="btn-modal-discard">値のみ</button>
-                <button id="modal-btn-paste-transpose" class="btn-modal-discard">行列入れ替え</button>
-                <button id="modal-btn-paste-cancel" class="btn-modal-cancel">キャンセル</button>
+                <button id="modal-btn-paste-all" class="btn-modal-save">縺吶∋縺ｦ�域嶌蠑上�謨ｰ蠑剰ｾｼ��</button>
+                <button id="modal-btn-paste-value" class="btn-modal-discard">蛟､縺ｮ縺ｿ</button>
+                <button id="modal-btn-paste-transpose" class="btn-modal-discard">陦悟�蜈･繧梧崛縺�</button>
+                <button id="modal-btn-paste-cancel" class="btn-modal-cancel">繧ｭ繝｣繝ｳ繧ｻ繝ｫ</button>
             </div>
         </div>
     </div>
 
-    <!-- クイックバー設定モーダル -->
+    <!-- 繧ｯ繧､繝�け繝舌�險ｭ螳壹Δ繝ｼ繝繝ｫ -->
     <div id="quickbar-config-modal" class="config-modal-overlay">
         <div class="config-modal">
-            <h3>クイックバーのカスタマイズ</h3>
-            <p style="font-size: 0.8rem; color: #666; margin-top: 0; margin-bottom: 10px;">表示項目の選択と順番（▲▼）の変更ができます。</p>
+            <h3>繧ｯ繧､繝�け繝舌�縺ｮ繧ｫ繧ｹ繧ｿ繝槭う繧ｺ</h3>
+            <p style="font-size: 0.8rem; color: #666; margin-top: 0; margin-bottom: 10px;">陦ｨ遉ｺ鬆�岼縺ｮ驕ｸ謚槭→鬆�分�遺夢笆ｼ�峨�螟画峩縺後〒縺阪∪縺吶�</p>
             <div id="config-item-list" class="config-item-list"></div>
             <div class="config-modal-buttons">
-                <button id="modal-btn-config-save" class="btn-config-save">保存</button>
-                <button id="modal-btn-config-cancel" class="btn-config-cancel">キャンセル</button>
+                <button id="modal-btn-config-save" class="btn-config-save">菫晏ｭ�</button>
+                <button id="modal-btn-config-cancel" class="btn-config-cancel">繧ｭ繝｣繝ｳ繧ｻ繝ｫ</button>
             </div>
         </div>
     </div>
@@ -624,17 +624,17 @@
     let redoStack = [];
     const MAX_HISTORY = 30;
 
-    // 現在選択中の罫線種類と太さの管理用
-    let currentBorderType = 'all'; // デフォルト: 格子
-    let currentBorderWidth = '1px'; // デフォルト: 細
+    // 迴ｾ蝨ｨ驕ｸ謚樔ｸｭ縺ｮ鄂ｫ邱夂ｨｮ鬘槭→螟ｪ縺輔�邂｡逅�畑
+    let currentBorderType = 'all'; // 繝�ヵ繧ｩ繝ｫ繝�: 譬ｼ蟄�
+    let currentBorderWidth = '1px'; // 繝�ヵ繧ｩ繝ｫ繝�: 邏ｰ
 
-    // 罫線ボタンの表示名を更新する関数
+    // 鄂ｫ邱壹�繧ｿ繝ｳ縺ｮ陦ｨ遉ｺ蜷阪ｒ譖ｴ譁ｰ縺吶ｋ髢｢謨ｰ
     function updateBorderLabels() {
-        const typeLabels = { 'all': '格子', 'outer': '外枠', 'top': '上', 'bottom': '下', 'left': '左', 'right': '右', 'none': '無' };
-        const widthLabels = { '1px': '細', '2px': '中', '3px': '太' };
+        const typeLabels = { 'all': '譬ｼ蟄�', 'outer': '螟匁棧', 'top': '荳�', 'bottom': '荳�', 'left': '蟾ｦ', 'right': '蜿ｳ', 'none': '辟｡' };
+        const widthLabels = { '1px': '邏ｰ', '2px': '荳ｭ', '3px': '螟ｪ' };
         
-        const typeText = typeLabels[currentBorderType] || '格子';
-        const widthText = widthLabels[currentBorderWidth] || '細';
+        const typeText = typeLabels[currentBorderType] || '譬ｼ蟄�';
+        const widthText = widthLabels[currentBorderWidth] || '邏ｰ';
 
         ['btn-modal-border-type', 'btn-modal-border-type-m', 'btn-modal-border-type-m2'].forEach(id => {
             const el = document.getElementById(id);
@@ -647,10 +647,10 @@
     }
 
     const QUICKBAR_ITEMS_CONFIG = [
-        { id: 'qb-allformat', label: '全書式', render: () => { const b = document.createElement('button'); b.id = 'btn-open-drawer'; b.className = 'puck-btn'; b.textContent = '全書式'; b.addEventListener('click', () => { drawer.classList.toggle('open'); }); return b; } },
-        { id: 'qb-history', label: '履歴', render: () => { 
+        { id: 'qb-allformat', label: '蜈ｨ譖ｸ蠑�', render: () => { const b = document.createElement('button'); b.id = 'btn-open-drawer'; b.className = 'puck-btn'; b.textContent = '蜈ｨ譖ｸ蠑�'; b.addEventListener('click', () => { drawer.classList.toggle('open'); }); return b; } },
+        { id: 'qb-history', label: '螻･豁ｴ', render: () => { 
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-history'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">履歴</span><button id="btn-undo-m2" class="puck-btn" title="戻る">↶</button><button id="btn-redo-m2" class="puck-btn" title="進む">↷</button>';
+            wrap.innerHTML = '<span class="tool-group-label">螻･豁ｴ</span><button id="btn-undo-m2" class="puck-btn" title="謌ｻ繧�">竊ｶ</button><button id="btn-redo-m2" class="puck-btn" title="騾ｲ繧">竊ｷ</button>';
             setTimeout(() => {
                 const u = wrap.querySelector('#btn-undo-m2'); const r = wrap.querySelector('#btn-redo-m2');
                 if(u) u.addEventListener('click', performUndo);
@@ -659,9 +659,9 @@
             }, 50);
             return wrap;
         }},
-        { id: 'qb-clipboard', label: 'コピー貼付', render: () => {
+        { id: 'qb-clipboard', label: '繧ｳ繝斐�雋ｼ莉�', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-clipboard'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">コピペ</span><button id="btn-copy-m2" class="puck-btn">コピー</button><button id="btn-paste-m2" class="puck-btn">貼付</button>';
+            wrap.innerHTML = '<span class="tool-group-label">繧ｳ繝斐�</span><button id="btn-copy-m2" class="puck-btn">繧ｳ繝斐�</button><button id="btn-paste-m2" class="puck-btn">雋ｼ莉�</button>';
             setTimeout(() => {
                 const cp = wrap.querySelector('#btn-copy-m2'); const ps = wrap.querySelector('#btn-paste-m2');
                 if(cp) cp.addEventListener('click', copySelectedCell);
@@ -670,9 +670,9 @@
             return wrap;
         }},
 
-        { id: 'qb-text', label: '文字', render: () => {
+        { id: 'qb-text', label: '譁�ｭ�', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-text'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">文字</span><button id="btn-bold-m2" class="puck-btn"><b>B</b></button><button id="select-font-size-m2" class="puck-btn arrow">サイズ</button><div class="color-picker-wrapper puck-btn"><label>字</label><input type="color" id="color-text-m2" value="#ff0000"></div><div class="color-picker-wrapper puck-btn"><label>背景</label><input type="color" id="color-bg-m2" value="#ffff00"></div>';
+            wrap.innerHTML = '<span class="tool-group-label">譁�ｭ�</span><button id="btn-bold-m2" class="puck-btn"><b>B</b></button><button id="select-font-size-m2" class="puck-btn arrow">繧ｵ繧､繧ｺ</button><div class="color-picker-wrapper puck-btn"><label>蟄�</label><input type="color" id="color-text-m2" value="#ff0000"></div><div class="color-picker-wrapper puck-btn"><label>閭梧勹</label><input type="color" id="color-bg-m2" value="#ffff00"></div>';
 
             setTimeout(() => {
                 const b = wrap.querySelector('#btn-bold-m2'); 
@@ -697,9 +697,9 @@
             }, 50);
             return wrap;
         }},
-        { id: 'qb-align', label: '配置', render: () => {
+        { id: 'qb-align', label: '驟咲ｽｮ', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-align'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">配置</span><button id="select-align-horiz-m2" class="puck-btn arrow">左右</button><button id="select-align-vert-m2" class="puck-btn arrow">上下</button>';
+            wrap.innerHTML = '<span class="tool-group-label">驟咲ｽｮ</span><button id="select-align-horiz-m2" class="puck-btn arrow">蟾ｦ蜿ｳ</button><button id="select-align-vert-m2" class="puck-btn arrow">荳贋ｸ�</button>';
             setTimeout(() => {
                 const sa = wrap.querySelector('#select-align-horiz-m2');
                 const sav = wrap.querySelector('#select-align-vert-m2');
@@ -718,9 +718,9 @@
             }, 50);
             return wrap;
         }},
-        { id: 'qb-matrix', label: '行列', render: () => {
+        { id: 'qb-matrix', label: '陦悟�', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-size'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">行・列</span><button id="btn-add-row-m2" class="puck-btn">行＋</button><button id="btn-delete-row-m2" class="puck-btn btn-del-rowcol">行－</button><button id="btn-add-col-m2" class="puck-btn">列＋</button><button id="btn-delete-col-m2" class="puck-btn btn-del-rowcol">列－</button>';
+            wrap.innerHTML = '<span class="tool-group-label">陦後�蛻�</span><button id="btn-add-row-m2" class="puck-btn">陦鯉ｼ�</button><button id="btn-delete-row-m2" class="puck-btn btn-del-rowcol">陦鯉ｼ�</button><button id="btn-add-col-m2" class="puck-btn">蛻暦ｼ�</button><button id="btn-delete-col-m2" class="puck-btn btn-del-rowcol">蛻暦ｼ�</button>';
             setTimeout(() => {
                 const ar = wrap.querySelector('#btn-add-row-m2'); const dr = wrap.querySelector('#btn-delete-row-m2');
                 const ac = wrap.querySelector('#btn-add-col-m2'); const dc = wrap.querySelector('#btn-delete-col-m2');
@@ -731,9 +731,9 @@
             }, 50);
             return wrap;
         }},
-        { id: 'qb-number', label: '数字', render: () => {
+        { id: 'qb-number', label: '謨ｰ蟄�', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-format'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">数字</span><button id="btn-format-none-m2" class="puck-btn">標準</button><button id="btn-format-comma-m2" class="puck-btn"><b>,</b></button><button id="btn-format-currency-m2" class="puck-btn"><b>¥</b></button>';
+            wrap.innerHTML = '<span class="tool-group-label">謨ｰ蟄�</span><button id="btn-format-none-m2" class="puck-btn">讓呎ｺ�</button><button id="btn-format-comma-m2" class="puck-btn"><b>,</b></button><button id="btn-format-currency-m2" class="puck-btn"><b>ﾂ･</b></button>';
             setTimeout(() => {
                 const fn = wrap.querySelector('#btn-format-none-m2'); const fc = wrap.querySelector('#btn-format-comma-m2'); const fcurr = wrap.querySelector('#btn-format-currency-m2');
                 if(fn) fn.addEventListener('click', () => { saveState(); selectedCells.forEach(td => applyFormat(td.querySelector('input'), 'none')); });
@@ -743,9 +743,9 @@
             return wrap;
         }},
 
-        { id: 'qb-border', label: '罫線', render: () => {
+        { id: 'qb-border', label: '鄂ｫ邱�', render: () => {
             const wrap = document.createElement('div'); wrap.className = 'tool-group group-border'; wrap.style.margin = '0';
-            wrap.innerHTML = '<span class="tool-group-label">罫線</span><button id="btn-modal-border-type-m2" class="puck-btn arrow">格子 </button><button id="btn-modal-border-width-m2" class="puck-btn arrow">1px </button><div class="color-picker-wrapper puck-btn"><label>線</label><input type="color" id="color-border-m2" value="#0000ff"></div>';
+            wrap.innerHTML = '<span class="tool-group-label">鄂ｫ邱�</span><button id="btn-modal-border-type-m2" class="puck-btn arrow">譬ｼ蟄� </button><button id="btn-modal-border-width-m2" class="puck-btn arrow">1px </button><div class="color-picker-wrapper puck-btn"><label>邱�</label><input type="color" id="color-border-m2" value="#0000ff"></div>';
 
             setTimeout(() => {
                 const bType = wrap.querySelector('#btn-modal-border-type-m2');
@@ -765,8 +765,8 @@
             }, 50);
             return wrap;
         }},
-        { id: 'qb-delete', label: '削除', render: () => {
-            const b = document.createElement('button'); b.id = 'btn-clear-m2'; b.className = 'puck-btn btn-clear-cell'; b.textContent = '削除';
+        { id: 'qb-delete', label: '蜑企勁', render: () => {
+            const b = document.createElement('button'); b.id = 'btn-clear-m2'; b.className = 'puck-btn btn-clear-cell'; b.textContent = '蜑企勁';
             b.addEventListener('click', () => {
                 if (selectedCells.length === 0) return;
                 saveState();
@@ -877,16 +877,16 @@
             actions.className = 'config-item-actions';
             
             const btnUp = document.createElement('button');
-            btnUp.textContent = '▲';
-            btnUp.title = '上へ移動';
+            btnUp.textContent = '笆ｲ';
+            btnUp.title = '荳翫∈遘ｻ蜍�';
             btnUp.type = 'button';
             btnUp.addEventListener('click', () => {
                 moveConfigItem(index, -1);
             });
 
             const btnDown = document.createElement('button');
-            btnDown.textContent = '▼';
-            btnDown.title = '下へ移動';
+            btnDown.textContent = '笆ｼ';
+            btnDown.title = '荳九∈遘ｻ蜍�';
             btnDown.type = 'button';
             btnDown.addEventListener('click', () => {
                 moveConfigItem(index, 1);
@@ -942,7 +942,7 @@
         });
     }
 
-    // 汎用モーダル表示関数
+    // 豎守畑繝｢繝ｼ繝繝ｫ陦ｨ遉ｺ髢｢謨ｰ
     const pickerModalOverlay = document.getElementById('generic-picker-modal');
     const pickerModalContent = document.getElementById('picker-modal-content');
 
@@ -958,11 +958,11 @@
     function openFontSizeModal(callback) {
         pickerModalContent.innerHTML = '';
         const sizes = [
-            { label: '小', value: '1.1rem' },
-            { label: '標準', value: '1.3rem' },
-            { label: '中', value: '1.6rem' },
-            { label: '大', value: '2.0rem' },
-            { label: '超', value: '2.4rem' }
+            { label: '蟆�', value: '1.1rem' },
+            { label: '讓呎ｺ�', value: '1.3rem' },
+            { label: '荳ｭ', value: '1.6rem' },
+            { label: '螟ｧ', value: '2.0rem' },
+            { label: '雜�', value: '2.4rem' }
         ];
         sizes.forEach(s => {
             const item = document.createElement('div');
@@ -980,9 +980,9 @@
     function openAlignHorizModal(callback) {
         pickerModalContent.innerHTML = '';
         const aligns = [
-            { label: '左', value: 'left' },
-            { label: '中', value: 'center' },
-            { label: '右', value: 'right' }
+            { label: '蟾ｦ', value: 'left' },
+            { label: '荳ｭ', value: 'center' },
+            { label: '蜿ｳ', value: 'right' }
         ];
         aligns.forEach(a => {
             const item = document.createElement('div');
@@ -1000,9 +1000,9 @@
     function openAlignVertModal(callback) {
         pickerModalContent.innerHTML = '';
         const aligns = [
-            { label: '上', value: 'flex-start' },
-            { label: '中', value: 'center' },
-            { label: '下', value: 'flex-end' }
+            { label: '荳�', value: 'flex-start' },
+            { label: '荳ｭ', value: 'center' },
+            { label: '荳�', value: 'flex-end' }
         ];
         aligns.forEach(a => {
             const item = document.createElement('div');
@@ -1017,20 +1017,20 @@
         pickerModalOverlay.style.display = 'flex';
     }
 
-    // 罫線「種類」モーダル
+    // 鄂ｫ邱壹檎ｨｮ鬘槭阪Δ繝ｼ繝繝ｫ
     function openBorderTypeModal(colorId) {
         pickerModalContent.innerHTML = '';
         const grid = document.createElement('div');
         grid.className = 'border-grid-container';
         
         const types = [
-            { label: '格子', val: 'all' },
-            { label: '外枠', val: 'outer' },
-            { label: '上', val: 'top' },
-            { label: '下', val: 'bottom' },
-            { label: '左', val: 'left' },
-            { label: '右', val: 'right' },
-            { label: '無', val: 'none' }
+            { label: '譬ｼ蟄�', val: 'all' },
+            { label: '螟匁棧', val: 'outer' },
+            { label: '荳�', val: 'top' },
+            { label: '荳�', val: 'bottom' },
+            { label: '蟾ｦ', val: 'left' },
+            { label: '蜿ｳ', val: 'right' },
+            { label: '辟｡', val: 'none' }
         ];
 
         types.forEach(t => {
@@ -1050,16 +1050,16 @@
         pickerModalOverlay.style.display = 'flex';
     }
 
-    // 罫線「太さ」モーダル
+    // 鄂ｫ邱壹悟､ｪ縺輔阪Δ繝ｼ繝繝ｫ
     function openBorderWidthModal() {
         pickerModalContent.innerHTML = '';
         const wGrid = document.createElement('div');
         wGrid.className = 'border-grid-container';
         
         const widths = [
-            { label: '細', val: '1px' },
-            { label: '中', val: '2px' },
-            { label: '太', val: '3px' }
+            { label: '邏ｰ', val: '1px' },
+            { label: '荳ｭ', val: '2px' },
+            { label: '螟ｪ', val: '3px' }
         ];
 
         widths.forEach(w => {
@@ -1079,7 +1079,7 @@
         pickerModalOverlay.style.display = 'flex';
     }
 
-    // 罫線適用処理
+    // 鄂ｫ邱夐←逕ｨ蜃ｦ逅�
     function applySelectedBorder(colorId) {
         if (selectedCells.length === 0) return;
         saveState();
@@ -1301,20 +1301,20 @@
         input.addEventListener('focus', () => {
             document.querySelectorAll('td.formula-source').forEach(el => el.classList.remove('formula-source'));
             const valStr = input.value;
-            if (valStr.startsWith('=') || valStr.startsWith('＝') || input.dataset.formula) {
+            if (valStr.startsWith('=') || valStr.startsWith('��') || input.dataset.formula) {
                 td.classList.add('formula-source');
             }
             if (input.dataset.formula) {
                 input.value = input.dataset.formula;
             } else if (input.dataset.format) {
                 let val = input.value;
-                if (typeof val === 'string') input.value = val.replace(/[¥,]/g, '');
+                if (typeof val === 'string') input.value = val.replace(/[ﾂ･,]/g, '');
             }
             if (selectedCells.length === 0 || !selectedCells.includes(td)) selectRange(r, c, r, c);
             updateToolbarState(input);
             updateSelectionInfo(r, c);
 
-            // iPhoneでのカーソルとアクティブセルのズレを同期するため、フォーカス時にカーソル位置を末尾に合わせる
+            // iPhone縺ｧ縺ｮ繧ｫ繝ｼ繧ｽ繝ｫ縺ｨ繧｢繧ｯ繝�ぅ繝悶そ繝ｫ縺ｮ繧ｺ繝ｬ繧貞酔譛溘☆繧九◆繧√√ヵ繧ｩ繝ｼ繧ｫ繧ｹ譎ゅ↓繧ｫ繝ｼ繧ｽ繝ｫ菴咲ｽｮ繧呈忰蟆ｾ縺ｫ蜷医ｏ縺帙ｋ
             setTimeout(() => {
                 const len = input.value.length;
                 input.setSelectionRange(len, len);
@@ -1323,7 +1323,7 @@
 
         input.addEventListener('input', () => {
             const valStr = input.value;
-            if (valStr.startsWith('=') || valStr.startsWith('＝')) {
+            if (valStr.startsWith('=') || valStr.startsWith('��')) {
                 activeFormulaInput = input;
                 td.classList.add('formula-source');
             } else {
@@ -1432,7 +1432,7 @@
                         startCellCoord = { r, c };
                         selectRange(r, c, r, c);
                         updateSelectionInfo(r, c);
-                        // 1クリック（タップ）ですぐにカーソルを移動してフォーカスを合わせる
+                        // 1繧ｯ繝ｪ繝�け�医ち繝���峨〒縺吶＄縺ｫ繧ｫ繝ｼ繧ｽ繝ｫ繧堤ｧｻ蜍輔＠縺ｦ繝輔か繝ｼ繧ｫ繧ｹ繧貞粋繧上○繧�
                         input.focus();
                     }
                 }
@@ -1535,7 +1535,7 @@
 
     function buildSheetStructure() {
         const colHeaderRow = document.getElementById('col-header-row');
-        colHeaderRow.innerHTML = '<th class="row-header" id="select-all-corner" title="表全体を選択" style="cursor: pointer;"></th>';
+        colHeaderRow.innerHTML = '<th class="row-header" id="select-all-corner" title="陦ｨ蜈ｨ菴薙ｒ驕ｸ謚�" style="cursor: pointer;"></th>';
         
         document.getElementById('select-all-corner').addEventListener('click', () => {
             selectRange(0, 0, ROWS - 1, COLS - 1);
@@ -1751,14 +1751,14 @@
         const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
         if (!input) return 0;
         let val = input.dataset.formula ? evaluateFormula(input.dataset.formula) : input.value;
-        if (typeof val === 'string') val = val.replace(/[¥,]/g, '');
+        if (typeof val === 'string') val = val.replace(/[ﾂ･,]/g, '');
         const num = Number(val);
         return isNaN(num) ? (val || 0) : num;
     }
 
     function processCellFormula(input) {
         const raw = input.value.trim();
-        if (raw.startsWith('=') || raw.startsWith('＝')) {
+        if (raw.startsWith('=') || raw.startsWith('��')) {
             const normalized = '=' + raw.substring(1);
             input.dataset.formula = normalized;
             input.value = evaluateFormula(normalized);
@@ -1893,7 +1893,7 @@
 
         copiedCellData = matrix[0][0]; 
         pasteSourceMatrix = { type: 'matrix', data: matrix };
-        alert("セルをコピーしました");
+        alert("繧ｻ繝ｫ繧偵さ繝斐�縺励∪縺励◆");
     }
 
     function openPasteModal() {
@@ -2009,11 +2009,11 @@
     function applyFormat(input, formatType) {
         input.dataset.format = formatType;
         let val = input.dataset.formula ? evaluateFormula(input.dataset.formula) : input.value;
-        if (typeof val === 'string') val = val.replace(/[¥,]/g, '');
+        if (typeof val === 'string') val = val.replace(/[ﾂ･,]/g, '');
         const num = Number(val);
         if (!isNaN(num) && val !== '') {
             if (formatType === 'comma') input.value = num.toLocaleString();
-            else if (formatType === 'currency') input.value = '¥' + num.toLocaleString();
+            else if (formatType === 'currency') input.value = 'ﾂ･' + num.toLocaleString();
             else { input.value = num; delete input.dataset.format; }
         } else if (formatType === 'none') {
             delete input.dataset.format;
@@ -2079,7 +2079,7 @@
         }
     });
 
-    // 罫線「種類」ボタン
+    // 鄂ｫ邱壹檎ｨｮ鬘槭阪�繧ｿ繝ｳ
     ['btn-modal-border-type', 'btn-modal-border-type-m'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -2090,7 +2090,7 @@
         }
     });
 
-    // 罫線「太さ」ボタン
+    // 鄂ｫ邱壹悟､ｪ縺輔阪�繧ｿ繝ｳ
     ['btn-modal-border-width', 'btn-modal-border-width-m'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -2128,7 +2128,7 @@
     if(colorTextM) { colorTextM.addEventListener('click', () => applyTextColor(colorTextM.value)); colorTextM.addEventListener('input', (e) => applyTextColor(e.target.value)); }
     if(colorBgM) { colorBgM.addEventListener('click', () => applyBgColor(colorBgM.value)); colorBgM.addEventListener('input', (e) => applyBgColor(e.target.value)); }
 
-    // 線BOXクリック・操作時
+    // 邱咤OX繧ｯ繝ｪ繝�け繝ｻ謫堺ｽ懈凾
     if(colorBorder) {
         colorBorder.addEventListener('click', (e) => { e.stopPropagation(); applySelectedBorder('color-border'); });
         colorBorder.addEventListener('input', (e) => applySelectedBorder('color-border'));
@@ -2189,7 +2189,7 @@
     }
 
     document.getElementById('btn-create-new').addEventListener('click', () => {
-        currentId = null; activeFormulaInput = null; document.getElementById('memo-title').value = "無題の表";
+        currentId = null; activeFormulaInput = null; document.getElementById('memo-title').value = "辟｡鬘後�陦ｨ";
         initSheet(); showPage('page-editor');
     });
 
@@ -2215,7 +2215,7 @@
     });
 
     document.getElementById('btn-save').addEventListener('click', () => {
-        let titleVal = document.getElementById('memo-title').value.trim() || "無題の表";
+        let titleVal = document.getElementById('memo-title').value.trim() || "辟｡鬘後�陦ｨ";
         let savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
         if (!currentId) currentId = 'memo_' + Date.now();
 
@@ -2224,7 +2224,7 @@
             isDuplicate = false;
             for (let id in savedMemos) {
                 if (id !== currentId && savedMemos[id].title === finalTitle) {
-                    count++; finalTitle = `${titleVal.replace(/（\d+）$/, '')}（${count}）`; isDuplicate = true; break;
+                    count++; finalTitle = `${titleVal.replace(/��\d+��$/, '')}��${count}�荏; isDuplicate = true; break;
                 }
             }
         }
@@ -2241,7 +2241,7 @@
             updatedAt: Date.now() 
         };
         localStorage.setItem('hyo_memos', JSON.stringify(savedMemos));
-        renderMemoList(); alert(`👤「${titleVal}」をセーブしました！`.replace('👤', ''));
+        renderMemoList(); alert(`側縲�${titleVal}縲阪ｒ繧ｻ繝ｼ繝悶＠縺ｾ縺励◆�～.replace('側', ''));
     });
 
     function renderMemoList() {
@@ -2249,7 +2249,7 @@
         const savedMemos = JSON.parse(localStorage.getItem('hyo_memos') || '{}');
         const keys = Object.keys(savedMemos);
         listContainer.innerHTML = '';
-        if (keys.length === 0) { listContainer.innerHTML = '<p style="color: #888; text-align: center; margin: 10px 0;">保存された表メモはありません。</p>'; return; }
+        if (keys.length === 0) { listContainer.innerHTML = '<p style="color: #888; text-align: center; margin: 10px 0;">菫晏ｭ倥＆繧後◆陦ｨ繝｡繝｢縺ｯ縺ゅｊ縺ｾ縺帙ｓ縲�</p>'; return; }
         
         keys.sort((a, b) => (savedMemos[b].updatedAt || 0) - (savedMemos[a].updatedAt || 0));
         keys.forEach(id => {
@@ -2267,7 +2267,7 @@
             const dateSpan = document.createElement('span');
             dateSpan.className = 'memo-date-text';
             const dateObj = new Date(memo.updatedAt || Date.now());
-            dateSpan.textContent = `更新: ${dateObj.getFullYear()}/${dateObj.getMonth()+1}/${dateObj.getDate()} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
+            dateSpan.textContent = `譖ｴ譁ｰ: ${dateObj.getFullYear()}/${dateObj.getMonth()+1}/${dateObj.getDate()} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
             
             infoDiv.appendChild(titleSpan);
             infoDiv.appendChild(dateSpan);
@@ -2282,7 +2282,7 @@
             actionsDiv.className = 'memo-actions';
 
             const exportSelect = document.createElement('select');
-            exportSelect.innerHTML = '<option value="" disabled selected>出力形式</option><option value="xlsx">Excel (.xlsx)</option><option value="csv">CSV (.csv)</option><option value="json">JSON (.json)</option>';
+            exportSelect.innerHTML = '<option value="" disabled selected>蜃ｺ蜉帛ｽ｢蠑�</option><option value="xlsx">Excel (.xlsx)</option><option value="csv">CSV (.csv)</option><option value="json">JSON (.json)</option>';
             exportSelect.addEventListener('change', (e) => {
                 const mode = e.target.value;
                 exportMemo(id, mode);
@@ -2291,10 +2291,10 @@
 
             const delBtn = document.createElement('button');
             delBtn.className = 'btn-del';
-            delBtn.textContent = '削除';
+            delBtn.textContent = '蜑企勁';
             delBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (confirm(`「${memo.title}」を削除しますか？`)) {
+                if (confirm(`縲�${memo.title}縲阪ｒ蜑企勁縺励∪縺吶°�歔)) {
                     delete savedMemos[id];
                     localStorage.setItem('hyo_memos', JSON.stringify(savedMemos));
                     renderMemoList();
@@ -2389,7 +2389,7 @@
                 });
                 showPage('page-editor');
             } catch (err) {
-                alert("ファイルの読み込みに失敗しました。");
+                alert("繝輔ぃ繧､繝ｫ縺ｮ隱ｭ縺ｿ霎ｼ縺ｿ縺ｫ螟ｱ謨励＠縺ｾ縺励◆縲�");
             }
             document.getElementById('file-input').value = '';
         };
@@ -2408,20 +2408,20 @@
             try {
                 const memo = JSON.parse(e.target.result);
                 currentId = null;
-                document.getElementById('memo-title').value = memo.title || "インポートの表";
+                document.getElementById('memo-title').value = memo.title || "繧､繝ｳ繝昴�繝医�陦ｨ";
                 restoreSheetState({ cols: memo.cols || 15, rows: memo.rows || 40, data: memo.data, colWidths: memo.colWidths, rowHeights: memo.rowHeights });
                 showPage('page-editor');
             } catch (err) {
-                alert("JSONファイルの形式が正しくありません。");
+                alert("JSON繝輔ぃ繧､繝ｫ縺ｮ蠖｢蠑上′豁｣縺励￥縺ゅｊ縺ｾ縺帙ｓ縲�");
             }
             document.getElementById('json-file-input').value = file.value = '';
         };
         reader.readAsText(file);
     });
 
-    // 初期化
+    // 蛻晄悄蛹�
     renderMobileQuickbar();
     renderMemoList();
 </script>
 </body>
-</html>
+    </html>
