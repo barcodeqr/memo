@@ -295,7 +295,9 @@
             width: 100%; border: none; outline: none; background: transparent;
             padding: 0 4px; box-sizing: border-box; font-family: inherit; font-size: 1.3rem;
             position: relative; z-index: 2;
+            caret-color: transparent;
         }
+        .cell-input.caret-visible { caret-color: auto; }
         td.selected { outline: 2px solid var(--excel-select-border); outline-offset: -2px; z-index: 5; position: relative; }
         td.selected::after { content: ''; position: absolute; inset: 0; background-color: rgba(43, 87, 154, 0.18); pointer-events: none; z-index: 1; }
         td.formula-source { outline: 2px solid #107c41; outline-offset: -2px; z-index: 6; }
@@ -959,6 +961,7 @@
     let COLS = 15; 
     let ROWS = 40;  
     let selectedCells = []; 
+    let caretVisibleInput = null; // 「再クリックで編集カーソル表示」のために、今カーソルを表示しているセルを覚えておく
     let currentId = null;
     let copiedCellData = null;
     let pasteSourceMatrix = null;
@@ -1667,10 +1670,13 @@
             updateSelectionInfo(r, c);
 
             // iPhoneでのカーソルとアクティブセルのズレを同期するため、フォーカス時にカーソル位置を末尾に合わせる
-            setTimeout(() => {
-                const len = input.value.length;
-                input.setSelectionRange(len, len);
-            }, 0);
+            // （編集カーソルを表示中＝クリックした位置に合わせたい場合は、末尾寄せをしない）
+            if (!input.classList.contains('caret-visible')) {
+                setTimeout(() => {
+                    const len = input.value.length;
+                    input.setSelectionRange(len, len);
+                }, 0);
+            }
         });
 
         input.addEventListener('input', () => {
@@ -1685,6 +1691,7 @@
         });
 
         input.addEventListener('blur', () => {
+            setCaretVisible(input, false);
             setTimeout(() => {
                 if (!isComposing) {
                     if (document.activeElement === activeFormulaInput) return;
@@ -1756,11 +1763,13 @@
                 return;
             }
 
+            const wasSoleActiveCell = document.activeElement === input && selectedCells.length === 1 && selectedCells[0] === td;
             isMouseDown = true;
             startCellCoord = { r, c };
             formulaRangeStart = null;
             selectRange(r, c, r, c);
             updateSelectionInfo(r, c);
+            if (wasSoleActiveCell) setCaretVisible(input, true); // 選択済みのセルをもう一度クリック→編集カーソルを表示
         };
 
         const handleTouchMove = (e) => {
@@ -1780,12 +1789,14 @@
                         insertCellRefToFormula(r, c, false);
                         formulaRangeStart = null;
                     } else if (!activeFormulaInput) {
+                        const wasSoleActiveCell = document.activeElement === input && selectedCells.length === 1 && selectedCells[0] === td;
                         isMouseDown = false;
                         startCellCoord = { r, c };
                         selectRange(r, c, r, c);
                         updateSelectionInfo(r, c);
                         // 1クリック（タップ）ですぐにカーソルを移動してフォーカスを合わせる
                         input.focus();
+                        if (wasSoleActiveCell) setCaretVisible(input, true); // 選択済みのセルをもう一度タップ→編集カーソルを表示
                     }
                 }
                 touchStartPos = null;
@@ -2171,7 +2182,14 @@
     document.addEventListener('mouseup', () => { isMouseDown = false; });
     document.addEventListener('touchend', () => { isMouseDown = false; });
 
+    function setCaretVisible(input, visible) {
+        if (caretVisibleInput && caretVisibleInput !== input) caretVisibleInput.classList.remove('caret-visible');
+        if (visible && input) { input.classList.add('caret-visible'); caretVisibleInput = input; }
+        else { if (input) input.classList.remove('caret-visible'); caretVisibleInput = null; }
+    }
+
     function selectRange(r1, c1, r2 = r1, c2 = c1) {
+        setCaretVisible(null, false); // 新しい選択のたびにカーソル表示はリセット
         selectedCells.forEach(td => td.classList.remove('selected'));
         selectedCells = [];
         const minR = Math.min(r1, r2); const maxR = Math.max(r1, r2);
