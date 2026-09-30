@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hyo-memo-v2'; // ← バージョンを v3 などに上げます（更新時はここを変更）
+const CACHE_NAME = 'hyo-memo-v1'; // ← バージョンを v3 などに上げます（更新時はここを変更）
 const urlsToCache = [
   './',
   './index.html',
